@@ -1,7 +1,25 @@
-# voxel islands
+# roomy worlds
+
+Roomy Worlds is a tool for creating and sharing 3D cube worlds. 
+
+Made with [roomy-sdk](https://github.com/muni-town/roomy-sdk) and [leaf](https://github.com/muni-town/leaf).
+
+Work in progress: You can create new worlds locally, but they are not synced yet (no multiplayer capabilities) 
+and might not work as expected (and they might disappear/change unexpectedly with new updates).
+
+After saving a new model you might have to refresh the world page to see it in the model picker.
 
 
 ## Development
+
+Clone repo and run:
+
+```bash
+npm install
+npm run dev
+```
+
+## For shared worlds
 
 Clone the [leaf repo](https://github.com/muni-town/leaf) and run
 
@@ -10,13 +28,17 @@ deno install
 deno run syncserver
 ```
 
-Then run this app
+then change this line in `src/lib/shared/roomy.svelte.ts` to `type: 'dev'`
 
-```bash
-npm install
-npm run dev
+```ts
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'local') {
+
+// change to
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
 ```
 
+Now when opening multiple browser windows you should see changes from all windows (when in the same world) 
+as well as see all models made in any window.
 
 ## todo general
 
@@ -42,4 +64,7 @@ npm run dev
 - outline around currently selected cube
 - save models with player
 
-http://localhost:5174/world/leaf:jrrazs66s9vaw1eg8fv1gbpg6wdm1jp896ksbpwz7ps3m6fpacz0
+
+## Credits
+
+- 3d character models from [kenney](https://kenney.nl/assets/mini-characters-1)

@@ -11,7 +11,7 @@
 
 		<Badge>work in progress!</Badge>
 		<p>
-			Roomy Worlds is a tool for creating and sharing 3D voxel worlds with your friends.
+			Roomy Worlds is a tool for creating and sharing 3D cube worlds.
 		</p>
 
 		<p class="italic">
