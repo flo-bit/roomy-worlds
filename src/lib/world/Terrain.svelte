@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { Vector3 as RapierVector3 } from '@dimforge/rapier3d-compat';
-	import { T, useTask } from '@threlte/core';
+	import { T } from '@threlte/core';
 	import { Collider } from '@threlte/rapier';
 	import * as THREE from 'three';
-
 	import { UberNoise } from 'uber-noise';
-	import { editingState, type AddInstanceFunction } from './state.svelte';
-	import { Vector3 } from 'three';
-	import { xor } from 'three/tsl';
+	import type { IntersectionEvent } from '@threlte/extras';
 
 	const size = 100;
 
@@ -21,11 +18,10 @@
 		Math.ceil(size * size * (1 / voxelSize) * (1 / voxelSize) * 2 * (Math.PI / 4))
 	);
 
+	instancedMesh.receiveShadow = true;
+
 	const dummy = new THREE.Object3D();
-
 	const color = new THREE.Color(0x00ff00);
-
-	const voxels: [number, number, number][] = $state([]);
 
 	const heightfield: number[] = [];
 
@@ -35,9 +31,8 @@
 		scale: 0.03,
 		min: 0,
 		max: 3,
-		warp: 1,
+		warp: 1
 	});
-
 	const lowerNoise = new UberNoise({
 		seed: 10,
 		octaves: 6,
@@ -74,8 +69,6 @@
 
 			heightfield.push(height + 1.5);
 
-			// lower terrain
-
 			const percentage = Math.pow(Math.min(distance / (size / 2), 1), 2);
 			const baseHeight = lowerNoise.get(x, z) + size * -0.5;
 
@@ -98,47 +91,34 @@
 
 	let heightfieldData = new Float32Array(heightfield);
 
-	let { addInstance }: { addInstance: AddInstanceFunction } = $props();
-
-	// let x = 0;
-	// useTask(() => {
-	// 	instancedMesh.count = x;
-	// 	x++;
-	// });
+	let {
+		clickedTerrain,
+		collider = true
+	}: { clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void; collider?: boolean } = $props();
 </script>
 
 <T
 	is={instancedMesh}
-	onclick={(e) => {
-		e.stopPropagation();
+	onclick={clickedTerrain
+		? (e) => {
+				e.stopPropagation();
 
-		if (e.instanceId === undefined || e.instanceId % 2 === 1) return;
-		console.log(e);
-
-		// voxels.push([Math.round(e.point.x), e.point.y + 0.5, Math.round(e.point.z)]);
-
-		if (editingState.selectedId) {
-			addInstance(editingState.selectedId, new Vector3(e.point.x, e.point.y, e.point.z));
-		}
-	}}
+				if (e.instanceId === undefined || e.instanceId % 2 === 1) return;
+				clickedTerrain(e);
+			}
+		: undefined}
 />
 
-{#each voxels as [x, y, z]}
-	<T.Mesh position={[x, y, z]}>
-		<T.BoxGeometry />
-		<T.MeshStandardMaterial color="red" />
-		<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
-	</T.Mesh>
-{/each}
-
-<T.Group position={[-voxelSize / 2, 0, -voxelSize / 2]}>
-	<Collider
-		shape={'heightfield'}
-		args={[
-			Math.round(size / voxelSize) - 1,
-			Math.round(size / voxelSize) - 1,
-			heightfieldData,
-			new RapierVector3(size, 1, size)
-		]}
-	/>
-</T.Group>
+{#if collider}
+	<T.Group position={[-voxelSize / 2, 0, -voxelSize / 2]}>
+		<Collider
+			shape={'heightfield'}
+			args={[
+				Math.round(size / voxelSize) - 1,
+				Math.round(size / voxelSize) - 1,
+				heightfieldData,
+				new RapierVector3(size, 1, size)
+			]}
+		/>
+	</T.Group>
+{/if}

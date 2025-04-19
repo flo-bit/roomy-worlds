@@ -11,6 +11,9 @@
 	import { UndoManager, type EntityIdStr } from '@muni-town/leaf';
 	import { Quaternion, Vector3 } from 'three';
 	import ModelSelection from './ModelSelection.svelte';
+	import { Button } from 'fuchs';
+	import { downloadObjectAsJson } from '$lib/editor/import';
+	import { type WorldData } from '$lib/viewer/types';
 
 	let voxelObject: VoxelGroup | null = $state(null);
 
@@ -81,3 +84,50 @@
 </div>
 
 <ModelSelection />
+
+<div class="absolute bottom-4 left-4 z-10 flex flex-col gap-2">
+	<Button
+		onclick={async () => {
+			// turn into json with all the instances
+			const json: WorldData = {
+				instances: [],
+				models: {}
+			}
+
+			const addedModels = new Set<EntityIdStr>();
+
+			for (const instance of instances.value) {
+				if (!addedModels.has(instance.group)) {
+					addedModels.add(instance.group);
+
+					let model = await instance.loadGroup();
+					const voxels = await model.voxels.items();
+
+					json.models[instance.group] = {
+						voxels: voxels.map((voxel) => ({
+							id: voxel.id,
+							position: voxel.position,
+							quaternion: voxel.quaternion,
+							scale: voxel.scale,
+							color: voxel.color,
+							visible: voxel.visible,
+							collider: voxel.collider
+						}))
+					};
+				}
+
+				json.instances.push({
+					id: instance.id,
+					position: instance.position,
+					quaternion: instance.quaternion,
+					scale: instance.scale,
+					model: instance.group
+				});
+			}
+
+			downloadObjectAsJson(json, 'world');
+
+			//downloadObjectAsJson(instances.value, 'world');
+		}}>Export</Button
+	>
+</div>

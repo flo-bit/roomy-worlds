@@ -18,7 +18,7 @@
 	const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
 
 	let isPublished = derivePromise(false, async () => {
-		if(!g.voxelObject || !g.roomy) return;
+		if (!g.voxelObject || !g.roomy) return;
 		const models = await g.roomy.open(Models, id as EntityIdStr);
 		return models.models.ids().some((m) => m === g.voxelObject?.id);
 	});
@@ -29,10 +29,10 @@
 		scale?: [number, number, number],
 		quaternion?: [number, number, number, number]
 	) {
-		if(!g.roomy) {
+		if (!g.roomy) {
 			await initRoomy();
 
-			if(!g.roomy) return;
+			if (!g.roomy) return;
 		}
 
 		const voxel = await g.roomy.create(Voxel);
@@ -99,9 +99,9 @@
 	let undoManager: UndoManager | null = $state(null);
 
 	$effect(() => {
-		if(g.voxelObject && !undoManager) {
+		if (g.voxelObject && !undoManager) {
 			undoManager = new UndoManager(g.voxelObject.entity.doc, {
-				maxUndoSteps: 100,
+				maxUndoSteps: 100
 			});
 
 			window.addEventListener('keydown', async (e) => {
@@ -152,19 +152,15 @@
 	});
 </script>
 
-<div 
-class="absolute top-0 left-0 bg-base-100 z-10 p-2 rounded-br-2xl">
-<Select
-	bind:selected={selectedTool}
-	items={['place', 'delete', 'move', 'rotate', 'scale']}
-/>
+<div class="bg-base-100 absolute top-0 left-0 z-10 rounded-br-2xl p-2">
+	<Select bind:selected={selectedTool} items={['place', 'delete', 'move', 'rotate', 'scale']} />
 </div>
 
 <div class="absolute top-3 right-3 z-10">
 	<PopoverColorPicker bind:rgb={editorState.color} />
 </div>
 
-<div class="absolute bottom-4 left-4 z-10 flex flex-col gap-2 hidden">
+<div class="absolute bottom-4 left-4 z-10 flex hidden flex-col gap-2">
 	<Button
 		onclick={async () => {
 			await applyTransform();

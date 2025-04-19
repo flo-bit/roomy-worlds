@@ -1,14 +1,20 @@
 # roomy worlds
 
-Roomy Worlds is a tool for creating and sharing 3D cube worlds. 
+Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.
 
 Made with [roomy-sdk](https://github.com/muni-town/roomy-sdk) and [leaf](https://github.com/muni-town/leaf).
 
 Work in progress: You can create new worlds locally, but they are not synced yet (no multiplayer capabilities) 
-and might not work as expected (and they might disappear/change unexpectedly with new updates).
+and might disappear/change unexpectedly with new updates.
 
-After saving a new model you might have to refresh the world page to see it in the model picker.
 
+### Notes
+
+- After saving a new model you might have to refresh the world page to see it in the model picker.
+
+- Sometimes after fresh load of an existing world, items are not visible until you place one more item.
+
+- Safari (mac and iOS) is currently not supported.
 
 ## Development
 
@@ -19,7 +25,7 @@ npm install
 npm run dev
 ```
 
-## For shared worlds
+### For shared worlds
 
 Clone the [leaf repo](https://github.com/muni-town/leaf) and run
 
@@ -40,11 +46,13 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
 Now when opening multiple browser windows you should see changes from all windows (when in the same world) 
 as well as see all models made in any window.
 
-## todo general
+## todo
+
+### general
 
 - add at proto login
 
-## todo worlds
+### worlds
 
 - import/export of world
 - show player positions
@@ -54,7 +62,7 @@ as well as see all models made in any window.
 - character selection
 - touch controls
 
-## todo models
+### models 
 
 - categories of models
 - allow setting visibility/collision of cubes
@@ -63,7 +71,6 @@ as well as see all models made in any window.
 - add undo/redo
 - outline around currently selected cube
 - save models with player
-
 
 ## Credits
 

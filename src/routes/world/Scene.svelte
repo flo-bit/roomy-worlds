@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { T, useTask } from '@threlte/core';
+	import { T, useTask, useThrelte } from '@threlte/core';
 	import { interactivity, OrbitControls, Sky } from '@threlte/extras';
-	import Terrain from './Terrain.svelte';
+	import Terrain from '../../lib/world/Terrain.svelte';
 	import Emitter from './Emitter.svelte';
 	import Player from './player/Player.svelte';
 	import { onMount } from 'svelte';
 	import { PlayerLocation, type Transform, type TransformedGroup } from '$lib/shared/components';
 	import Instance from './Instance.svelte';
-	import type { AddInstanceFunction } from './state.svelte';
-	import { Debug } from '@threlte/rapier';
+	import { editingState, type AddInstanceFunction } from './state.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import Location from './Location.svelte';
-
+	import { ACESFilmicToneMapping } from 'three';
 
 	interactivity();
 
 	let camera = $state('first');
+
+	const { renderer } = useThrelte();
 
 	onMount(() => {
 		window.addEventListener('keydown', (e) => {
@@ -24,14 +24,19 @@
 				camera = camera === 'first' ? 'third' : 'first';
 			}
 		});
+
+		renderer.toneMapping = ACESFilmicToneMapping;
 	});
 
 	let {
 		instances,
 		addInstance,
 		locations
-	}: { instances: TransformedGroup[]; addInstance: AddInstanceFunction; locations: PlayerLocation[] } = $props();
-
+	}: {
+		instances: TransformedGroup[];
+		addInstance: AddInstanceFunction;
+		locations: PlayerLocation[];
+	} = $props();
 
 	let playerLocation: PlayerLocation | undefined = $state();
 
@@ -52,7 +57,7 @@
 	}
 
 	$effect(() => {
-		if(!playerLocation) {
+		if (!playerLocation) {
 			createLocation();
 		}
 	});
@@ -67,9 +72,7 @@
 		// g.world?.locations.subscribe(() => {
 		// 	console.log('commit');
 		// });
-
 		//console.log(locations.length);
-
 		// locations.forEach((location) => {
 		// 	location.subscribe(() => {
 		// 		console.log('location changed', location.x, location.y, location.z);
@@ -95,7 +98,13 @@
 <T.DirectionalLight position={[0, 10, -10]} />
 <T.HemisphereLight position={[0, 10, 10]} args={[0xffff00, 0x0000ff, 1]} />
 
-<Terrain {addInstance} />
+<Terrain
+	clickedTerrain={(e) => {
+		if (editingState.selectedId) {
+			addInstance(editingState.selectedId, e.point);
+		}
+	}}
+/>
 
 <!-- <Debug /> -->
 

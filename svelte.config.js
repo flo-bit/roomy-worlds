@@ -13,7 +13,7 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter(),
 		paths: {
-			base: '/roomy-worlds'
+			base: process.env.NODE_ENV === 'development' ? '' : '/roomy-worlds'
 		}
 	}
 };

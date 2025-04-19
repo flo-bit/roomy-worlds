@@ -37,6 +37,8 @@
 		"vite": "^6.2.5"
 	},
 	"dependencies": {
+		"@atcute/client": "^3.0.1",
+		"@atcute/oauth-browser-client": "^1.0.17",
 		"@dimforge/rapier3d-compat": "^0.15.1",
 		"@muni-town/leaf": "npm:@jsr/muni-town__leaf@^0.2.0-preview.15",
 		"@threlte/core": "^8.0.2",
