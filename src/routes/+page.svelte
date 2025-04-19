@@ -64,23 +64,9 @@
 				<p>Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.</p>
 
 				<p class="italic">
-					Work in progress/Preview only: You can create new worlds/models locally, but they are not
-					synced yet (no multiplayer capabilities) and might disappear/change unexpectedly with new
-					updates.
+					Work in progress/Preview only: You can create new worlds/models, but might disappear/change unexpectedly with new
+					updates. Lots of bugs too.
 				</p>
-
-				<p>Notes:</p>
-				<ul>
-					<li>
-						After saving a new model you might have to refresh the world page to see it in the model
-						picker.
-					</li>
-					<li>
-						Sometimes after fresh load of an existing world, items are not visible until you place
-						one more item.
-					</li>
-				</ul>
-
 				<p class="flex flex-wrap gap-8">
 					<a href="https://github.com/flo-bit/roomy-worlds" target="_blank"> Source </a>
 					<a href="https://roomy.chat" target="_blank"> Roomy Chat </a>
