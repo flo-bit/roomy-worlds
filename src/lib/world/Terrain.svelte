@@ -129,7 +129,6 @@
 		? (e) => {
 				e.stopPropagation();
 
-				if (e.instanceId === undefined || e.instanceId % 2 === 1) return;
 				clickedTerrain(e);
 			}
 		: undefined}

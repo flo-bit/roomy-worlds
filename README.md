@@ -14,8 +14,6 @@ and might disappear/change unexpectedly with new updates.
 
 - Sometimes after fresh load of an existing world, items are not visible until you place one more item.
 
-- Safari (mac and iOS) is currently not supported.
-
 ## Development
 
 Clone repo and run:

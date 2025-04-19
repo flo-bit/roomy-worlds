@@ -3,7 +3,7 @@
 	import { createWorld } from '$lib';
 	import BlueskyLoginModal, { blueskyLoginModalState } from '$lib/BlueskyLoginModal.svelte';
 	import { client, login } from '$lib/oauth';
-	import { g } from '$lib/shared/roomy.svelte';
+	// import { g } from '$lib/shared/roomy.svelte';
 	import { Badge, Button, Prose } from 'fuchs';
 
 	import { Canvas } from '@threlte/core';
@@ -12,26 +12,26 @@
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
 
-	$effect(() => {
-		if (client.isLoggedIn || !client.rpc) return;
+	// $effect(() => {
+	// 	if (client.isLoggedIn || !client.rpc) return;
 
-		client.rpc
-			.request({
-				type: 'get',
-				nsid: 'chat.roomy.v0.sync.token',
-				headers: {
-					'atproto-proxy': 'did:web:syncserver.roomy.chat#roomy_syncserver'
-				}
-			})
-			.then((resp) => {
-				console.log(resp);
-				g.token = resp.data.token;
-				g.did = client.profile?.did;
+	// 	client.rpc
+	// 		.request({
+	// 			type: 'get',
+	// 			nsid: 'chat.roomy.v0.sync.token',
+	// 			headers: {
+	// 				'atproto-proxy': 'did:web:syncserver.roomy.chat#roomy_syncserver'
+	// 			}
+	// 		})
+	// 		.then((resp) => {
+	// 			console.log(resp);
+	// 			g.token = resp.data.token;
+	// 			g.did = client.profile?.did;
 
-				localStorage.setItem('token', resp.data.token);
-				localStorage.setItem('did', client.profile?.did ?? '');
-			});
-	});
+	// 			localStorage.setItem('token', resp.data.token);
+	// 			localStorage.setItem('did', client.profile?.did ?? '');
+	// 		});
+	// });
 
 	let showText = $state(true);
 </script>
@@ -78,7 +78,6 @@
 						Sometimes after fresh load of an existing world, items are not visible until you place
 						one more item.
 					</li>
-					<li>Safari (mac and iOS) is currently not supported.</li>
 				</ul>
 
 				<p class="flex flex-wrap gap-8">
