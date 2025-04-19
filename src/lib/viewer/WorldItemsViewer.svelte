@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { T } from '@threlte/core';
+	import { T, useTask } from '@threlte/core';
 	import type { WorldData } from './types';
 	import * as THREE from 'three';
+	import { shuffle } from '$lib';
 
 	const { world }: { world: WorldData } = $props();
 
@@ -19,6 +20,9 @@
 		totalVoxels
 	);
 
+	// make array of all indices (0, totalVoxels)
+	const indices = shuffle(Array.from({ length: totalVoxels }, (_, i) => i));
+
 	instancedMesh.castShadow = true;
 	instancedMesh.receiveShadow = true;
 
@@ -28,7 +32,6 @@
 	const color = new THREE.Color(0x00ff00);
 
 	const worldMatrix = new THREE.Matrix4();
-	let i = 0;
 	for (let instance of world.instances) {
 		const model = world.models[instance.model];
 
@@ -50,9 +53,9 @@
 			// get world matrix
 			worldMatrix.multiplyMatrices(parentDummy.matrix, dummy.matrix);
 
+			let i = indices.shift() ?? 0;
 			instancedMesh.setMatrixAt(i, worldMatrix);
 			instancedMesh.setColorAt(i, color);
-			i++;
 		}
 	}
 
@@ -60,6 +63,21 @@
 	if (instancedMesh.instanceColor) {
 		instancedMesh.instanceColor.needsUpdate = true;
 	}
+
+
+	let totalAnimationTime = 5;
+	let addPerSecond = totalVoxels / totalAnimationTime;
+
+	let i = 0;
+	const {stop} = useTask((dt) => {
+		instancedMesh.count = Math.min(Math.floor(i), totalVoxels);
+
+		i += addPerSecond * dt;
+
+		if(i > totalVoxels) {
+			stop();
+		}
+	});
 </script>
 
 <T

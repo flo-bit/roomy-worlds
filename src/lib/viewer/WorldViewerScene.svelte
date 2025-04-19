@@ -19,7 +19,7 @@
 </T.PerspectiveCamera>
 
 <Float floatingRange={[-10, -5]} floatIntensity={5}>
-	<Terrain collider={false} />
+	<Terrain collider={false} animate />
 
 	<WorldItemsViewer {world} />
 </Float>

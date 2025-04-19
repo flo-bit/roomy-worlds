@@ -1,22 +1,25 @@
 <script lang="ts">
 	import { Vector3 as RapierVector3 } from '@dimforge/rapier3d-compat';
-	import { T } from '@threlte/core';
+	import { T, useTask } from '@threlte/core';
 	import { Collider } from '@threlte/rapier';
 	import * as THREE from 'three';
 	import { UberNoise } from 'uber-noise';
 	import type { IntersectionEvent } from '@threlte/extras';
+	import { shuffle } from '$lib';
 
 	const size = 100;
 
 	const voxelSize = 1;
 
+	const totalVoxels = Math.ceil(
+		size * size * (1 / voxelSize) * (1 / voxelSize) * 2 * (Math.PI / 4)
+	);
+
 	const instancedGeometry = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
 	const instancedMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-	const instancedMesh = new THREE.InstancedMesh(
-		instancedGeometry,
-		instancedMaterial,
-		Math.ceil(size * size * (1 / voxelSize) * (1 / voxelSize) * 2 * (Math.PI / 4))
-	);
+	const instancedMesh = new THREE.InstancedMesh(instancedGeometry, instancedMaterial, totalVoxels);
+
+	const indices = shuffle(Array.from({ length: totalVoxels }, (_, i) => i));
 
 	instancedMesh.receiveShadow = true;
 
@@ -42,7 +45,6 @@
 		warp: 1
 	});
 
-	let i = 0;
 	for (let x = -size / 2; x < size / 2; x += voxelSize) {
 		for (let z = -size / 2; z < size / 2; z += voxelSize) {
 			// get distance from center
@@ -62,10 +64,12 @@
 			dummy.updateMatrix();
 			color.setRGB(0, 0.15 * noise + 0.2, 0);
 
+			let i = indices.shift() ?? 0;
+
 			instancedMesh.setMatrixAt(i, dummy.matrix);
 			instancedMesh.setColorAt(i, color);
 
-			i++;
+			
 
 			heightfield.push(height + 1.5);
 
@@ -78,10 +82,11 @@
 			color.setRGB(0.3 * percentage + 0.1, 0.03 * percentage + 0.02, 0);
 			dummy.scale.set(1.1, 3, 1.1);
 			dummy.updateMatrix();
+
+			i = indices.shift() ?? 0;
+
 			instancedMesh.setMatrixAt(i, dummy.matrix);
 			instancedMesh.setColorAt(i, color);
-
-			i++;
 		}
 	}
 	instancedMesh.instanceMatrix.needsUpdate = true;
@@ -93,8 +98,29 @@
 
 	let {
 		clickedTerrain,
-		collider = true
-	}: { clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void; collider?: boolean } = $props();
+		collider = true,
+		animate = false,
+		animationTime = 3
+	}: {
+		clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void;
+		collider?: boolean;
+		animate?: boolean;
+		animationTime?: number;
+	} = $props();
+
+	let i = 0;
+	const addPerSecond = totalVoxels / animationTime;
+
+	const { stop } = useTask((dt) => {
+		if (!animate) {
+			stop();
+			return;
+		}
+
+		instancedMesh.count = Math.min(Math.floor(i), totalVoxels);
+
+		i += addPerSecond * dt;
+	});
 </script>
 
 <T
