@@ -8,20 +8,38 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	// import { TransformControls } from '@threlte/extras';
-	import type { TransformedGroup } from '$lib/shared/components';
+	import { Voxel, type TransformedGroup } from '$lib/shared/components';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { Instance, InstancedMesh, TransformControls } from '@threlte/extras';
-	import { Collider } from '@threlte/rapier';
 	import { applyTransform, editingState } from './state.svelte';
+	import type { EntityIdStr } from '@muni-town/leaf';
+	import { Collider } from '@threlte/rapier';
+	import { models } from './models.svelte';
 
 	let { instance }: { instance: TransformedGroup } = $props();
 
-	let voxels = derivePromise([], async () =>
-		instance ? await (await instance.loadGroup()).voxels.items() : []
-	);
+	let voxels = derivePromise([], async () => models.getModel(instance.group));
 </script>
 
-{#if editingState.selectedInstance !== instance}
+{#if editingState.selectedInstance === instance}
+	<TransformControls
+		position={instance.position.toArray()}
+		quaternion={instance.quaternion.toArray()}
+		scale={instance.scale.toArray()}
+		bind:controls={editingState.transformControls}
+	>
+		{#each voxels.value as voxel}
+			<T.Mesh
+				position={voxel.position.toArray()}
+				quaternion={voxel.quaternion.toArray()}
+				scale={voxel.scale.toArray()}
+			>
+				<T is={geometry} />
+				<T is={material.clone()} color={voxel.color} />
+			</T.Mesh>
+		{/each}
+	</TransformControls>
+{:else}
 	<T.Group
 		position={instance.position.toArray()}
 		quaternion={instance.quaternion.toArray()}
@@ -42,42 +60,14 @@
 				position={voxel.position.toArray()}
 				quaternion={voxel.quaternion.toArray()}
 				scale={voxel.scale.toArray()}
+				castShadow
+				receiveShadow
 			>
 				<T is={geometry} />
 				<T is={material.clone()} color={voxel.color} />
-			</T.Mesh>
-			<!-- <T.Group
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray().map((s) => Math.abs(s)) as [number, number, number]}
-			>
+
 				<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
-			</T.Group> -->
-			<!-- <Instance
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-				color={voxel.color}
-			/> -->
-		{/each}
-		<!-- </InstancedMesh> -->
-	</T.Group>
-{:else}
-	<TransformControls
-		position={instance.position.toArray()}
-		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray()}
-		bind:controls={editingState.transformControls}
-	>
-		{#each voxels.value as voxel}
-			<T.Mesh
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-			>
-				<T is={geometry} />
-				<T is={material.clone()} color={voxel.color} />
 			</T.Mesh>
 		{/each}
-	</TransformControls>
+	</T.Group>
 {/if}

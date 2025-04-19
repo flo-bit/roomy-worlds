@@ -4,8 +4,8 @@ Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.
 
 Made with [roomy-sdk](https://github.com/muni-town/roomy-sdk) and [leaf](https://github.com/muni-town/leaf).
 
-Work in progress: You can create new worlds locally, but they are not synced yet (no multiplayer capabilities) 
-and might disappear/change unexpectedly with new updates.
+Work in progress: You can create new worlds locally, but they might disappear/change unexpectedly with new updates. 
+Also lots of bugs.
 
 [Demo](https://flo-bit.dev/roomy-worlds)
 

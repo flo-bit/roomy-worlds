@@ -69,7 +69,7 @@
 		g.world?.commit();
 	}
 
-	let showPerfMonitor = $state(false);
+	let showPerfMonitor = $state(true);
 </script>
 
 <div class="h-screen w-screen">
@@ -105,11 +105,11 @@
 
 					json.models[instance.group] = {
 						voxels: voxels.map((voxel) => ({
-							id: voxel.id,
+							id: voxel.id as string,
 							position: voxel.position,
-							quaternion: voxel.quaternion,
+							quaternion: voxel.quaternion.toArray(),
 							scale: voxel.scale,
-							color: voxel.color,
+							color: voxel.color as unknown as number,
 							visible: voxel.visible,
 							collider: voxel.collider
 						}))
@@ -119,7 +119,7 @@
 				json.instances.push({
 					id: instance.id,
 					position: instance.position,
-					quaternion: instance.quaternion,
+					quaternion: instance.quaternion.toArray(),
 					scale: instance.scale,
 					model: instance.group
 				});
