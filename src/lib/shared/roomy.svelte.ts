@@ -20,7 +20,7 @@ export const g = $state({
 	did: undefined as string | undefined
 });
 
-export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'local') {
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
 	const savedCatalogId = localStorage.getItem('catalogId');
 	const catalogId = new EntityId((savedCatalogId as EntityIdStr) ?? undefined);
 	if (!savedCatalogId) localStorage.setItem('catalogId', catalogId.toString());
@@ -35,18 +35,22 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'local') {
 
 	const storageId = 'mini-3d-voxels';
 
-	if ((!token || !did) && type === 'remote') type = 'local';
+	//if ((!token || !did) && type === 'remote') type = 'local';
 
 	console.log('initRoomy', type, token, did);
 
 	if (type === 'local') {
 		peer = new SveltePeer(new StorageManager(indexedDBStorageAdapter(storageId)));
-	} else if (type === 'remote' && token && did) {
+	} else if (type === 'remote') {
 		try {
 			peer = new SveltePeer(
 				new StorageManager(indexedDBStorageAdapter(storageId)),
 				await webSocketSyncer(
-					new WebSocket('wss://syncserver.roomy.chat/sync/as/' + did, ['authorization', token])
+					//new WebSocket('wss://syncserver.roomy.chat/sync/as/' + did, ['authorization', token])
+					new WebSocket(
+						'wss://demo.sync.muni.town/sync/as/' + (did ?? 'did:plc:xv2x4dimpe3zukzuynblaiyt'),
+						['authorization', token ?? 'demodevtoken']
+					)
 				)
 			);
 		} catch (e) {

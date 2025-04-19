@@ -13,18 +13,18 @@
 	let showWorld = $state(false);
 
 	$effect(() => {
-		if (!g.roomy) {
-			initRoomy();
-
-			if (!g.roomy) return;
-		}
-
 		//const worldId = page.params.id;
 		// TODO: we should use search params here
 		const worldId = page.url.searchParams.get('id');
 		if (!worldId) return;
 
 		showWorld = true;
+
+		if (!g.roomy) {
+			initRoomy();
+
+			if (!g.roomy) return;
+		}
 
 		g.roomy
 			.open(World, worldId as EntityIdStr)

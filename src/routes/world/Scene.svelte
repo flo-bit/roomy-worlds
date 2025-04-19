@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T, useTask, useThrelte } from '@threlte/core';
-	import { interactivity, OrbitControls, Sky } from '@threlte/extras';
+	import { Grid, interactivity, OrbitControls, Sky } from '@threlte/extras';
 	import Terrain from '../../lib/world/Terrain.svelte';
 	import Emitter from './Emitter.svelte';
 	import Player from './player/Player.svelte';
@@ -10,6 +10,7 @@
 	import { editingState, type AddInstanceFunction } from './state.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { ACESFilmicToneMapping } from 'three';
+	import Water from '$lib/world/Water.svelte';
 
 	interactivity();
 
@@ -100,11 +101,14 @@
 
 <Terrain
 	clickedTerrain={(e) => {
-		if (editingState.selectedId) {
-			addInstance(editingState.selectedId, e.point);
+		if (editingState.selectedModelId) {
+			addInstance(editingState.selectedModelId, e.point);
 		}
 	}}
 />
+
+
+<Water />
 
 <!-- <Debug /> -->
 

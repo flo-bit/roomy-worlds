@@ -11,6 +11,7 @@
 	import WorldViewerScene from '$lib/viewer/WorldViewerScene.svelte';
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
+	import { g } from '$lib/shared/roomy.svelte';
 
 	// $effect(() => {
 	// 	if (client.isLoggedIn || !client.rpc) return;

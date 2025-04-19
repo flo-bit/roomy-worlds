@@ -45,6 +45,8 @@
 		warp: 1
 	});
 
+	const lowerIndices = new Set<number>();
+
 	for (let x = -size / 2; x < size / 2; x += voxelSize) {
 		for (let z = -size / 2; z < size / 2; z += voxelSize) {
 			// get distance from center
@@ -69,8 +71,6 @@
 			instancedMesh.setMatrixAt(i, dummy.matrix);
 			instancedMesh.setColorAt(i, color);
 
-			
-
 			heightfield.push(height + 1.5);
 
 			const percentage = Math.pow(Math.min(distance / (size / 2), 1), 2);
@@ -84,6 +84,8 @@
 			dummy.updateMatrix();
 
 			i = indices.shift() ?? 0;
+
+			lowerIndices.add(i);
 
 			instancedMesh.setMatrixAt(i, dummy.matrix);
 			instancedMesh.setColorAt(i, color);
@@ -127,6 +129,8 @@
 	is={instancedMesh}
 	onclick={clickedTerrain
 		? (e) => {
+				if (e.instanceId !== undefined && lowerIndices.has(e.instanceId)) return;
+
 				e.stopPropagation();
 
 				clickedTerrain(e);

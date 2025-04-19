@@ -30,13 +30,13 @@
 	let showEditor = $state(false);
 
 	$effect(() => {
-		if(!g.roomy) return;
-		
+		if (!g.roomy) return;
+
 		// const voxelObjectId = page.params.id;
 		// or we use search params
 		const voxelObjectId = page.url.searchParams.get('id');
 
-		if(!voxelObjectId) return;
+		if (!voxelObjectId) return;
 
 		showEditor = true;
 
@@ -54,29 +54,27 @@
 
 {#if showEditor}
 	{@render children()}
-	{:else}
+{:else}
+	<Button class="m-4" size="lg" onclick={() => createModel(base, false)}
+		><svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="2.5"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+		</svg>
 
-<Button class="m-4" size="lg" onclick={() => createModel(base, false)}
-	><svg
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		stroke-width="2.5"
-		stroke="currentColor"
+		New Model</Button
 	>
-		<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-	</svg>
 
-	New Model</Button
->
-
-{#if modelList.value.length > 0}
-	<ModelPicker
-		items={modelList.value.map((model) => ({ voxels: model, label: model.name }))}
-		onselect={({ voxels, label }) => {
-			goto(`/editor/${voxels.id}`);
-		}}
-	/>
-{/if}
-
+	{#if modelList.value.length > 0}
+		<ModelPicker
+			items={modelList.value.map((model) => ({ voxels: model, label: model.name }))}
+			onselect={({ voxels, label }) => {
+				goto(`/editor?id=${voxels.id}`);
+			}}
+		/>
+	{/if}
 {/if}
