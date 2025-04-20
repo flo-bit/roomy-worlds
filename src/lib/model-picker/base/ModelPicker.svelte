@@ -7,9 +7,6 @@
 	import { ACESFilmicToneMapping, CineonToneMapping } from 'three';
 	import type { Voxel, VoxelGroup } from '$lib/shared/components';
 
-
-
-
 	let {
 		items,
 		alwaysRotate = false,

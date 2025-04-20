@@ -5,7 +5,7 @@
 	import type { EntityIdStr } from '@muni-town/leaf';
 	import { Button } from 'fuchs';
 	import { onMount } from 'svelte';
-	import { editingState } from './state.svelte';
+	import { applyTransform, editingState } from './state.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { createModel } from '$lib';
 	import { base } from '$app/paths';
@@ -55,6 +55,9 @@
 		bind:open
 		items={modelList.value.map((model) => ({ voxels: model, label: model.name }))}
 		onselect={({ voxels, label }) => {
+			applyTransform();
+			editingState.selectedInstance = null;
+			
 			editingState.selectedModelId = voxels.id;
 			console.log(editingState.selectedModelId);
 		}}

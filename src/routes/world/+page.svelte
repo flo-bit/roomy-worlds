@@ -9,11 +9,10 @@
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { UndoManager, type EntityIdStr } from '@muni-town/leaf';
-	import { Quaternion, Vector3 } from 'three';
+	import { ACESFilmicToneMapping, Quaternion, Vector3 } from 'three';
 	import ModelSelection from './ModelSelection.svelte';
-	import { Button } from 'fuchs';
-	import { downloadObjectAsJson } from '$lib/editor/import';
-	import { type WorldData } from '$lib/viewer/types';
+	import { applyTransform, editingState } from './state.svelte';
+	import { dev } from '$app/environment';
 
 	let voxelObject: VoxelGroup | null = $state(null);
 
@@ -69,11 +68,11 @@
 		g.world?.commit();
 	}
 
-	let showPerfMonitor = $state(true);
+	let showPerfMonitor = $state(dev);
 </script>
 
 <div class="h-screen w-screen">
-	<Canvas>
+	<Canvas toneMapping={ACESFilmicToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />
 		{/if}
@@ -85,8 +84,8 @@
 
 <ModelSelection />
 
-<div class="absolute bottom-4 left-4 z-10 flex flex-col gap-2">
-	<Button
+<div class="absolute bottom-2 left-4 z-10 flex flex-col gap-2">
+	<!-- <Button
 		onclick={async () => {
 			// turn into json with all the instances
 			const json: WorldData = {
@@ -129,5 +128,58 @@
 
 			//downloadObjectAsJson(instances.value, 'world');
 		}}>Export</Button
-	>
+	> -->
+
+	{#if editingState.selectedInstance}
+		<div class="flex gap-2 items-center">
+			<span class="text-base-800 text-sm"> moving </span>
+
+			<button
+				onclick={() => {
+					applyTransform();
+					editingState.selectedInstance = null;
+				}}
+				class="bg-base-200/20 text-base-900 rounded-full p-0.5 cursor-pointer"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					class="size-3"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+						clip-rule="evenodd"
+					/>
+				</svg>
+				<span class="sr-only"> deselect </span>
+			</button>
+		</div>
+	{:else if editingState.selectedModelId}
+		<div class="flex gap-2 items-center">
+			<span class="text-base-800 text-sm"> placing </span>
+
+			<button
+				onclick={() => {
+					editingState.selectedModelId = null;
+				}}
+				class="bg-base-200/20 text-base-900 rounded-full p-0.5 cursor-pointer"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					class="size-3"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+						clip-rule="evenodd"
+					/>
+				</svg>
+				<span class="sr-only"> deselect </span>
+			</button>
+		</div>
+	{/if}
 </div>

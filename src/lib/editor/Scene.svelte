@@ -7,7 +7,12 @@
 	import { Voxel } from '$lib/shared/components';
 	import type { AddVoxelFunction } from './types';
 
-	interactivity();
+	interactivity({
+		filter: (hits, state) => {
+			console.log(hits, state);
+			return hits.slice(0, 1);
+		}
+	});
 
 	let {
 		voxels,
@@ -35,6 +40,11 @@
 
 <!-- ghost voxel that shows where a newly placed voxel will be -->
 <GhostVoxel />
+
+<T.Mesh>
+	<T.SphereGeometry args={[0.08]} />
+	<T.MeshStandardMaterial color="red" />
+</T.Mesh>
 
 <Grid
 	cellColor="#333333"

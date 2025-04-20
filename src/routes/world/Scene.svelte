@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T, useTask, useThrelte } from '@threlte/core';
-	import { Grid, interactivity, OrbitControls, Sky } from '@threlte/extras';
+	import { Grid, HUD, interactivity, OrbitControls, Sky } from '@threlte/extras';
 	import Terrain from '../../lib/world/Terrain.svelte';
 	import Emitter from './Emitter.svelte';
 	import Player from './player/Player.svelte';
@@ -11,8 +11,13 @@
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { ACESFilmicToneMapping } from 'three';
 	import Water from '$lib/world/Water.svelte';
+	import HudScene from './HudScene.svelte';
 
-	interactivity();
+	interactivity({
+		filter: (hits, state) => {
+			return hits.slice(0, 1);
+		}
+	});
 
 	let camera = $state('first');
 
@@ -107,7 +112,6 @@
 	}}
 />
 
-
 <Water />
 
 <!-- <Debug /> -->
@@ -123,3 +127,7 @@
 <!-- {#each locations as location}
 	<Location {location} />
 {/each} -->
+
+<HUD>
+	<HudScene />
+</HUD>

@@ -57,7 +57,7 @@ as well as see all models made in any window.
 - character selection
 - touch controls
 - allow adding cubes directly to world
-- show selected model (that will be placed)
+- [x] show selected model (that will be placed)
 - viewer for user uploaded worlds
 - inline model editor
 - add clouds?
@@ -67,6 +67,11 @@ as well as see all models made in any window.
 ### models 
 
 - categories of models
+- private, world, global models
+- snap transform with shift
+- switch between world and local transform
+- box selection
+- select multiple cubes with shift
 - allow setting visibility/collision of cubes
 - show recently used colors in color picker
 - add model name

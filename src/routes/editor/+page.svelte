@@ -9,6 +9,7 @@
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { Models, Voxel } from '$lib/shared/components';
 	import { UndoManager, type EntityIdStr } from '$lib/roomy';
+	import { ACESFilmicToneMapping } from 'three';
 
 	let selectedTool: 'place' | 'delete' | 'move' | 'rotate' | 'scale' = $state('place');
 	let voxels = derivePromise([], async () =>
@@ -214,7 +215,7 @@
 </div>
 
 <div class="h-screen w-screen">
-	<Canvas>
+	<Canvas toneMapping={ACESFilmicToneMapping}>
 		<Scene voxels={voxels.value} {addVoxel} {deleteVoxel} />
 	</Canvas>
 </div>

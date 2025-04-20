@@ -49,6 +49,7 @@
 
 			await applyTransform();
 
+			editingState.selectedModelId = null;
 			editingState.selectedInstance = instance;
 		}}
 	>
