@@ -2,7 +2,7 @@
 	import { T, useTask } from '@threlte/core';
 	import type { WorldData } from './types';
 	import * as THREE from 'three';
-	import { shuffle } from '$lib';
+	import { shuffle } from '$lib/utils.svelte';
 
 	const { world }: { world: WorldData } = $props();
 

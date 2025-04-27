@@ -45,7 +45,7 @@ export * as components from './components';
 import * as c from './components';
 import { Color, Quaternion, Vector3 } from 'three';
 
-import { g, initRoomy } from '$lib/shared/roomy.svelte.js';
+import { g, initRoomy } from '$lib/roomy.svelte.js';
 
 /** A constructor for an {@linkcode EntityWrapper}. */
 export type EntityConstructor<T extends EntityWrapper> = new (peer: Peer, entity: Entity) => T;

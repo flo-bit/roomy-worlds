@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { createWorld } from '$lib';
+	import { createWorld } from '$lib/utils.svelte';
 	import BlueskyLoginModal, { blueskyLoginModalState } from '$lib/BlueskyLoginModal.svelte';
-	import { client, login } from '$lib/oauth';
-	// import { g } from '$lib/shared/roomy.svelte';
+	import { login } from '$lib/oauth';
 	import { Badge, Button, Prose } from 'fuchs';
 
 	import { Canvas } from '@threlte/core';
@@ -11,28 +10,6 @@
 	import WorldViewerScene from '$lib/viewer/WorldViewerScene.svelte';
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
-	import { g } from '$lib/shared/roomy.svelte';
-
-	// $effect(() => {
-	// 	if (client.isLoggedIn || !client.rpc) return;
-
-	// 	client.rpc
-	// 		.request({
-	// 			type: 'get',
-	// 			nsid: 'chat.roomy.v0.sync.token',
-	// 			headers: {
-	// 				'atproto-proxy': 'did:web:syncserver.roomy.chat#roomy_syncserver'
-	// 			}
-	// 		})
-	// 		.then((resp) => {
-	// 			console.log(resp);
-	// 			g.token = resp.data.token;
-	// 			g.did = client.profile?.did;
-
-	// 			localStorage.setItem('token', resp.data.token);
-	// 			localStorage.setItem('did', client.profile?.did ?? '');
-	// 		});
-	// });
 
 	let showText = $state(true);
 </script>

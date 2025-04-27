@@ -1,6 +1,7 @@
-import type { TransformedGroup } from '$lib/roomy';
+import { TransformedGroup } from '$lib/roomy';
+import { g, initRoomy } from '$lib/roomy.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
-import type { Vector3 } from 'three';
+import { Quaternion, Vector3 } from 'three';
 import type { TransformControls } from 'three/examples/jsm/Addons.js';
 
 export const editingState = $state({
@@ -67,4 +68,22 @@ export async function applyTransform() {
 	console.log('commit');
 
 	await new Promise((resolve) => setTimeout(resolve, 10));
+}
+
+export async function addInstance(id: EntityIdStr, position: Vector3) {
+	if (!g.roomy) {
+		await initRoomy();
+
+		if (!g.roomy) return;
+	}
+
+	const instance = await g.roomy.create(TransformedGroup);
+	instance.group = id;
+	instance.position = position;
+	instance.quaternion = new Quaternion();
+	instance.scale = new Vector3(1, 1, 1);
+	instance.commit();
+
+	g.world?.instances.push(instance);
+	g.world?.commit();
 }

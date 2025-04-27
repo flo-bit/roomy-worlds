@@ -1,38 +1,17 @@
 <script lang="ts">
 	import { Canvas } from '@threlte/core';
-	import Scene from './Scene.svelte';
+	import Scene from '$lib/world-editor/WorldEditorScene.svelte';
 	import { PerfMonitor } from '@threlte/extras';
 	import { World } from '@threlte/rapier';
-	import { derivePromise } from '$lib/shared/utils.svelte';
-	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import { type EntityIdStr } from '@muni-town/leaf';
-	import { ACESFilmicToneMapping, Quaternion, Vector3 } from 'three';
-	import ModelSelection from './ModelSelection.svelte';
-	import { applyTransform, editingState } from './state.svelte';
-	import ModelScene from '$lib/editor/Scene.svelte';
-	import { Button, cn, ColorGradientPicker, Label, SliderNumber } from 'fuchs';
-	import ModelEditorUi from '$lib/editor/ModelEditorUI.svelte';
-	import { TransformedGroup } from '$lib/roomy';
-
-	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
-
-	async function addInstance(id: EntityIdStr, position: Vector3) {
-		if (!g.roomy) {
-			await initRoomy();
-
-			if (!g.roomy) return;
-		}
-
-		const instance = await g.roomy.create(TransformedGroup);
-		instance.group = id;
-		instance.position = position;
-		instance.quaternion = new Quaternion();
-		instance.scale = new Vector3(1, 1, 1);
-		instance.commit();
-
-		g.world?.instances.push(instance);
-		g.world?.commit();
-	}
+	import { ACESFilmicToneMapping } from 'three';
+	import ModelSelection from '$lib/world-editor/ModelSelection.svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
+	import ModelScene from '$lib/model-editor/ModelEditorScene.svelte';
+	import { cn } from 'fuchs';
+	import ModelEditorUi from '$lib/model-editor/ModelEditorUI.svelte';
+	import WorldSettingsUi from '$lib/world-editor/WorldSettingsUI.svelte';
+	import HudUi from '$lib/world-editor/HudUI.svelte';
+	import WorldEditorUi from '$lib/world-editor/WorldEditorUI.svelte';
 
 	let showPerfMonitor = $state(false);
 </script>
@@ -53,7 +32,7 @@
 			{#if editingState.showModelEditor}
 				<ModelScene />
 			{:else}
-				<Scene instances={instances.value} {addInstance} />
+				<Scene />
 			{/if}
 		</World>
 	</Canvas>
@@ -63,115 +42,12 @@
 
 {#if !editingState.showModelEditor}
 	{#if editingState.showWorldSettings}
-		<div class="absolute top-0 bottom-0 left-0 w-80 px-8 py-16">
-			<Label>Size</Label>
-			<SliderNumber class="mt-2" min={20} max={100} bind:value={editingState.worldSettings.size} />
-
-			<Label>Terrain</Label>
-			<ColorGradientPicker
-				class="mt-6 mb-8"
-				bind:colors={editingState.worldSettings.terrainGradient}
-				onchange={() => {
-					editingState.worldSettings.version += 1;
-				}}
-			/>
-
-			<Label>Water</Label>
-
-			<ColorGradientPicker
-				class="mt-6 mb-4"
-				bind:colors={editingState.worldSettings.waterGradient}
-				onchange={() => {
-					editingState.worldSettings.version += 1;
-				}}
-			/>
-
-			<Label>Percentage</Label>
-			<SliderNumber class="mt-2" bind:value={editingState.worldSettings.waterPercentage} />
-
-			<Button
-				class="mt-6"
-				onclick={() => {
-					editingState.worldSettings.version += 1;
-				}}
-			>
-				Update
-			</Button>
-		</div>
+		<WorldSettingsUi />
 	{:else}
-		<Button
-			size="iconLg"
-			class="bg-accent-100 hover:bg-accent-200 absolute top-4 left-4"
-			onclick={() => (editingState.showModelPicker = true)}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="2.5"
-				stroke="currentColor"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-			</svg>
-
-			<span class="sr-only">Add Model</span>
-		</Button>
+	<WorldEditorUi />
 	{/if}
 {:else}
 	<ModelEditorUi />
 {/if}
 
-<div class="absolute bottom-2 left-4 z-10 flex flex-col gap-2">
-	{#if editingState.selectedInstance}
-		<div class="flex items-center gap-2">
-			<span class="text-base-800 text-sm"> moving </span>
-
-			<button
-				onclick={() => {
-					applyTransform();
-					editingState.selectedInstance = null;
-				}}
-				class="bg-base-200/20 text-base-900 cursor-pointer rounded-full p-0.5"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					class="size-3"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
-						clip-rule="evenodd"
-					/>
-				</svg>
-				<span class="sr-only"> deselect </span>
-			</button>
-		</div>
-	{:else if editingState.selectedModelId}
-		<div class="flex items-center gap-2">
-			<span class="text-base-800 text-sm"> placing </span>
-
-			<button
-				onclick={() => {
-					editingState.selectedModelId = null;
-				}}
-				class="bg-base-200/20 text-base-900 cursor-pointer rounded-full p-0.5"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					class="size-3"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
-						clip-rule="evenodd"
-					/>
-				</svg>
-				<span class="sr-only"> deselect </span>
-			</button>
-		</div>
-	{/if}
-</div>
+<HudUi />

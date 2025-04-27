@@ -1,6 +1,6 @@
 import { Voxel, type EntityIdStr } from '$lib/roomy';
 import type { TransformControls } from 'three/examples/jsm/Addons.js';
-import { g, initRoomy } from '$lib/shared/roomy.svelte';
+import { g, initRoomy } from '$lib/roomy.svelte';
 
 export const modelEditor: {
 	tool: 'place' | 'delete' | 'move' | 'rotate' | 'scale';

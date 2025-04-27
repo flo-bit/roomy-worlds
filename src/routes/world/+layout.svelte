@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { g, initRoomy } from '$lib/shared/roomy.svelte';
+	import { g, initRoomy } from '$lib/roomy.svelte';
 	import { World, type EntityIdStr } from '$lib/roomy';
 	import { goto } from '$app/navigation';
 	import { Button } from 'fuchs';
-	import { createWorld } from '$lib';
+	import { createWorld } from '$lib/utils.svelte';
 	import { base } from '$app/paths';
 
 	let { children } = $props();

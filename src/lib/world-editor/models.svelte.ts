@@ -1,5 +1,5 @@
 import { Voxel, VoxelGroup } from '$lib/roomy';
-import { g } from '$lib/shared/roomy.svelte';
+import { g } from '$lib/roomy.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
 
 class Models {

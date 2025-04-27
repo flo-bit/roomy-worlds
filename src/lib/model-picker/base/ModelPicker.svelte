@@ -6,8 +6,8 @@
 	import { Button, cn } from 'fuchs';
 	import { ACESFilmicToneMapping } from 'three';
 	import type { VoxelGroup } from '$lib/roomy';
-	import { editingState } from '../../../routes/world/state.svelte';
-	import { g } from '$lib/shared/roomy.svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
+	import { g } from '$lib/roomy.svelte';
 
 	let {
 		items,

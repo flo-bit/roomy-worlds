@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Voxel, VoxelGroup } from '$lib/roomy';
-	import { derivePromise } from '$lib/shared/utils.svelte';
+	import type { VoxelGroup } from '$lib/roomy';
+	import { derivePromise } from '$lib/utils.svelte';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { onMount } from 'svelte';
-	import { Box3, Group, HemisphereLight, Object3D, Vector3 } from 'three';
+	import { Box3, Group, Vector3 } from 'three';
 
 	let {
 		voxels,

@@ -1,22 +1,25 @@
 <script lang="ts">
 	import { T, useThrelte } from '@threlte/core';
 	import { HUD, interactivity, OrbitControls, Sky } from '@threlte/extras';
-	import Terrain from '../../lib/world/Terrain.svelte';
-	import Player from './player/Player.svelte';
+	import Terrain from '$lib/world/Terrain.svelte';
+	import Player from '$lib/player/Player.svelte';
 	import { onMount } from 'svelte';
 	import Instance from './Instance.svelte';
-	import { editingState, type AddInstanceFunction } from './state.svelte';
+	import { addInstance, editingState } from './state.svelte';
 	import { ACESFilmicToneMapping } from 'three';
 	import Water from '$lib/world/Water.svelte';
 	import HudScene from './HudScene.svelte';
 	import { Debug } from '@threlte/rapier';
-	import { TransformedGroup } from '$lib/roomy';
+	import { derivePromise } from '$lib/utils.svelte';
+	import { g } from '$lib/roomy.svelte';
 
 	interactivity({
 		filter: (hits) => {
 			return hits.slice(0, 1);
 		}
 	});
+
+	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 
 	let camera = $state('first');
 
@@ -32,14 +35,6 @@
 
 		renderer.toneMapping = ACESFilmicToneMapping;
 	});
-
-	let {
-		instances,
-		addInstance
-	}: {
-		instances: TransformedGroup[];
-		addInstance: AddInstanceFunction;
-	} = $props();
 </script>
 
 {#if camera === 'first'}
@@ -74,7 +69,7 @@
 
 <Sky />
 
-{#each instances as instance}
+{#each instances.value as instance}
 	<Instance {instance} />
 {/each}
 

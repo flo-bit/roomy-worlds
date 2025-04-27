@@ -1,12 +1,12 @@
 <script lang="ts">
 	import ModalModelPicker from '$lib/model-picker/modal/ModalModelPicker.svelte';
-	import { derivePromise } from '$lib/shared/utils.svelte';
+	import { derivePromise } from '$lib/utils.svelte';
 	import type { EntityIdStr } from '@muni-town/leaf';
 	import { Button } from 'fuchs';
 	import { onMount } from 'svelte';
 	import { applyTransform, editingState } from './state.svelte';
-	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import { modelEditor } from '$lib/editor/state.svelte';
+	import { g, initRoomy } from '$lib/roomy.svelte';
+	import { modelEditor } from '$lib/model-editor/state.svelte';
 	import { Models, VoxelGroup } from '$lib/roomy';
 
 	let globalModels: Models | null = $state(null);
@@ -22,9 +22,9 @@
 		for (const model of models ?? []) {
 			groups.add(model.group);
 		}
-		return (await Promise.all(
+		return Promise.all(
 			Array.from(groups).map(async (group) => await g.roomy?.open(VoxelGroup, group))
-		)) as VoxelGroup[];
+		);
 	});
 
 	let privateModelList = derivePromise([], async () => {
@@ -55,7 +55,7 @@
 		}
 
 		if (editingState.modelPickerType === 'world') {
-			items = worldModelList.value.map((model) => ({ voxels: model, label: model.name }));
+			items = worldModelList.value.map((model) => ({ voxels: model, label: model?.name })) as { voxels: VoxelGroup; label: string }[];
 		}
 
 		// filter all items that have no voxels

@@ -7,7 +7,7 @@
 
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { derivePromise } from '$lib/shared/utils.svelte';
+	import { derivePromise } from '$lib/utils.svelte';
 	import { Instance, InstancedMesh, TransformControls } from '@threlte/extras';
 	import { applyTransform, editingState } from './state.svelte';
 	import { Collider } from '@threlte/rapier';

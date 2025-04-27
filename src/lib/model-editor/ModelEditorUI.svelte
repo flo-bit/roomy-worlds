@@ -1,8 +1,8 @@
 <script>
 	import { Button, PopoverColorPicker, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
 	import { addVoxel, applyModelEditorTransform, deleteVoxel, modelEditor } from './state.svelte';
-	import { editingState } from '../../routes/world/state.svelte';
-	import { g } from '$lib/shared/roomy.svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
+	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
 
 	$effect(() => {

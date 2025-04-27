@@ -47,7 +47,7 @@ as well as see all models made in any window.
 - rotate and scale models 
 - add advanced settings to world (noise settings)
 - add sound effects (placing, walking)
-- add selection between world/local/global models
+- [x] add selection between world/local/global models
 - add model name and category
 - download model
 - add gradient for lower part of island

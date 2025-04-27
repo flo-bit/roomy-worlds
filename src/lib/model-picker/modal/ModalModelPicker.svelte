@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, cn, Modal, Select } from 'fuchs';
 	import ModelPicker from '../base/ModelPicker.svelte';
-	import { editingState } from '../../../routes/world/state.svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
 	import type { VoxelGroup } from '$lib/roomy';
 
 	let {

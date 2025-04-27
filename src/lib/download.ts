@@ -1,5 +1,5 @@
 import type { EntityIdStr } from '@muni-town/leaf';
-import { downloadObjectAsJson } from './editor/import';
+import { downloadObjectAsJson } from './model-editor/import';
 import type { WorldData } from './viewer/types';
 import type { TransformedGroup } from './roomy';
 

@@ -4,8 +4,8 @@
 	import Voxels from './Voxels.svelte';
 	import Floor from './Floor.svelte';
 	import GhostVoxel from './GhostVoxel.svelte';
-	import { g } from '$lib/shared/roomy.svelte';
-	import { derivePromise } from '$lib/shared/utils.svelte';
+	import { g } from '$lib/roomy.svelte';
+	import { derivePromise } from '$lib/utils.svelte';
 
 	interactivity({
 		filter: (hits) => {

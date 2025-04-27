@@ -2,9 +2,9 @@
 	import { T, useTask } from '@threlte/core';
 	import * as THREE from 'three';
 	import { UberNoise } from 'uber-noise';
-	import { shuffle } from '$lib';
+	import { shuffle } from '$lib/utils.svelte';
 	import { ColorGradient } from './colorgradient';
-	import { editingState } from '../../routes/world/state.svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
 
 	const size = editingState.worldSettings.size;
 
