@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Voxel } from '$lib/shared/components';
+	import type { Voxel } from '$lib/roomy';
 	import ModelPicker from '../base/ModelPicker.svelte';
 	import { Popover } from 'fuchs';
 

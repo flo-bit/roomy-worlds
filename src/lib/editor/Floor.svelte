@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { applyTransform, editorState, isTransforming } from './state.svelte';
+	import { applyModelEditorTransform, modelEditor, isTransforming } from './state.svelte';
 	import { useCursor } from '@threlte/extras';
 	import type { AddVoxelFunction } from './types';
 
@@ -16,38 +16,38 @@
 <T.Mesh
 	rotation.x={-Math.PI / 2}
 	onclick={(e) => {
-		console.log(e.point, editorState.tool);
+		console.log(e.point, modelEditor.tool);
 		e.stopPropagation();
-		if (editorState.tool !== 'place') return;
+		if (modelEditor.tool !== 'place') return;
 
 		console.log(e.point);
 
 		addVoxel(
 			[e.point.x, e.point.y + 0.5, e.point.z],
-			[editorState.color.r, editorState.color.g, editorState.color.b]
+			[modelEditor.color.r, modelEditor.color.g, modelEditor.color.b]
 		);
 	}}
 	onpointerenter={(e) => {
-		if (editorState.tool !== 'place') return;
+		if (modelEditor.tool !== 'place') return;
 		onPointerEnter();
 
-		editorState.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
+		modelEditor.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
 	}}
 	onpointermove={(e) => {
 		e.stopPropagation();
-		if (editorState.tool !== 'place') return;
-		editorState.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
+		if (modelEditor.tool !== 'place') return;
+		modelEditor.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
 	}}
 	onpointerleave={() => {
-		if (editorState.tool !== 'place') return;
+		if (modelEditor.tool !== 'place') return;
 		onPointerLeave();
 	}}
 	ondblclick={() => {
 		if (!isTransforming()) return;
 		// deselect current voxel
 
-		applyTransform();
-		editorState.selectedVoxel = null;
+		applyModelEditorTransform();
+		modelEditor.selectedVoxel = null;
 	}}
 >
 	<T.PlaneGeometry args={[100, 100, 100]}></T.PlaneGeometry>

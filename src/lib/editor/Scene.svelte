@@ -4,7 +4,7 @@
 	import Voxels from './Voxels.svelte';
 	import Floor from './Floor.svelte';
 	import GhostVoxel from './GhostVoxel.svelte';
-	import { Voxel } from '$lib/shared/components';
+	import { Voxel } from '$lib/roomy';
 	import type { AddVoxelFunction } from './types';
 
 	interactivity({

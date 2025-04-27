@@ -1,9 +1,8 @@
-import { EntityId, Roomy, type EntityIdStr } from '$lib/roomy';
+import { EntityId, Roomy, VoxelGroup, World, type EntityIdStr } from '$lib/roomy';
 import { StorageManager } from '@muni-town/leaf/storage';
 import { SveltePeer } from '@muni-town/leaf/svelte';
 import { indexedDBStorageAdapter } from '@muni-town/leaf/storage/indexed-db';
 import { webSocketSyncer } from '@muni-town/leaf/sync1/ws-client';
-import { VoxelGroup, World } from './components';
 
 if (import.meta.hot) {
 	import.meta.hot.accept(() => {
@@ -20,7 +19,7 @@ export const g = $state({
 	did: undefined as string | undefined
 });
 
-export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
 	const savedCatalogId = localStorage.getItem('catalogId');
 	const catalogId = new EntityId((savedCatalogId as EntityIdStr) ?? undefined);
 	if (!savedCatalogId) localStorage.setItem('catalogId', catalogId.toString());
@@ -63,5 +62,9 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
 			await webSocketSyncer(new WebSocket('ws://localhost:8095'))
 		);
 	}
-	g.roomy = await Roomy.init(peer, catalogId);
+	try {
+		g.roomy = await Roomy.init(peer, catalogId);
+	} catch (e) {
+		console.error(e);
+	}
 }

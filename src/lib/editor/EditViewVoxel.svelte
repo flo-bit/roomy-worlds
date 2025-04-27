@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { useCursor } from '@threlte/extras';
-	import { applyTransform, editorState } from './state.svelte';
+	import { applyModelEditorTransform, modelEditor } from './state.svelte';
 	import { T } from '@threlte/core';
-	import type { Voxel } from '$lib/shared/components';
 	import type { AddVoxelFunction } from './types';
-
+	import { Voxel } from '$lib/roomy';
+	
 	let {
 		voxel,
 		index,
@@ -25,23 +25,23 @@
 	scale={voxel.scale.toArray()}
 	onclick={(e) => {
 		e.stopPropagation();
-		if (editorState.tool === 'delete') {
+		if (modelEditor.tool === 'delete') {
 			//editorState.cubes.splice(index, 1);
 			deleteVoxel(voxel.id);
-			editorState.ghostDeleteIndex = null;
-		} else if (editorState.tool === 'place' && e.normal) {
+			modelEditor.ghostDeleteIndex = null;
+		} else if (modelEditor.tool === 'place' && e.normal) {
 			addVoxel(
 				[e.point.x + e.normal.x * 0.5, e.point.y + e.normal.y * 0.5, e.point.z + e.normal.z * 0.5],
-				[editorState.color.r, editorState.color.g, editorState.color.b]
+				[modelEditor.color.r, modelEditor.color.g, modelEditor.color.b]
 			);
 		} else if (
-			editorState.tool === 'move' ||
-			editorState.tool === 'rotate' ||
-			editorState.tool === 'scale'
+			modelEditor.tool === 'move' ||
+			modelEditor.tool === 'rotate' ||
+			modelEditor.tool === 'scale'
 		) {
-			applyTransform();
-			editorState.color = voxel.color;
-			editorState.selectedVoxel = voxel;
+			applyModelEditorTransform();
+			modelEditor.color = voxel.color;
+			modelEditor.selectedVoxel = voxel;
 		}
 
 		onPointerLeave();
@@ -50,37 +50,37 @@
 		e.stopPropagation();
 		onPointerEnter();
 
-		if (editorState.tool === 'delete') {
-			editorState.ghostDeleteIndex = index;
+		if (modelEditor.tool === 'delete') {
+			modelEditor.ghostDeleteIndex = index;
 		}
 	}}
 	onpointermove={(e) => {
 		e.stopPropagation();
 
-		if (editorState.tool === 'place' && e.normal) {
-			editorState.ghostPosition = [
+		if (modelEditor.tool === 'place' && e.normal) {
+			modelEditor.ghostPosition = [
 				e.point.x + e.normal.x * 0.5,
 				e.point.y + e.normal.y * 0.5,
 				e.point.z + e.normal.z * 0.5
 			];
 		}
-		if (editorState.tool === 'delete') {
-			editorState.ghostDeleteIndex = index;
+		if (modelEditor.tool === 'delete') {
+			modelEditor.ghostDeleteIndex = index;
 		}
 	}}
 	onpointerleave={(e) => {
 		e.stopPropagation();
 		onPointerLeave();
 
-		if (editorState.tool === 'delete') {
-			editorState.ghostDeleteIndex = null;
-		} else if (editorState.tool === 'place') {
-			editorState.ghostPosition = null;
+		if (modelEditor.tool === 'delete') {
+			modelEditor.ghostDeleteIndex = null;
+		} else if (modelEditor.tool === 'place') {
+			modelEditor.ghostPosition = null;
 		}
 	}}
 >
 	<T.BoxGeometry />
 	<T.MeshStandardMaterial
-		color={index === editorState.ghostDeleteIndex ? [1, 0, 0] : [voxel.r, voxel.g, voxel.b]}
+		color={index === modelEditor.ghostDeleteIndex ? [1, 0, 0] : [voxel.r, voxel.g, voxel.b]}
 	/>
 </T.Mesh>

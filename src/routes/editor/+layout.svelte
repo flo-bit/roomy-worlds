@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { VoxelGroup } from '$lib/shared/components';
+	import { VoxelGroup } from '$lib/roomy';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { Button } from 'fuchs';
-	import { Models } from '$lib/shared/components';
+	import { Models } from '$lib/roomy';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import type { EntityIdStr } from '@muni-town/leaf';
 	import { onMount } from 'svelte';

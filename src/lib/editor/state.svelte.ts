@@ -1,7 +1,7 @@
-import type { Voxel } from '$lib/shared/components';
+import type { Voxel } from '$lib/roomy';
 import type { TransformControls } from 'three/examples/jsm/Addons.js';
 
-export const editorState: {
+export const modelEditor: {
 	tool: 'place' | 'delete' | 'move' | 'rotate' | 'scale';
 	color: { r: number; g: number; b: number };
 	selectedVoxel: Voxel | null;
@@ -9,33 +9,37 @@ export const editorState: {
 
 	ghostDeleteIndex: number | null;
 	ghostPosition: [number, number, number] | null;
+
+	applyTransform: () => Promise<void>;
 } = $state({
 	tool: 'move',
 	color: { r: 1, g: 1, b: 1 },
 	selectedVoxel: null,
 	transformControls: undefined,
 	ghostDeleteIndex: null,
-	ghostPosition: null
+	ghostPosition: null,
+
+	applyTransform: applyModelEditorTransform
 });
 
 // apply the transform to the selected voxel
-export async function applyTransform() {
-	if (editorState.selectedVoxel === null || !editorState.transformControls?.object) return;
+export async function applyModelEditorTransform() {
+	if (modelEditor.selectedVoxel === null || !modelEditor.transformControls?.object) return;
 
-	const voxel = editorState.selectedVoxel;
+	const voxel = modelEditor.selectedVoxel;
 
-	voxel.x = editorState.transformControls.object.position.x;
-	voxel.y = editorState.transformControls.object.position.y;
-	voxel.z = editorState.transformControls.object.position.z;
+	voxel.x = modelEditor.transformControls.object.position.x;
+	voxel.y = modelEditor.transformControls.object.position.y;
+	voxel.z = modelEditor.transformControls.object.position.z;
 
-	voxel.sx = editorState.transformControls.object.scale.x;
-	voxel.sy = editorState.transformControls.object.scale.y;
-	voxel.sz = editorState.transformControls.object.scale.z;
+	voxel.sx = modelEditor.transformControls.object.scale.x;
+	voxel.sy = modelEditor.transformControls.object.scale.y;
+	voxel.sz = modelEditor.transformControls.object.scale.z;
 
-	voxel.qx = editorState.transformControls.object.quaternion.x;
-	voxel.qy = editorState.transformControls.object.quaternion.y;
-	voxel.qz = editorState.transformControls.object.quaternion.z;
-	voxel.qw = editorState.transformControls.object.quaternion.w;
+	voxel.qx = modelEditor.transformControls.object.quaternion.x;
+	voxel.qy = modelEditor.transformControls.object.quaternion.y;
+	voxel.qz = modelEditor.transformControls.object.quaternion.z;
+	voxel.qw = modelEditor.transformControls.object.quaternion.w;
 
 	voxel.commit();
 
@@ -44,6 +48,6 @@ export async function applyTransform() {
 
 export function isTransforming() {
 	return (
-		editorState.tool === 'move' || editorState.tool === 'rotate' || editorState.tool === 'scale'
+		modelEditor.tool === 'move' || modelEditor.tool === 'rotate' || modelEditor.tool === 'scale'
 	);
 }

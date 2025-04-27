@@ -2,12 +2,12 @@
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/editor/Scene.svelte';
 	import { Button, PopoverColorPicker, Select } from 'fuchs';
-	import { applyTransform, editorState } from '$lib/editor/state.svelte';
+	import { applyModelEditorTransform, modelEditor } from '$lib/editor/state.svelte';
 	import { downloadObjectAsJson, loadVoxelFromJson } from '$lib/editor/import';
 	import { onMount } from 'svelte';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import { Models, Voxel } from '$lib/shared/components';
+	import { Models, Voxel } from '$lib/roomy';
 	import { UndoManager, type EntityIdStr } from '$lib/roomy';
 	import { ACESFilmicToneMapping } from 'three';
 	import { editingState } from '../world/state.svelte';
@@ -85,16 +85,16 @@
 	}
 
 	$effect(() => {
-		applyTransform();
+		applyModelEditorTransform();
 
-		editorState.tool = selectedTool;
+		modelEditor.tool = selectedTool;
 
-		if (editorState.selectedVoxel !== null) {
-			editorState.selectedVoxel.r = editorState.color.r;
-			editorState.selectedVoxel.g = editorState.color.g;
-			editorState.selectedVoxel.b = editorState.color.b;
+		if (modelEditor.selectedVoxel !== null) {
+			modelEditor.selectedVoxel.r = modelEditor.color.r;
+			modelEditor.selectedVoxel.g = modelEditor.color.g;
+			modelEditor.selectedVoxel.b = modelEditor.color.b;
 
-			editorState.selectedVoxel.commit();
+			modelEditor.selectedVoxel.commit();
 		}
 	});
 
@@ -135,20 +135,20 @@
 			} else if (e.key === 'p') {
 				selectedTool = 'place';
 			} else if (e.key === 'c') {
-				if (editorState.selectedVoxel === null) return;
+				if (modelEditor.selectedVoxel === null) return;
 
-				applyTransform();
+				applyModelEditorTransform();
 
 				await new Promise((resolve) => setTimeout(resolve, 10));
 				// clone
-				let v = editorState.selectedVoxel;
+				let v = modelEditor.selectedVoxel;
 
 				addVoxel([v.x, v.y, v.z], [v.r, v.g, v.b], [v.sx, v.sy, v.sz], [v.qx, v.qy, v.qz, v.qw]);
 			} else if (e.key === 'x') {
 				// delete
-				if (editorState.selectedVoxel === null) return;
-				deleteVoxel(editorState.selectedVoxel.id);
-				editorState.selectedVoxel = null;
+				if (modelEditor.selectedVoxel === null) return;
+				deleteVoxel(modelEditor.selectedVoxel.id);
+				modelEditor.selectedVoxel = null;
 			}
 		});
 	});
@@ -159,19 +159,19 @@
 </div>
 
 <div class="absolute top-3 right-3 z-10">
-	<PopoverColorPicker bind:rgb={editorState.color} />
+	<PopoverColorPicker bind:rgb={modelEditor.color} />
 </div>
 
 <div class="absolute bottom-4 left-4 z-10 flex hidden flex-col gap-2">
 	<Button
 		onclick={async () => {
-			await applyTransform();
+			await applyModelEditorTransform();
 			downloadObjectAsJson(voxels.value, 'voxels');
 		}}>Export</Button
 	>
 	<Button
 		onclick={async () => {
-			await applyTransform();
+			await applyModelEditorTransform();
 			loadVoxelFromJson(addVoxel);
 		}}>Import</Button
 	>

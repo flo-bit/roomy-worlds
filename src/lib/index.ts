@@ -1,9 +1,9 @@
 // place files you want to import through the `$lib` alias in this folder.
 
 import type { EntityIdStr } from '@muni-town/leaf';
-import { VoxelGroup, World } from './shared/components';
 import { g, initRoomy } from './shared/roomy.svelte';
 import { goto } from '$app/navigation';
+import { VoxelGroup, World } from './roomy';
 
 export async function getVoxelObject(id: string) {
 	if (!g.roomy) {

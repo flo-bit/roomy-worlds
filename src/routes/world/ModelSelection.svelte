@@ -1,18 +1,36 @@
 <script lang="ts">
 	import ModalModelPicker from '$lib/model-picker/modal/ModalModelPicker.svelte';
-	import { Models } from '$lib/shared/components';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import type { EntityIdStr } from '@muni-town/leaf';
 	import { Button } from 'fuchs';
 	import { onMount } from 'svelte';
 	import { applyTransform, editingState } from './state.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import { createModel } from '$lib';
-	import { base } from '$app/paths';
+	import { modelEditor } from '$lib/editor/state.svelte';
+	import { Models, VoxelGroup } from '$lib/roomy';
 
-	let models: Models | null = $state(null);
+	let globalModels: Models | null = $state(null);
 
-	let modelList = derivePromise([], async () => (models ? await models.models.items() : []));
+	let globalModelList = derivePromise([], async () =>
+		globalModels ? await globalModels.models.items() : []
+	);
+
+	let worldModelList = derivePromise([], async () => {
+		if (!g.roomy) return [];
+		const models = await g.world?.instances.items();
+		const groups = new Set<EntityIdStr>();
+		for (const model of models ?? []) {
+			groups.add(model.group);
+		}
+		return Promise.all(
+			Array.from(groups).map(async (group) => await g.roomy?.open(VoxelGroup, group))
+		);
+	});
+
+	let privateModelList = derivePromise([], async () => {
+		if (!g.roomy?.models) return [];
+		return await g.roomy.models.items();
+	});
 
 	onMount(async () => {
 		if (!g.roomy) {
@@ -23,44 +41,52 @@
 
 		const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
 
-		models = await g.roomy.open(Models, id as EntityIdStr);
+		globalModels = await g.roomy.open(Models, id as EntityIdStr);
 	});
 
-	let open = $state(false);
+	function getItems() {
+		let items: { voxels: VoxelGroup; label: string }[] = [];
+		if (editingState.modelPickerType === 'public') {
+			items=  globalModelList.value.map((model) => ({ voxels: model, label: model.name }));
+		}
+
+		if (editingState.modelPickerType === 'private') {
+			items = privateModelList.value.map((model) => ({ voxels: model, label: model.name }));
+		}
+
+		if (editingState.modelPickerType === 'world') {
+			items = worldModelList.value.map((model) => ({ voxels: model, label: model.name }));
+		}
+
+		// filter all items that have no voxels
+		items = items.filter((item) => item.voxels.voxels.length > 0);
+
+		return items;
+	}
 </script>
 
-<Button
-	size="iconLg"
-	class="bg-accent-100 hover:bg-accent-200 absolute top-4 left-84"
-	onclick={() => (open = true)}
->
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		stroke-width="2.5"
-		stroke="currentColor"
-	>
-		<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-	</svg>
+<ModalModelPicker
+	newModelButtonClick={async () => {
+		if (!g.roomy) return;
 
-	<span class="sr-only">Add Model</span>
-</Button>
+		const voxels = await g.roomy.create(VoxelGroup);
+		voxels.commit();
+		g.voxelObject = voxels;
 
-{#key modelList.value.length}
-	<ModalModelPicker
-		newModelButtonClick={() => {
-			editingState.showModelEditor = true;
-			open = false;
-		}}
-		bind:open
-		items={modelList.value.map((model) => ({ voxels: model, label: model.name }))}
-		onselect={({ voxels, label }) => {
-			applyTransform();
-			editingState.selectedInstance = null;
-			
-			editingState.selectedModelId = voxels.id;
-			console.log(editingState.selectedModelId);
-		}}
-	/>
-{/key}
+		g.roomy.models.push(voxels);
+		g.roomy.models.commit();
+
+		modelEditor.tool = 'place';
+
+		editingState.showModelPicker = false;
+		editingState.showModelEditor = true;
+	}}
+	bind:open={editingState.showModelPicker}
+	items={getItems()}
+	onselect={({ voxels, label }) => {
+		applyTransform();
+		editingState.selectedInstance = null;
+		editingState.selectedModelId = voxels.id;
+	}}
+	showEditButton={editingState.modelPickerType === 'private'}
+/>

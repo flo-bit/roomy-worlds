@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { TransformControls } from '@threlte/extras';
-	import { editorState } from './state.svelte';
+	import { modelEditor } from './state.svelte';
 	import { T } from '@threlte/core';
-	import type { Voxel } from '$lib/shared/components';
+	import type { Voxel } from '$lib/roomy';
 
 	let { voxel }: { voxel: Voxel } = $props();
 </script>
 
-{#if editorState.tool === 'move' || editorState.tool === 'scale' || editorState.tool === 'rotate'}
+{#if modelEditor.tool === 'move' || modelEditor.tool === 'scale' || modelEditor.tool === 'rotate'}
 	<TransformControls
-		bind:controls={editorState.transformControls}
-		mode={editorState.tool === 'move' ? 'translate' : editorState.tool}
+		bind:controls={modelEditor.transformControls}
+		mode={modelEditor.tool === 'move' ? 'translate' : modelEditor.tool}
 		position={voxel.position.toArray()}
 		quaternion={voxel.quaternion.toArray()}
 		scale={voxel.scale.toArray()}

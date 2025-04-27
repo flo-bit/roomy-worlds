@@ -1,4 +1,4 @@
-import { VoxelGroup, type Voxel } from '$lib/shared/components';
+import { Voxel, VoxelGroup } from '$lib/roomy';
 import { g } from '$lib/shared/roomy.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
 

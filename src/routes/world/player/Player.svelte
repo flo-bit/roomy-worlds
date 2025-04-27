@@ -5,7 +5,7 @@
 	import Controller from './ThirdPersonControls.svelte';
 	import CharacterModel, { type ActionName } from './CharacterModel.svelte';
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
-	import { PlayerLocation } from '$lib/shared/components';
+	import { PlayerLocation } from '$lib/roomy';
 	import { onMount } from 'svelte';
 
 	let {

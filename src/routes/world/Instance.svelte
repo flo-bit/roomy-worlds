@@ -7,16 +7,14 @@
 
 <script lang="ts">
 	import { T } from '@threlte/core';
-	// import { TransformControls } from '@threlte/extras';
-	import { Voxel, type TransformedGroup } from '$lib/shared/components';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { Instance, InstancedMesh, TransformControls } from '@threlte/extras';
 	import { applyTransform, editingState } from './state.svelte';
-	import type { EntityIdStr } from '@muni-town/leaf';
 	import { Collider } from '@threlte/rapier';
 	import { models } from './models.svelte';
 	import { onMount } from 'svelte';
 	import { Spring } from 'svelte/motion';
+	import { TransformedGroup } from '$lib/roomy';
 
 	let { instance }: { instance: TransformedGroup } = $props();
 
@@ -26,8 +24,6 @@
 	let scale = new Spring(0)
 
 	onMount(() => {
-		console.log('instance', instance);
-
 		scale.target = 1;
 	})
 </script>
@@ -78,7 +74,9 @@
 				<T is={geometry} />
 				<T is={material.clone()} color={voxel.color} />
 
-				<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
+				{#if scale.current > 0.99}
+					<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
+				{/if}
 			</T.Mesh>
 		{/each}
 	</T.Group>

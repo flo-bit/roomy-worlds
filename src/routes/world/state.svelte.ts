@@ -1,4 +1,4 @@
-import type { TransformedGroup } from '$lib/shared/components';
+import type { TransformedGroup } from '$lib/roomy';
 import type { EntityIdStr } from '@muni-town/leaf';
 import type { Vector3 } from 'three';
 import type { TransformControls } from 'three/examples/jsm/Addons.js';
@@ -9,12 +9,14 @@ export const editingState = $state({
 	transformControls: undefined as TransformControls | undefined,
 	showModelEditor: false,
 	showWorldSettings: false,
+	showModelPicker: false,
+	modelPickerType: 'public' as 'private' | 'world' | 'public',
 	worldSettings: {
 		seed: Math.floor(Math.random() * 1000000),
 		size: 100,
 		terrainGradient: [
-			{ rgb: { r: 0, g: 0, b: 0 }, position: 0 },
-			{ rgb: { r: 1, g: 1, b: 0 }, position: 1 }
+			{ rgb: { r: 0, g: 0.05, b: 0 }, position: 0 },
+			{ rgb: { r: 0, g: 0.35, b: 0 }, position: 1 }
 		] as {
 			rgb: {
 				r: number;

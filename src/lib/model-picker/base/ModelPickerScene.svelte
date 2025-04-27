@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Voxel, VoxelGroup } from '$lib/shared/components';
+	import type { Voxel, VoxelGroup } from '$lib/roomy';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { onMount } from 'svelte';

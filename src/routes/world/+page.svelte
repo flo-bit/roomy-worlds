@@ -3,9 +3,6 @@
 	import Scene from './Scene.svelte';
 	import { PerfMonitor } from '@threlte/extras';
 	import { World } from '@threlte/rapier';
-	import { onMount, untrack } from 'svelte';
-	import { getVoxelObject } from '$lib';
-	import { Models, TransformedGroup, Voxel, VoxelGroup } from '$lib/shared/components';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
 	import { type EntityIdStr } from '@muni-town/leaf';
@@ -13,17 +10,11 @@
 	import ModelSelection from './ModelSelection.svelte';
 	import { applyTransform, editingState } from './state.svelte';
 	import ModelScene from '$lib/editor/Scene.svelte';
-	import { editorState } from '$lib/editor/state.svelte';
-	import { Button, ColorGradientPicker, Label, SliderNumber } from 'fuchs';
-
-	let voxelObject: VoxelGroup | null = $state(null);
+	import { Button, cn, ColorGradientPicker, Label, SliderNumber } from 'fuchs';
+	import ModelEditorUi from '$lib/editor/ModelEditorUI.svelte';
+	import { TransformedGroup, Models, Voxel } from '$lib/roomy';
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
-	let locations = derivePromise([], async () => (g.world ? await g.world.locations.items() : []));
-
-	onMount(async () => {
-		voxelObject = await getVoxelObject('leaf:vw7a1c7xhdcwnt915t953amrq8dfpcffj2ksc74pymqchv9ap48g');
-	});
 
 	async function addInstance(id: EntityIdStr, position: Vector3) {
 		if (!g.roomy) {
@@ -45,7 +36,6 @@
 
 	let showPerfMonitor = $state(false);
 
-	let selectedTool: 'place' | 'delete' | 'move' | 'rotate' | 'scale' = $state('place');
 	let voxels = derivePromise([], async () =>
 		g.voxelObject ? await g.voxelObject.voxels.items() : []
 	);
@@ -116,24 +106,16 @@
 		g.voxelObject?.voxels.remove(voxel);
 		g.voxelObject?.commit();
 	}
-
-	$effect(() => {
-		applyTransform();
-
-		editorState.tool = selectedTool;
-
-		if (editorState.selectedVoxel !== null) {
-			editorState.selectedVoxel.r = editorState.color.r;
-			editorState.selectedVoxel.g = editorState.color.g;
-			editorState.selectedVoxel.b = editorState.color.b;
-
-			editorState.selectedVoxel.commit();
-		}
-	});
-	
 </script>
 
-<div class="absolute left-80 h-screen w-[calc(100vw-320px)]">
+<div
+	class={cn(
+		'absolute h-[100dvh]',
+		!editingState.showModelEditor && editingState.showWorldSettings
+			? 'left-80 w-[calc(100vw-320px)]'
+			: 'left-0 w-screen'
+	)}
+>
 	<Canvas toneMapping={ACESFilmicToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />
@@ -142,109 +124,75 @@
 			{#if editingState.showModelEditor}
 				<ModelScene voxels={voxels.value} {addVoxel} {deleteVoxel} />
 			{:else}
-				<Scene instances={instances.value} {addInstance} locations={locations.value} />
+				<Scene instances={instances.value} {addInstance} />
 			{/if}
 		</World>
 	</Canvas>
 </div>
 
-<div class="absolute top-0 bottom-0 left-0 w-80 px-8 py-16">
-
-	<Label>Size</Label>
-	<SliderNumber class="mt-2" min={20} max={100} bind:value={editingState.worldSettings.size} />
-
-	<Label>Terrain</Label>
-	<ColorGradientPicker
-		class="mt-6 mb-8"
-		bind:colors={editingState.worldSettings.terrainGradient}
-		onchange={() => {
-			editingState.worldSettings.version += 1;
-		}}
-	/>
-
-	<Label>Water</Label>
-
-	<ColorGradientPicker
-		class="mt-6 mb-4"
-		bind:colors={editingState.worldSettings.waterGradient}
-		onchange={() => {
-			editingState.worldSettings.version += 1;
-		}}
-	/>
-
-	<Label>Percentage</Label>
-	<SliderNumber class="mt-2" bind:value={editingState.worldSettings.waterPercentage} />
-
-	<Button class="mt-6" onclick={() => {
-		editingState.worldSettings.version += 1;
-	}}>
-		Update
-	</Button>
-</div>
-
 <ModelSelection />
 
-<div class="absolute right-2 bottom-2">
-	<Button
-		onclick={async () => {
-			if (!g.roomy) return;
+{#if !editingState.showModelEditor}
+	{#if editingState.showWorldSettings}
+		<div class="absolute top-0 bottom-0 left-0 w-80 px-8 py-16">
+			<Label>Size</Label>
+			<SliderNumber class="mt-2" min={20} max={100} bind:value={editingState.worldSettings.size} />
 
-			if (!g.voxelObject) {
-				const voxels = await g.roomy.create(VoxelGroup);
-				voxels.commit();
-				g.voxelObject = voxels;
-			}
-			editingState.showModelEditor = !editingState.showModelEditor;
-		}}>Model Editor</Button
-	>
-</div>
+			<Label>Terrain</Label>
+			<ColorGradientPicker
+				class="mt-6 mb-8"
+				bind:colors={editingState.worldSettings.terrainGradient}
+				onchange={() => {
+					editingState.worldSettings.version += 1;
+				}}
+			/>
+
+			<Label>Water</Label>
+
+			<ColorGradientPicker
+				class="mt-6 mb-4"
+				bind:colors={editingState.worldSettings.waterGradient}
+				onchange={() => {
+					editingState.worldSettings.version += 1;
+				}}
+			/>
+
+			<Label>Percentage</Label>
+			<SliderNumber class="mt-2" bind:value={editingState.worldSettings.waterPercentage} />
+
+			<Button
+				class="mt-6"
+				onclick={() => {
+					editingState.worldSettings.version += 1;
+				}}
+			>
+				Update
+			</Button>
+		</div>
+	{:else}
+		<Button
+			size="iconLg"
+			class="bg-accent-100 hover:bg-accent-200 absolute top-4 left-4"
+			onclick={() => (editingState.showModelPicker = true)}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="2.5"
+				stroke="currentColor"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+			</svg>
+
+			<span class="sr-only">Add Model</span>
+		</Button>
+	{/if}
+{:else}
+	<ModelEditorUi />
+{/if}
 
 <div class="absolute bottom-2 left-4 z-10 flex flex-col gap-2">
-	<!-- <Button
-		onclick={async () => {
-			// turn into json with all the instances
-			const json: WorldData = {
-				instances: [],
-				models: {}
-			}
-
-			const addedModels = new Set<EntityIdStr>();
-
-			for (const instance of instances.value) {
-				if (!addedModels.has(instance.group)) {
-					addedModels.add(instance.group);
-
-					let model = await instance.loadGroup();
-					const voxels = await model.voxels.items();
-
-					json.models[instance.group] = {
-						voxels: voxels.map((voxel) => ({
-							id: voxel.id as string,
-							position: voxel.position,
-							quaternion: voxel.quaternion.toArray(),
-							scale: voxel.scale,
-							color: voxel.color as unknown as number,
-							visible: voxel.visible,
-							collider: voxel.collider
-						}))
-					};
-				}
-
-				json.instances.push({
-					id: instance.id,
-					position: instance.position,
-					quaternion: instance.quaternion.toArray(),
-					scale: instance.scale,
-					model: instance.group
-				});
-			}
-
-			downloadObjectAsJson(json, 'world');
-
-			//downloadObjectAsJson(instances.value, 'world');
-		}}>Export</Button
-	> -->
-
 	{#if editingState.selectedInstance}
 		<div class="flex items-center gap-2">
 			<span class="text-base-800 text-sm"> moving </span>

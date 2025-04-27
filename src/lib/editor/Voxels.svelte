@@ -1,8 +1,8 @@
 <script lang="ts">
 	import EditViewVoxel from './EditViewVoxel.svelte';
-	import { editorState } from './state.svelte';
+	import { modelEditor } from './state.svelte';
 	import TransformingVoxel from './TransformingVoxel.svelte';
-	import type { Voxel } from '$lib/shared/components';
+	import type { Voxel } from '$lib/roomy';
 	import type { AddVoxelFunction } from './types';
 
 	let {
@@ -13,17 +13,17 @@
 		$props();
 
 	$effect(() => {
-		if (editorState.tool !== 'place' && editorState.ghostPosition) {
-			editorState.ghostPosition = null;
+		if (modelEditor.tool !== 'place' && modelEditor.ghostPosition) {
+			modelEditor.ghostPosition = null;
 		}
-		if (editorState.tool !== 'delete' && editorState.ghostDeleteIndex) {
-			editorState.ghostDeleteIndex = null;
+		if (modelEditor.tool !== 'delete' && modelEditor.ghostDeleteIndex) {
+			modelEditor.ghostDeleteIndex = null;
 		}
 	});
 </script>
 
 {#each voxels as voxel, index}
-	{#if editorState.selectedVoxel?.id === voxel.id}
+	{#if modelEditor.selectedVoxel?.id === voxel.id}
 		<TransformingVoxel {voxel} />
 	{:else}
 		<EditViewVoxel {voxel} {index} {addVoxel} {deleteVoxel} />
