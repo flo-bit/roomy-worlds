@@ -31,7 +31,7 @@
 
 <Button
 	size="iconLg"
-	class="bg-accent-100 hover:bg-accent-200 absolute top-4 left-4"
+	class="bg-accent-100 hover:bg-accent-200 absolute top-4 left-84"
 	onclick={() => (open = true)}
 >
 	<svg
@@ -50,7 +50,8 @@
 {#key modelList.value.length}
 	<ModalModelPicker
 		newModelButtonClick={() => {
-			createModel(base, true);
+			editingState.showModelEditor = true;
+			open = false;
 		}}
 		bind:open
 		items={modelList.value.map((model) => ({ voxels: model, label: model.name }))}

@@ -9,7 +9,6 @@
 
 	interactivity({
 		filter: (hits, state) => {
-			console.log(hits, state);
 			return hits.slice(0, 1);
 		}
 	});

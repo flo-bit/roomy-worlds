@@ -3,8 +3,10 @@
 	import * as THREE from 'three';
 	import { UberNoise } from 'uber-noise';
 	import { shuffle } from '$lib';
+	import { ColorGradient } from './colorgradient';
+	import { editingState } from '../../routes/world/state.svelte';
 
-	const size = 100;
+	const size = editingState.worldSettings.size;
 
 	const voxelSize = 1;
 
@@ -13,7 +15,7 @@
 	);
 
 	const instancedGeometry = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
-	const instancedMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0, transparent: true, opacity: 0.8, roughness: 0 });
+	const instancedMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0, transparent: true, opacity: 0.95, roughness: 0 });
 	const instancedMesh = new THREE.InstancedMesh(instancedGeometry, instancedMaterial, totalVoxels);
 
 	const indices = shuffle(Array.from({ length: totalVoxels }, (_, i) => i));
@@ -21,10 +23,9 @@
 	instancedMesh.receiveShadow = true;
 
 	const dummy = new THREE.Object3D();
-	const color = new THREE.Color(0x00ff00);
 
 	const waterNoise = new UberNoise({
-		seed: 1,
+		seed: editingState.worldSettings.seed + 10,
 		octaves: 3,
 		scale: 0.01,
 		min: 0,
@@ -34,12 +35,19 @@
 
 
 	const terrainNoise = new UberNoise({
-		seed: 1,
+		seed: editingState.worldSettings.seed,
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
 		max: 3,
 		warp: 1
+	});
+
+	const waterGradient = new ColorGradient({
+		stops: editingState.worldSettings.waterGradient.map(({ rgb, position }) => ({
+			position: (position - 1),
+			value: new THREE.Color(rgb.r, rgb.g, rgb.b)
+		}))
 	});
 
 	let positions: THREE.Vector3[] = new Array(totalVoxels);
@@ -70,15 +78,14 @@
 
 
 			const height = noiseHeight + Math.pow(distance / (size / 2), 2) * -5;
-			const noise = waterNoise.get(x, z);
 
-			if(water > -0.3) continue;
+			if(water > (editingState.worldSettings.waterPercentage / 100 * 2 - 1)) continue;
 
 			dummy.position.set(x, height, z);
 			dummy.scale.set(1.2, isEdge ? 20 : 3, 1.2);
 			dummy.updateMatrix();
 			
-			color.setRGB(0.1 * noise, 0.1 * noise, 2 * noise );
+			const color = waterGradient.get(water);
 
 			//if(isEdge) color.setRGB(1, 0, 0);
 

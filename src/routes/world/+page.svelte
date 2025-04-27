@@ -3,51 +3,26 @@
 	import Scene from './Scene.svelte';
 	import { PerfMonitor } from '@threlte/extras';
 	import { World } from '@threlte/rapier';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { getVoxelObject } from '$lib';
-	import { TransformedGroup, type Voxel, type VoxelGroup } from '$lib/shared/components';
+	import { Models, TransformedGroup, Voxel, VoxelGroup } from '$lib/shared/components';
 	import { derivePromise } from '$lib/shared/utils.svelte';
 	import { g, initRoomy } from '$lib/shared/roomy.svelte';
-	import { UndoManager, type EntityIdStr } from '@muni-town/leaf';
+	import { type EntityIdStr } from '@muni-town/leaf';
 	import { ACESFilmicToneMapping, Quaternion, Vector3 } from 'three';
 	import ModelSelection from './ModelSelection.svelte';
 	import { applyTransform, editingState } from './state.svelte';
-	import { dev } from '$app/environment';
+	import ModelScene from '$lib/editor/Scene.svelte';
+	import { editorState } from '$lib/editor/state.svelte';
+	import { Button, ColorGradientPicker, Label, SliderNumber } from 'fuchs';
 
 	let voxelObject: VoxelGroup | null = $state(null);
-
-	let voxels: Voxel[] = $state([]);
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 	let locations = derivePromise([], async () => (g.world ? await g.world.locations.items() : []));
 
-	let undoManager: UndoManager | null = $state(null);
-
-	$inspect(instances);
-
 	onMount(async () => {
 		voxelObject = await getVoxelObject('leaf:vw7a1c7xhdcwnt915t953amrq8dfpcffj2ksc74pymqchv9ap48g');
-
-		voxels = await voxelObject.voxels.items();
-	});
-
-	$effect(() => {
-		if (g.world?.entity.doc && !undoManager) {
-			undoManager = new UndoManager(g.world.entity.doc, {
-				maxUndoSteps: 100
-			});
-
-			window.addEventListener('keyup', (e) => {
-				if (e.key.toLowerCase() === 'z' && e.shiftKey) {
-					console.log('undo', e);
-					undoManager?.undo();
-				} else if (e.key.toLowerCase() === 'y' && e.shiftKey) {
-					undoManager?.redo();
-				} else if (e.key.toLowerCase() === 'p') {
-					showPerfMonitor = !showPerfMonitor;
-				}
-			});
-		}
 	});
 
 	async function addInstance(id: EntityIdStr, position: Vector3) {
@@ -68,21 +43,161 @@
 		g.world?.commit();
 	}
 
-	let showPerfMonitor = $state(dev);
+	let showPerfMonitor = $state(false);
+
+	let selectedTool: 'place' | 'delete' | 'move' | 'rotate' | 'scale' = $state('place');
+	let voxels = derivePromise([], async () =>
+		g.voxelObject ? await g.voxelObject.voxels.items() : []
+	);
+
+	const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
+
+	let isPublished = derivePromise(false, async () => {
+		if (!g.voxelObject || !g.roomy) return;
+		const models = await g.roomy.open(Models, id as EntityIdStr);
+		return models.models.ids().some((m) => m === g.voxelObject?.id);
+	});
+
+	export async function addVoxel(
+		position: [number, number, number],
+		color: [number, number, number],
+		scale?: [number, number, number],
+		quaternion?: [number, number, number, number]
+	) {
+		if (!g.roomy) {
+			await initRoomy();
+
+			if (!g.roomy) return;
+		}
+
+		const voxel = await g.roomy.create(Voxel);
+		voxel.x = position[0];
+		voxel.y = position[1];
+		voxel.z = position[2];
+		voxel.r = color[0];
+		voxel.g = color[1];
+		voxel.b = color[2];
+
+		if (scale) {
+			voxel.sx = scale[0];
+			voxel.sy = scale[1];
+			voxel.sz = scale[2];
+		} else {
+			voxel.sx = 1;
+			voxel.sy = 1;
+			voxel.sz = 1;
+		}
+
+		if (quaternion) {
+			voxel.qx = quaternion[0];
+			voxel.qy = quaternion[1];
+			voxel.qz = quaternion[2];
+			voxel.qw = quaternion[3];
+		} else {
+			voxel.qx = 0;
+			voxel.qy = 0;
+			voxel.qz = 0;
+			voxel.qw = 1;
+		}
+
+		voxel.visible = true;
+		voxel.collider = false;
+
+		voxel.commit();
+		g.voxelObject?.voxels.push(voxel);
+		g.voxelObject?.commit();
+	}
+
+	export async function deleteVoxel(id: string) {
+		// find voxel by id
+		const voxel = voxels.value.findIndex((v) => v.id === id);
+		if (!voxel) return;
+
+		g.voxelObject?.voxels.remove(voxel);
+		g.voxelObject?.commit();
+	}
+
+	$effect(() => {
+		applyTransform();
+
+		editorState.tool = selectedTool;
+
+		if (editorState.selectedVoxel !== null) {
+			editorState.selectedVoxel.r = editorState.color.r;
+			editorState.selectedVoxel.g = editorState.color.g;
+			editorState.selectedVoxel.b = editorState.color.b;
+
+			editorState.selectedVoxel.commit();
+		}
+	});
+	
 </script>
 
-<div class="h-screen w-screen">
+<div class="absolute left-80 h-screen w-[calc(100vw-320px)]">
 	<Canvas toneMapping={ACESFilmicToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />
 		{/if}
 		<World framerate={60}>
-			<Scene instances={instances.value} {addInstance} locations={locations.value} />
+			{#if editingState.showModelEditor}
+				<ModelScene voxels={voxels.value} {addVoxel} {deleteVoxel} />
+			{:else}
+				<Scene instances={instances.value} {addInstance} locations={locations.value} />
+			{/if}
 		</World>
 	</Canvas>
 </div>
 
+<div class="absolute top-0 bottom-0 left-0 w-80 px-8 py-16">
+
+	<Label>Size</Label>
+	<SliderNumber class="mt-2" min={20} max={100} bind:value={editingState.worldSettings.size} />
+
+	<Label>Terrain</Label>
+	<ColorGradientPicker
+		class="mt-6 mb-8"
+		bind:colors={editingState.worldSettings.terrainGradient}
+		onchange={() => {
+			editingState.worldSettings.version += 1;
+		}}
+	/>
+
+	<Label>Water</Label>
+
+	<ColorGradientPicker
+		class="mt-6 mb-4"
+		bind:colors={editingState.worldSettings.waterGradient}
+		onchange={() => {
+			editingState.worldSettings.version += 1;
+		}}
+	/>
+
+	<Label>Percentage</Label>
+	<SliderNumber class="mt-2" bind:value={editingState.worldSettings.waterPercentage} />
+
+	<Button class="mt-6" onclick={() => {
+		editingState.worldSettings.version += 1;
+	}}>
+		Update
+	</Button>
+</div>
+
 <ModelSelection />
+
+<div class="absolute right-2 bottom-2">
+	<Button
+		onclick={async () => {
+			if (!g.roomy) return;
+
+			if (!g.voxelObject) {
+				const voxels = await g.roomy.create(VoxelGroup);
+				voxels.commit();
+				g.voxelObject = voxels;
+			}
+			editingState.showModelEditor = !editingState.showModelEditor;
+		}}>Model Editor</Button
+	>
+</div>
 
 <div class="absolute bottom-2 left-4 z-10 flex flex-col gap-2">
 	<!-- <Button
@@ -131,7 +246,7 @@
 	> -->
 
 	{#if editingState.selectedInstance}
-		<div class="flex gap-2 items-center">
+		<div class="flex items-center gap-2">
 			<span class="text-base-800 text-sm"> moving </span>
 
 			<button
@@ -139,7 +254,7 @@
 					applyTransform();
 					editingState.selectedInstance = null;
 				}}
-				class="bg-base-200/20 text-base-900 rounded-full p-0.5 cursor-pointer"
+				class="bg-base-200/20 text-base-900 cursor-pointer rounded-full p-0.5"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -157,14 +272,14 @@
 			</button>
 		</div>
 	{:else if editingState.selectedModelId}
-		<div class="flex gap-2 items-center">
+		<div class="flex items-center gap-2">
 			<span class="text-base-800 text-sm"> placing </span>
 
 			<button
 				onclick={() => {
 					editingState.selectedModelId = null;
 				}}
-				class="bg-base-200/20 text-base-900 rounded-full p-0.5 cursor-pointer"
+				class="bg-base-200/20 text-base-900 cursor-pointer rounded-full p-0.5"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

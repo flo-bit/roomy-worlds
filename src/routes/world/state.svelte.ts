@@ -6,7 +6,37 @@ import type { TransformControls } from 'three/examples/jsm/Addons.js';
 export const editingState = $state({
 	selectedInstance: null as TransformedGroup | null,
 	selectedModelId: null as EntityIdStr | null,
-	transformControls: undefined as TransformControls | undefined
+	transformControls: undefined as TransformControls | undefined,
+	showModelEditor: false,
+	showWorldSettings: false,
+	worldSettings: {
+		seed: Math.floor(Math.random() * 1000000),
+		size: 100,
+		terrainGradient: [
+			{ rgb: { r: 0, g: 0, b: 0 }, position: 0 },
+			{ rgb: { r: 1, g: 1, b: 0 }, position: 1 }
+		] as {
+			rgb: {
+				r: number;
+				g: number;
+				b: number;
+			};
+			position: number;
+		}[],
+		waterGradient: [
+			{ rgb: { r: 0, g: 0, b: 0 }, position: 0 },
+			{ rgb: { r: 0, g: 0, b: 1 }, position: 1 }
+		] as {
+			rgb: {
+				r: number;
+				g: number;
+				b: number;
+			};
+			position: number;
+		}[],
+		waterPercentage: 35,
+		version: 0
+	}
 });
 
 export type AddInstanceFunction = (id: EntityIdStr, position: Vector3) => void;

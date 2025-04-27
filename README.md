@@ -4,7 +4,7 @@ Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.
 
 Made with [roomy-sdk](https://github.com/muni-town/roomy-sdk) and [leaf](https://github.com/muni-town/leaf).
 
-Work in progress: You can create new worlds locally, but they might disappear/change unexpectedly with new updates. 
+Work in progress: You can create new worlds, but they might disappear/change unexpectedly with new updates. 
 Also lots of bugs.
 
 [Demo](https://flo-bit.dev/roomy-worlds)
@@ -41,9 +41,16 @@ as well as see all models made in any window.
 
 ## todo
 
-### general
-
-- [x] add at proto login
+- save world settings with roomy world
+- add default gradients
+- export and import world (incl world settings)
+- rotate and scale models 
+- add advanced settings to world (noise settings)
+- add sound effects (placing, walking)
+- add selection between world/local/global models
+- add model name and category
+- download model
+- add gradient for lower part of island
 
 ### worlds
 
@@ -84,9 +91,7 @@ as well as see all models made in any window.
 ### bugs
 
 - fix click (for placement and selection on floor + cubes) to only work when mouse stays still (down-up)
-- not showing world items on fresh load (until one item is placed)
 - first cube cant be removed in model editor
-- new model in model picker not showing without refreshing (in world)
 - updates to models not showing without refreshing (in world)
 
 ## Credits

@@ -16,8 +16,11 @@
 <T.Mesh
 	rotation.x={-Math.PI / 2}
 	onclick={(e) => {
+		console.log(e.point, editorState.tool);
 		e.stopPropagation();
 		if (editorState.tool !== 'place') return;
+
+		console.log(e.point);
 
 		addVoxel(
 			[e.point.x, e.point.y + 0.5, e.point.z],

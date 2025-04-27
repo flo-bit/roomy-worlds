@@ -6,8 +6,10 @@
 	import { UberNoise } from 'uber-noise';
 	import type { IntersectionEvent } from '@threlte/extras';
 	import { shuffle } from '$lib';
+	import { ColorGradient } from './colorgradient';
+	import { editingState } from '../../routes/world/state.svelte';
 
-	const size = 100;
+	const size = editingState.worldSettings.size;
 
 	const voxelSize = 1;
 
@@ -29,7 +31,7 @@
 	const heightfield: number[] = [];
 
 	const upperNoise = new UberNoise({
-		seed: 1,
+		seed: editingState.worldSettings.seed,
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
@@ -37,7 +39,7 @@
 		warp: 1
 	});
 	const lowerNoise = new UberNoise({
-		seed: 10,
+		seed: editingState.worldSettings.seed + 10,
 		octaves: 6,
 		scale: 0.05,
 		min: 0,
@@ -46,6 +48,14 @@
 	});
 
 	const lowerIndices = new Set<number>();
+
+
+	const gradient = new ColorGradient({
+		stops: editingState.worldSettings.terrainGradient.map(({ rgb, position }) => ({
+			position: (position - 0.5) * 2,
+			value: new THREE.Color(rgb.r, rgb.g, rgb.b)
+		}))
+	});
 
 	for (let x = -size / 2; x < size / 2; x += voxelSize) {
 		for (let z = -size / 2; z < size / 2; z += voxelSize) {
@@ -64,7 +74,9 @@
 			dummy.position.set(x, height, z);
 			dummy.scale.set(1, 3, 1);
 			dummy.updateMatrix();
-			color.setRGB(0, 0.15 * noise + 0.2, 0);
+			//color.setRGB(0, 0.15 * noise + 0.2, 0);
+
+			const color = gradient.get(noise);
 
 			let i = indices.shift() ?? 0;
 

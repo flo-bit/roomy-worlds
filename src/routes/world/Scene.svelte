@@ -104,15 +104,17 @@
 <T.DirectionalLight position={[0, 10, -10]} />
 <T.HemisphereLight position={[0, 10, 10]} args={[0xffff00, 0x0000ff, 1]} />
 
-<Terrain
-	clickedTerrain={(e) => {
-		if (editingState.selectedModelId) {
-			addInstance(editingState.selectedModelId, e.point);
-		}
-	}}
-/>
+{#key editingState.worldSettings.version}
+	<Terrain
+		clickedTerrain={(e) => {
+			if (editingState.selectedModelId) {
+				addInstance(editingState.selectedModelId, e.point);
+			}
+		}}
+	/>
 
-<Water />
+	<Water />
+{/key}
 
 <!-- <Debug /> -->
 

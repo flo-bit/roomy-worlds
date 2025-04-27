@@ -15,10 +15,21 @@
 	import type { EntityIdStr } from '@muni-town/leaf';
 	import { Collider } from '@threlte/rapier';
 	import { models } from './models.svelte';
+	import { onMount } from 'svelte';
+	import { Spring } from 'svelte/motion';
 
 	let { instance }: { instance: TransformedGroup } = $props();
 
 	let voxels = derivePromise([], async () => models.getModel(instance.group));
+
+
+	let scale = new Spring(0)
+
+	onMount(() => {
+		console.log('instance', instance);
+
+		scale.target = 1;
+	})
 </script>
 
 {#if editingState.selectedInstance === instance}
@@ -43,7 +54,7 @@
 	<T.Group
 		position={instance.position.toArray()}
 		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray()}
+		scale={instance.scale.toArray().map(s => scale.current * s) as [number, number, number]}
 		onclick={async (e) => {
 			e.stopPropagation();
 
