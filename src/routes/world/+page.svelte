@@ -12,7 +12,7 @@
 	import ModelScene from '$lib/editor/Scene.svelte';
 	import { Button, cn, ColorGradientPicker, Label, SliderNumber } from 'fuchs';
 	import ModelEditorUi from '$lib/editor/ModelEditorUI.svelte';
-	import { TransformedGroup, Models, Voxel } from '$lib/roomy';
+	import { TransformedGroup } from '$lib/roomy';
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 
@@ -35,77 +35,6 @@
 	}
 
 	let showPerfMonitor = $state(false);
-
-	let voxels = derivePromise([], async () =>
-		g.voxelObject ? await g.voxelObject.voxels.items() : []
-	);
-
-	const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
-
-	let isPublished = derivePromise(false, async () => {
-		if (!g.voxelObject || !g.roomy) return;
-		const models = await g.roomy.open(Models, id as EntityIdStr);
-		return models.models.ids().some((m) => m === g.voxelObject?.id);
-	});
-
-	export async function addVoxel(
-		position: [number, number, number],
-		color: [number, number, number],
-		scale?: [number, number, number],
-		quaternion?: [number, number, number, number]
-	) {
-		if (!g.roomy) {
-			await initRoomy();
-
-			if (!g.roomy) return;
-		}
-
-		const voxel = await g.roomy.create(Voxel);
-		voxel.x = position[0];
-		voxel.y = position[1];
-		voxel.z = position[2];
-		voxel.r = color[0];
-		voxel.g = color[1];
-		voxel.b = color[2];
-
-		if (scale) {
-			voxel.sx = scale[0];
-			voxel.sy = scale[1];
-			voxel.sz = scale[2];
-		} else {
-			voxel.sx = 1;
-			voxel.sy = 1;
-			voxel.sz = 1;
-		}
-
-		if (quaternion) {
-			voxel.qx = quaternion[0];
-			voxel.qy = quaternion[1];
-			voxel.qz = quaternion[2];
-			voxel.qw = quaternion[3];
-		} else {
-			voxel.qx = 0;
-			voxel.qy = 0;
-			voxel.qz = 0;
-			voxel.qw = 1;
-		}
-
-		voxel.visible = true;
-		voxel.collider = false;
-
-		voxel.commit();
-		g.voxelObject?.voxels.push(voxel);
-		g.voxelObject?.commit();
-	}
-
-	export async function deleteVoxel(id: string) {
-		// find voxel by id
-		const voxel = voxels.value.findIndex((v) => v.id === id);
-		if (!voxel) return;
-
-		g.voxelObject?.voxels.remove(voxel);
-		g.voxelObject?.commit();
-	}
 </script>
 
 <div
@@ -122,7 +51,7 @@
 		{/if}
 		<World framerate={60}>
 			{#if editingState.showModelEditor}
-				<ModelScene voxels={voxels.value} {addVoxel} {deleteVoxel} />
+				<ModelScene />
 			{:else}
 				<Scene instances={instances.value} {addInstance} />
 			{/if}

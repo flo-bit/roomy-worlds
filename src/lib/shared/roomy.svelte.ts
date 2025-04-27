@@ -19,7 +19,7 @@ export const g = $state({
 	did: undefined as string | undefined
 });
 
-export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
 	const savedCatalogId = localStorage.getItem('catalogId');
 	const catalogId = new EntityId((savedCatalogId as EntityIdStr) ?? undefined);
 	if (!savedCatalogId) localStorage.setItem('catalogId', catalogId.toString());
@@ -63,6 +63,7 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
 		);
 	}
 	try {
+		// @ts-expect-error - this is probably fine?
 		g.roomy = await Roomy.init(peer, catalogId);
 	} catch (e) {
 		console.error(e);

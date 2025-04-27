@@ -1,21 +1,10 @@
 <script lang="ts">
 	import { useCursor } from '@threlte/extras';
-	import { applyModelEditorTransform, modelEditor } from './state.svelte';
+	import { addVoxel, applyModelEditorTransform, deleteVoxel, modelEditor } from './state.svelte';
 	import { T } from '@threlte/core';
-	import type { AddVoxelFunction } from './types';
 	import { Voxel } from '$lib/roomy';
-	
-	let {
-		voxel,
-		index,
-		addVoxel,
-		deleteVoxel
-	}: {
-		voxel: Voxel;
-		index: number;
-		addVoxel: AddVoxelFunction;
-		deleteVoxel: (id: string) => Promise<void>;
-	} = $props();
+
+	let { voxel }: { voxel: Voxel } = $props();
 	const { onPointerEnter, onPointerLeave } = useCursor();
 </script>
 
@@ -28,7 +17,7 @@
 		if (modelEditor.tool === 'delete') {
 			//editorState.cubes.splice(index, 1);
 			deleteVoxel(voxel.id);
-			modelEditor.ghostDeleteIndex = null;
+			modelEditor.ghostDeleteId = null;
 		} else if (modelEditor.tool === 'place' && e.normal) {
 			addVoxel(
 				[e.point.x + e.normal.x * 0.5, e.point.y + e.normal.y * 0.5, e.point.z + e.normal.z * 0.5],
@@ -51,7 +40,7 @@
 		onPointerEnter();
 
 		if (modelEditor.tool === 'delete') {
-			modelEditor.ghostDeleteIndex = index;
+			modelEditor.ghostDeleteId = voxel.id;
 		}
 	}}
 	onpointermove={(e) => {
@@ -65,7 +54,7 @@
 			];
 		}
 		if (modelEditor.tool === 'delete') {
-			modelEditor.ghostDeleteIndex = index;
+			modelEditor.ghostDeleteId = voxel.id;
 		}
 	}}
 	onpointerleave={(e) => {
@@ -73,7 +62,7 @@
 		onPointerLeave();
 
 		if (modelEditor.tool === 'delete') {
-			modelEditor.ghostDeleteIndex = null;
+			modelEditor.ghostDeleteId = null;
 		} else if (modelEditor.tool === 'place') {
 			modelEditor.ghostPosition = null;
 		}
@@ -81,6 +70,6 @@
 >
 	<T.BoxGeometry />
 	<T.MeshStandardMaterial
-		color={index === modelEditor.ghostDeleteIndex ? [1, 0, 0] : [voxel.r, voxel.g, voxel.b]}
+		color={modelEditor.ghostDeleteId === voxel.id ? [1, 0, 0] : [voxel.r, voxel.g, voxel.b]}
 	/>
 </T.Mesh>

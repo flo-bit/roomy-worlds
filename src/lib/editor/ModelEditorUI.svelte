@@ -1,8 +1,9 @@
 <script>
-	import { Button, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
-	import { applyModelEditorTransform, modelEditor } from './state.svelte';
+	import { Button, PopoverColorPicker, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
+	import { addVoxel, applyModelEditorTransform, deleteVoxel, modelEditor } from './state.svelte';
 	import { editingState } from '../../routes/world/state.svelte';
 	import { g } from '$lib/shared/roomy.svelte';
+	import { onMount } from 'svelte';
 
 	$effect(() => {
 		applyModelEditorTransform();
@@ -16,6 +17,40 @@
 
 			modelEditor.selectedVoxel.commit();
 		}
+	});
+
+	onMount(() => {
+		window.addEventListener('keydown', async (e) => {
+			// if target is input, don't handle
+			if (e.target instanceof HTMLInputElement) return;
+
+			if (e.key === 'r') {
+				selectedTool = 'rotate';
+			} else if (e.key === 's') {
+				selectedTool = 'scale';
+			} else if (e.key === 'g') {
+				selectedTool = 'move';
+			} else if (e.key === 'd') {
+				selectedTool = 'delete';
+			} else if (e.key === 'p') {
+				selectedTool = 'place';
+			} else if (e.key === 'c') {
+				if (modelEditor.selectedVoxel === null) return;
+
+				applyModelEditorTransform();
+
+				await new Promise((resolve) => setTimeout(resolve, 10));
+				// clone
+				let v = modelEditor.selectedVoxel;
+
+				addVoxel([v.x, v.y, v.z], [v.r, v.g, v.b], [v.sx, v.sy, v.sz], [v.qx, v.qy, v.qz, v.qw]);
+			} else if (e.key === 'x') {
+				// delete
+				if (modelEditor.selectedVoxel === null) return;
+				deleteVoxel(modelEditor.selectedVoxel.id);
+				modelEditor.selectedVoxel = null;
+			}
+		});
 	});
 
 	let selectedTool = $state(modelEditor.tool);
@@ -138,11 +173,16 @@
 	</div>
 </div>
 
-<div class="absolute top-2 right-2">
+<div class="absolute bottom-2 right-2">
 	<Button size="iconLg" onclick={() => {
 		editingState.showModelEditor = false;
 		if(g.voxelObject?.id && g.voxelObject.voxels.length > 0) editingState.selectedModelId = g.voxelObject.id;;
 	}}>
 		Back to world
 	</Button>
+</div>
+
+
+<div class="absolute top-3 right-3 z-10">
+	<PopoverColorPicker bind:rgb={modelEditor.color} />
 </div>

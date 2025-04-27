@@ -3,29 +3,23 @@
 	import { modelEditor } from './state.svelte';
 	import TransformingVoxel from './TransformingVoxel.svelte';
 	import type { Voxel } from '$lib/roomy';
-	import type { AddVoxelFunction } from './types';
 
-	let {
-		voxels,
-		addVoxel,
-		deleteVoxel
-	}: { voxels: Voxel[]; addVoxel: AddVoxelFunction; deleteVoxel: (id: string) => Promise<void> } =
-		$props();
+	let { voxels }: { voxels: Voxel[] } = $props();
 
 	$effect(() => {
 		if (modelEditor.tool !== 'place' && modelEditor.ghostPosition) {
 			modelEditor.ghostPosition = null;
 		}
-		if (modelEditor.tool !== 'delete' && modelEditor.ghostDeleteIndex) {
-			modelEditor.ghostDeleteIndex = null;
+		if (modelEditor.tool !== 'delete' && modelEditor.ghostDeleteId) {
+			modelEditor.ghostDeleteId = null;
 		}
 	});
 </script>
 
-{#each voxels as voxel, index}
+{#each voxels as voxel}
 	{#if modelEditor.selectedVoxel?.id === voxel.id}
 		<TransformingVoxel {voxel} />
 	{:else}
-		<EditViewVoxel {voxel} {index} {addVoxel} {deleteVoxel} />
+		<EditViewVoxel {voxel} />
 	{/if}
 {/each}

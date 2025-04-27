@@ -6,7 +6,7 @@ import {
 	LoroText,
 	Marker
 } from '@muni-town/leaf';
-import { LoroList } from './index.ts';
+import { LoroList } from './index';
 
 export type Uri = string;
 

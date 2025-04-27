@@ -16,6 +16,10 @@ class Models {
 
 		this.models[id] = voxels;
 
+		model.voxels.subscribe(async () => {
+			this.models[id] = await model.voxels.items();
+		});
+
 		return voxels;
 	}
 }

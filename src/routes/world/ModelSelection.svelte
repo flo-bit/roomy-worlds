@@ -22,9 +22,9 @@
 		for (const model of models ?? []) {
 			groups.add(model.group);
 		}
-		return Promise.all(
+		return (await Promise.all(
 			Array.from(groups).map(async (group) => await g.roomy?.open(VoxelGroup, group))
-		);
+		)) as VoxelGroup[];
 	});
 
 	let privateModelList = derivePromise([], async () => {

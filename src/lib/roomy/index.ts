@@ -41,19 +41,10 @@ export * from '@muni-town/leaf';
  *
  * @category Advanced
  * */
-export * as components from './components.ts';
-import * as c from './components.ts';
+export * as components from './components';
+import * as c from './components';
 import { Color, Quaternion, Vector3 } from 'three';
-import {
-	ModelsComponent,
-	PlayerLocationComponent,
-	PlayerLocationsComponent,
-	TransformComponent,
-	TransformedGroupComponent,
-	VoxelComponent,
-	VoxelGroupComponent,
-	WorldComponent
-} from './components.ts';
+
 import { g, initRoomy } from '$lib/shared/roomy.svelte.js';
 
 /** A constructor for an {@linkcode EntityWrapper}. */
@@ -178,6 +169,7 @@ export class EntityWrapper extends HasPeer {
 	 * override it to check for the existence of certain marker components.
 	 * */
 	// deno-lint-ignore no-unused-vars
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static matches(wrapper: EntityWrapper): boolean {
 		return true;
 	}
@@ -400,6 +392,7 @@ export class EntityList<
 			}
 
 			// deno-lint-ignore no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			return undefined as any;
 		});
 	}
@@ -460,7 +453,7 @@ export class Roomy extends EntityWrapper {
 	}
 
 	get models(): EntityList<VoxelGroup> {
-		return new EntityList(this.peer, this.entity, ModelsComponent, VoxelGroup);
+		return new EntityList(this.peer, this.entity, c.ModelsComponent, VoxelGroup);
 	}
 }
 
@@ -798,80 +791,80 @@ export class Transform extends EntityWrapper {
 	}
 
 	get x() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('x'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('x'));
 	}
 	set x(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('x', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('x', value));
 	}
 
 	get y() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('y'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('y'));
 	}
 	set y(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('y', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('y', value));
 	}
 
 	get z() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('z'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('z'));
 	}
 	set z(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('z', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('z', value));
 	}
 
 	get sx() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('sx'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('sx'));
 	}
 
 	set sx(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('sx', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('sx', value));
 	}
 
 	get sy() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('sy'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('sy'));
 	}
 
 	set sy(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('sy', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('sy', value));
 	}
 
 	get sz() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('sz'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('sz'));
 	}
 
 	set sz(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('sz', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('sz', value));
 	}
 
 	get qx() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('qx'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('qx'));
 	}
 
 	set qx(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('qx', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('qx', value));
 	}
 
 	get qy() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('qy'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('qy'));
 	}
 
 	set qy(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('qy', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('qy', value));
 	}
 
 	get qz() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('qz'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('qz'));
 	}
 
 	set qz(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('qz', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('qz', value));
 	}
 
 	get qw() {
-		return this.entity.getOrInit(TransformComponent, (entity) => entity.get('qw'));
+		return this.entity.getOrInit(c.TransformComponent, (entity) => entity.get('qw'));
 	}
 
 	set qw(value: number) {
-		this.entity.getOrInit(TransformComponent, (entity) => entity.set('qw', value));
+		this.entity.getOrInit(c.TransformComponent, (entity) => entity.set('qw', value));
 	}
 }
 
@@ -887,52 +880,52 @@ export class Voxel extends Transform {
 	}
 
 	get r() {
-		return this.entity.getOrInit(VoxelComponent, (entity) => entity.get('r'));
+		return this.entity.getOrInit(c.VoxelComponent, (entity) => entity.get('r'));
 	}
 	set r(value: number) {
-		this.entity.getOrInit(VoxelComponent, (entity) => entity.set('r', value));
+		this.entity.getOrInit(c.VoxelComponent, (entity) => entity.set('r', value));
 	}
 
 	get g() {
-		return this.entity.getOrInit(VoxelComponent, (entity) => entity.get('g'));
+		return this.entity.getOrInit(c.VoxelComponent, (entity) => entity.get('g'));
 	}
 	set g(value: number) {
-		this.entity.getOrInit(VoxelComponent, (entity) => entity.set('g', value));
+		this.entity.getOrInit(c.VoxelComponent, (entity) => entity.set('g', value));
 	}
 
 	get b() {
-		return this.entity.getOrInit(VoxelComponent, (entity) => entity.get('b'));
+		return this.entity.getOrInit(c.VoxelComponent, (entity) => entity.get('b'));
 	}
 	set b(value: number) {
-		this.entity.getOrInit(VoxelComponent, (entity) => entity.set('b', value));
+		this.entity.getOrInit(c.VoxelComponent, (entity) => entity.set('b', value));
 	}
 
 	get visible() {
-		return this.entity.getOrInit(VoxelComponent, (entity) => entity.get('visible'));
+		return this.entity.getOrInit(c.VoxelComponent, (entity) => entity.get('visible'));
 	}
 
 	set visible(value: boolean) {
-		this.entity.getOrInit(VoxelComponent, (entity) => entity.set('visible', value));
+		this.entity.getOrInit(c.VoxelComponent, (entity) => entity.set('visible', value));
 	}
 
 	get collider() {
-		return this.entity.getOrInit(VoxelComponent, (entity) => entity.get('collider'));
+		return this.entity.getOrInit(c.VoxelComponent, (entity) => entity.get('collider'));
 	}
 
 	set collider(value: boolean) {
-		this.entity.getOrInit(VoxelComponent, (entity) => entity.set('collider', value));
+		this.entity.getOrInit(c.VoxelComponent, (entity) => entity.set('collider', value));
 	}
 }
 
 export class VoxelGroup extends NamedEntity {
 	get voxels(): EntityList<Voxel> {
-		return new EntityList(this.peer, this.entity, VoxelGroupComponent, Voxel);
+		return new EntityList(this.peer, this.entity, c.VoxelGroupComponent, Voxel);
 	}
 }
 
 export class TransformedGroup extends Transform {
 	get group() {
-		return this.entity.getOrInit(TransformedGroupComponent, (entity) => entity.get('group'));
+		return this.entity.getOrInit(c.TransformedGroupComponent, (entity) => entity.get('group'));
 	}
 
 	async loadGroup() {
@@ -942,56 +935,56 @@ export class TransformedGroup extends Transform {
 	}
 
 	set group(value: EntityIdStr) {
-		this.entity.getOrInit(TransformedGroupComponent, (entity) => entity.set('group', value));
+		this.entity.getOrInit(c.TransformedGroupComponent, (entity) => entity.set('group', value));
 	}
 }
 
 export class Models extends NamedEntity {
 	get models(): EntityList<VoxelGroup> {
-		return new EntityList(this.peer, this.entity, ModelsComponent, VoxelGroup);
+		return new EntityList(this.peer, this.entity, c.ModelsComponent, VoxelGroup);
 	}
 }
 
 export class PlayerLocation extends EntityWrapper {
 	get time() {
-		return this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.get('time'));
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('time'));
 	}
 
 	set time(value: number) {
-		this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.set('time', value));
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('time', value));
 	}
 
 	get x() {
-		return this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.get('x'));
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('x'));
 	}
 
 	set x(value: number) {
-		this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.set('x', value));
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('x', value));
 	}
 
 	get y() {
-		return this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.get('y'));
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('y'));
 	}
 
 	set y(value: number) {
-		this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.set('y', value));
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('y', value));
 	}
 
 	get z() {
-		return this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.get('z'));
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('z'));
 	}
 
 	set z(value: number) {
-		this.entity.getOrInit(PlayerLocationComponent, (entity) => entity.set('z', value));
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('z', value));
 	}
 }
 
 export class World extends NamedEntity {
 	get instances(): EntityList<TransformedGroup> {
-		return new EntityList(this.peer, this.entity, WorldComponent, TransformedGroup);
+		return new EntityList(this.peer, this.entity, c.WorldComponent, TransformedGroup);
 	}
 
 	get locations(): EntityList<PlayerLocation> {
-		return new EntityList(this.peer, this.entity, PlayerLocationsComponent, PlayerLocation);
+		return new EntityList(this.peer, this.entity, c.PlayerLocationsComponent, PlayerLocation);
 	}
 }

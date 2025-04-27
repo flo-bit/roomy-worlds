@@ -1,15 +1,9 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { applyModelEditorTransform, modelEditor, isTransforming } from './state.svelte';
+	import { applyModelEditorTransform, modelEditor, isTransforming, addVoxel } from './state.svelte';
 	import { useCursor } from '@threlte/extras';
-	import type { AddVoxelFunction } from './types';
 
 	const { onPointerEnter, onPointerLeave } = useCursor();
-
-	let {
-		addVoxel
-	}: { addVoxel: AddVoxelFunction } =
-		$props();
 </script>
 
 <!-- floor that we can click on to place voxels -->

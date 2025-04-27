@@ -4,24 +4,18 @@
 	import Voxels from './Voxels.svelte';
 	import Floor from './Floor.svelte';
 	import GhostVoxel from './GhostVoxel.svelte';
-	import { Voxel } from '$lib/roomy';
-	import type { AddVoxelFunction } from './types';
+	import { g } from '$lib/shared/roomy.svelte';
+	import { derivePromise } from '$lib/shared/utils.svelte';
 
 	interactivity({
-		filter: (hits, state) => {
+		filter: (hits) => {
 			return hits.slice(0, 1);
 		}
 	});
 
-	let {
-		voxels,
-		addVoxel,
-		deleteVoxel
-	}: {
-		voxels: Voxel[];
-		addVoxel: AddVoxelFunction;
-		deleteVoxel: (id: string) => Promise<void>;
-	} = $props();
+	let voxels = derivePromise([], async () =>
+		g.voxelObject ? await g.voxelObject.voxels.items() : []
+	);
 </script>
 
 <T.PerspectiveCamera position={[10, 10, 10]} makeDefault>
@@ -32,10 +26,10 @@
 <T.DirectionalLight position={[1, 2, 5]} />
 
 <!-- all the voxels -->
-<Voxels {voxels} {addVoxel} {deleteVoxel} />
+<Voxels voxels={voxels.value} />
 
 <!-- floor that we can click on to place voxels -->
-<Floor addVoxel={addVoxel} />
+<Floor />
 
 <!-- ghost voxel that shows where a newly placed voxel will be -->
 <GhostVoxel />
