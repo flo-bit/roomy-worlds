@@ -1,4 +1,4 @@
-import { TransformedGroup } from '$lib/roomy';
+import { TransformedGroup, type WorldSettings } from '$lib/roomy';
 import { g, initRoomy } from '$lib/roomy.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
 import { Quaternion, Vector3 } from 'three';
@@ -11,13 +11,17 @@ export const editingState = $state({
 	showModelEditor: false,
 	showWorldSettings: false,
 	showModelPicker: false,
+	camera: 'third' as 'first' | 'third',
 	modelPickerType: 'public' as 'private' | 'world' | 'public',
+
+	tool: 'move' as 'move' | 'rotate' | 'scale',
+
 	worldSettings: {
-		seed: Math.floor(Math.random() * 1000000),
-		size: 100,
+		seed: Math.floor(Math.random() * 1000000).toString(),
+		size: 0,
 		terrainGradient: [
-			{ rgb: { r: 0, g: 0.05, b: 0 }, position: 0 },
-			{ rgb: { r: 0, g: 0.35, b: 0 }, position: 1 }
+			{ rgb: { r: 0, g: 0, b: 0 }, position: 0 },
+			{ rgb: { r: 0, g: 0, b: 0 }, position: 1 }
 		] as {
 			rgb: {
 				r: number;
@@ -28,7 +32,7 @@ export const editingState = $state({
 		}[],
 		waterGradient: [
 			{ rgb: { r: 0, g: 0, b: 0 }, position: 0 },
-			{ rgb: { r: 0, g: 0, b: 1 }, position: 1 }
+			{ rgb: { r: 0, g: 0, b: 0 }, position: 1 }
 		] as {
 			rgb: {
 				r: number;
@@ -38,8 +42,8 @@ export const editingState = $state({
 			position: number;
 		}[],
 		waterPercentage: 35,
-		version: 0
-	}
+		version: -1
+	} as WorldSettings
 });
 
 export type AddInstanceFunction = (id: EntityIdStr, position: Vector3) => void;
@@ -85,5 +89,16 @@ export async function addInstance(id: EntityIdStr, position: Vector3) {
 	instance.commit();
 
 	g.world?.instances.push(instance);
+	g.world?.commit();
+}
+
+export async function deleteInstance(id: string) {
+	const instances = await g.world?.instances.items();
+	// find voxel by id
+	const instance = instances?.findIndex((v) => v.id === id);
+	console.log(instance);
+	if (instance === undefined || instance < 0) return;
+
+	g.world?.instances.remove(instance);
 	g.world?.commit();
 }

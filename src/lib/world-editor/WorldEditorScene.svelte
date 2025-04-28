@@ -21,7 +21,11 @@
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 
-	let camera = $state('first');
+	let terrainGradient = derivePromise([], async () =>
+		g.world ? (await g.world.loadTerrainGradient()).stops.items() : []
+	);
+
+	$inspect(terrainGradient.value);
 
 	const { renderer } = useThrelte();
 
@@ -29,18 +33,25 @@
 		window.addEventListener('keydown', (e) => {
 			// on c switch camera
 			if (e.key === 'c') {
-				camera = camera === 'first' ? 'third' : 'first';
+				editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
 			}
 		});
 
 		renderer.toneMapping = ACESFilmicToneMapping;
 	});
+
+	$effect(() => {
+		if (g.world && g.world.settings.version > editingState.worldSettings.version) {
+			editingState.worldSettings = g.world.settings;
+			console.log('settings', editingState.worldSettings);
+		}
+	});
 </script>
 
-{#if camera === 'first'}
+{#if editingState.camera === 'third'}
 	<T.PerspectiveCamera
 		makeDefault
-		position={[100, 10, 100]}
+		position={[100, 50, 100]}
 		oncreate={(ref) => {
 			ref.lookAt(0, 1, 0);
 		}}
@@ -53,19 +64,22 @@
 
 <T.DirectionalLight position={[0, 10, -10]} />
 
-{#key editingState.worldSettings.version}
+{#key editingState.worldSettings.version + editingState.worldSettings.waterPercentage + editingState.worldSettings.size}
 	<Terrain
 		clickedTerrain={(e) => {
 			if (editingState.selectedModelId) {
 				addInstance(editingState.selectedModelId, e.point);
 			}
 		}}
+		settings={editingState.worldSettings}
 	/>
 
-	<Water />
+	{#if editingState.worldSettings.waterPercentage > 0}
+		<Water settings={editingState.worldSettings} />
+	{/if}
 {/key}
 
-<Debug />
+<!-- <Debug /> -->
 
 <Sky />
 

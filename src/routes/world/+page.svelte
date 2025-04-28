@@ -12,13 +12,14 @@
 	import WorldSettingsUi from '$lib/world-editor/WorldSettingsUI.svelte';
 	import HudUi from '$lib/world-editor/HudUI.svelte';
 	import WorldEditorUi from '$lib/world-editor/WorldEditorUI.svelte';
+	import { g } from '$lib/roomy.svelte';
 
 	let showPerfMonitor = $state(false);
 </script>
 
 <div
 	class={cn(
-		'absolute h-[100dvh]',
+		'absolute h-[100dvh] transition-all duration-200',
 		!editingState.showModelEditor && editingState.showWorldSettings
 			? 'left-80 w-[calc(100vw-320px)]'
 			: 'left-0 w-screen'
@@ -42,12 +43,14 @@
 
 {#if !editingState.showModelEditor}
 	{#if editingState.showWorldSettings}
-		<WorldSettingsUi />
-	{:else}
-	<WorldEditorUi />
+		{#if g.world?.settings}
+			<WorldSettingsUi />
+		{/if}
+		
 	{/if}
+	<WorldEditorUi />
+
+	<HudUi />
 {:else}
 	<ModelEditorUi />
 {/if}
-
-<HudUi />

@@ -7,9 +7,24 @@
 	import type { IntersectionEvent } from '@threlte/extras';
 	import { shuffle } from '$lib/utils.svelte';
 	import { ColorGradient } from './colorgradient';
-	import { editingState } from '$lib/world-editor/state.svelte';
+	import type { WorldSettings } from '$lib/roomy';
+	import { applyTransform, editingState } from '$lib/world-editor/state.svelte';
 
-	const size = editingState.worldSettings.size;
+	let {
+		clickedTerrain,
+		collider = true,
+		animate = false,
+		animationTime = 3,
+		settings
+	}: {
+		clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void;
+		collider?: boolean;
+		animate?: boolean;
+		animationTime?: number;
+		settings: WorldSettings;
+	} = $props();
+
+	const size = settings.size;
 
 	const voxelSize = 1;
 
@@ -28,18 +43,22 @@
 	const dummy = new THREE.Object3D();
 	const color = new THREE.Color(0x00ff00);
 
+	console.log('seed', settings.seed);
 	const heightfield: number[] = [];
 
-	const upperNoise = new UberNoise({
-		seed: editingState.worldSettings.seed,
+	const options = settings.terrainNoise ?? {
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
 		max: 3,
 		warp: 1
-	});
+	};
+
+	options.seed = settings.seed;
+
+	const upperNoise = new UberNoise(options);
 	const lowerNoise = new UberNoise({
-		seed: editingState.worldSettings.seed + 10,
+		seed: settings.seed + 10,
 		octaves: 6,
 		scale: 0.05,
 		min: 0,
@@ -51,7 +70,7 @@
 
 
 	const gradient = new ColorGradient({
-		stops: editingState.worldSettings.terrainGradient.map(({ rgb, position }) => ({
+		stops: settings.terrainGradient.map(({ rgb, position }) => ({
 			position: (position - 0.5) * 2,
 			value: new THREE.Color(rgb.r, rgb.g, rgb.b)
 		}))
@@ -69,7 +88,7 @@
 				continue;
 			}
 
-			const height = noiseHeight + Math.pow(distance / (size / 2), 2) * -5;
+			const height = noiseHeight// + Math.pow(distance / (size / 2), 2) * -5;
 			const noise = upperNoise.normalized(x, z);
 			dummy.position.set(x, height, z);
 			dummy.scale.set(1, 3, 1);
@@ -110,17 +129,6 @@
 
 	let heightfieldData = new Float32Array(heightfield);
 
-	let {
-		clickedTerrain,
-		collider = true,
-		animate = false,
-		animationTime = 3
-	}: {
-		clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void;
-		collider?: boolean;
-		animate?: boolean;
-		animationTime?: number;
-	} = $props();
 
 	let i = 0;
 	const addPerSecond = totalVoxels / animationTime;
@@ -148,6 +156,11 @@
 				clickedTerrain(e);
 			}
 		: undefined}
+
+	ondblclick={() => {
+		applyTransform();
+		editingState.selectedInstance = null;
+	}}
 />
 
 {#if collider}

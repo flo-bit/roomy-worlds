@@ -12,9 +12,6 @@
 	let showWorld = $state(false);
 
 	$effect(() => {
-		console.log('hello');
-		//const worldId = page.params.id;
-		// TODO: we should use search params here
 		const worldId = page.url.searchParams.get('id');
 		if (!worldId) return;
 
@@ -28,7 +25,6 @@
 				return;
 			}
 		}
-		console.log('loading', worldId);
 
 		g.roomy
 			.open(World, worldId as EntityIdStr)

@@ -44,8 +44,7 @@ export * from '@muni-town/leaf';
 export * as components from './components';
 import * as c from './components';
 import { Color, Quaternion, Vector3 } from 'three';
-
-import { g, initRoomy } from '$lib/roomy.svelte.js';
+import UberNoise, { type NoiseOptions } from 'uber-noise';
 
 /** A constructor for an {@linkcode EntityWrapper}. */
 export type EntityConstructor<T extends EntityWrapper> = new (peer: Peer, entity: Entity) => T;
@@ -928,10 +927,8 @@ export class TransformedGroup extends Transform {
 		return this.entity.getOrInit(c.TransformedGroupComponent, (entity) => entity.get('group'));
 	}
 
-	async loadGroup() {
-		if (!g.roomy) await initRoomy();
-
-		return await g.roomy!.open(VoxelGroup, this.group);
+	async loadGroup(): Promise<VoxelGroup> {
+		return this.open(VoxelGroup, this.group);
 	}
 
 	set group(value: EntityIdStr) {
@@ -979,6 +976,20 @@ export class PlayerLocation extends EntityWrapper {
 	}
 }
 
+// export type WorldSettings = {
+// 	seed: string;
+// 	size: number;
+// 	terrainGradient: {
+// 		rgb: { r: number; g: number; b: number };
+// 		position: number;
+// 	}[];
+// 	waterGradient: {
+// 		rgb: { r: number; g: number; b: number };
+// 		position: number;
+// 	}[];
+// 	version?: number;
+// };
+
 export class World extends NamedEntity {
 	get instances(): EntityList<TransformedGroup> {
 		return new EntityList(this.peer, this.entity, c.WorldComponent, TransformedGroup);
@@ -987,4 +998,89 @@ export class World extends NamedEntity {
 	get locations(): EntityList<PlayerLocation> {
 		return new EntityList(this.peer, this.entity, c.PlayerLocationsComponent, PlayerLocation);
 	}
+
+	get settings(): WorldSettings {
+		return JSON.parse(
+			this.entity.getOrInit(c.WorldSettingsComponent, (entity) => entity.get('settings'))
+		);
+	}
+
+	set settings(value: WorldSettings) {
+		this.entity.getOrInit(c.WorldSettingsComponent, (entity) =>
+			entity.set('settings', JSON.stringify(value))
+		);
+	}
+
+	get terrainGradient(): EntityIdStr {
+		return this.entity.getOrInit(c.WorldSettingsComponent, (entity) =>
+			entity.get('terrainGradient')
+		);
+	}
+
+	async loadTerrainGradient(): Promise<Gradient> {
+		return await this.open(Gradient, this.terrainGradient);
+	}
+
+	get seed(): string {
+		return this.entity.getOrInit(c.WorldSettingsComponent, (entity) => entity.get('seed'));
+	}
+
+	set seed(value: string) {
+		this.entity.getOrInit(c.WorldSettingsComponent, (entity) => entity.set('seed', value));
+	}
 }
+
+export class GradientStop extends EntityWrapper {
+	get r() {
+		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('r'));
+	}
+
+	set r(value: number) {
+		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('r', value));
+	}
+
+	get g() {
+		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('g'));
+	}
+	set g(value: number) {
+		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('g', value));
+	}
+
+	get b() {
+		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('b'));
+	}
+	set b(value: number) {
+		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('b', value));
+	}
+
+	get position() {
+		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('position'));
+	}
+
+	set position(value: number) {
+		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('position', value));
+	}
+}
+
+export class Gradient extends EntityWrapper {
+	get stops(): EntityList<GradientStop> {
+		return new EntityList(this.peer, this.entity, c.GradientComponent, GradientStop);
+	}
+}
+
+export type WorldSettings = {
+	seed: string;
+	size: number;
+	terrainGradient: {
+		rgb: { r: number; g: number; b: number };
+		position: number;
+	}[];
+	waterGradient: {
+		rgb: { r: number; g: number; b: number };
+		position: number;
+	}[];
+	version: number;
+	waterPercentage: number;
+	terrainNoise?: NoiseOptions;
+	waterNoise?: NoiseOptions;
+};

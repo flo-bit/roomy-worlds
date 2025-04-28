@@ -78,7 +78,7 @@
 							}
 						}
 					></div>
-					<div class="text-base-700 dark:text-base-300 text-sm">{item.label}</div>
+					<!-- <div class="text-base-700 dark:text-base-300 text-sm">{item.label}</div> -->
 
 					{#if showEditButton}
 						<div class="absolute -top-1 -right-1 z-10">

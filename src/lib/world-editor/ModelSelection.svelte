@@ -2,7 +2,6 @@
 	import ModalModelPicker from '$lib/model-picker/modal/ModalModelPicker.svelte';
 	import { derivePromise } from '$lib/utils.svelte';
 	import type { EntityIdStr } from '@muni-town/leaf';
-	import { Button } from 'fuchs';
 	import { onMount } from 'svelte';
 	import { applyTransform, editingState } from './state.svelte';
 	import { g, initRoomy } from '$lib/roomy.svelte';
@@ -16,14 +15,19 @@
 	);
 
 	let worldModelList = derivePromise([], async () => {
-		if (!g.roomy) return [];
-		const models = await g.world?.instances.items();
+		if (!g.world || !g.roomy) {
+			return [];
+		}
+
+		const models = await g.world.instances.items();
 		const groups = new Set<EntityIdStr>();
 		for (const model of models ?? []) {
 			groups.add(model.group);
 		}
 		return Promise.all(
-			Array.from(groups).map(async (group) => await g.roomy?.open(VoxelGroup, group))
+			Array.from(groups)
+				.filter((group) => group)
+				.map(async (group) => await g.roomy?.open(VoxelGroup, group))
 		);
 	});
 
@@ -47,7 +51,7 @@
 	function getItems() {
 		let items: { voxels: VoxelGroup; label: string }[] = [];
 		if (editingState.modelPickerType === 'public') {
-			items=  globalModelList.value.map((model) => ({ voxels: model, label: model.name }));
+			items = globalModelList.value.map((model) => ({ voxels: model, label: model.name }));
 		}
 
 		if (editingState.modelPickerType === 'private') {
@@ -55,7 +59,10 @@
 		}
 
 		if (editingState.modelPickerType === 'world') {
-			items = worldModelList.value.map((model) => ({ voxels: model, label: model?.name })) as { voxels: VoxelGroup; label: string }[];
+			items = worldModelList.value.map((model) => ({ voxels: model, label: model?.name })) as {
+				voxels: VoxelGroup;
+				label: string;
+			}[];
 		}
 
 		// filter all items that have no voxels

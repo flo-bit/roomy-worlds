@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { Camera, Vector2, Vector3, Quaternion, Mesh } from 'three';
-	import { useThrelte, useParent, useTask } from '@threlte/core';
+	import { useThrelte, useParent } from '@threlte/core';
+	import { usePhysicsTask } from '@threlte/rapier';
 
 	let {
 		object,
-		rotateSpeed = 1.0,
+		rotateSpeed = 0.8,
 		idealOffset = { x: -0.5, y: 1.5, z: -4 },
 		idealLookAt = { x: 0, y: 1, z: 5 },
 	}: {
@@ -54,7 +55,7 @@
 	});
 
 	// This is basically your update function
-	useTask((delta) => {
+	usePhysicsTask((delta) => {
 		// the object's position is bound to the prop
 		if (!object) return;
 

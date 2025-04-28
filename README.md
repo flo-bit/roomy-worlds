@@ -93,6 +93,7 @@ as well as see all models made in any window.
 - fix click (for placement and selection on floor + cubes) to only work when mouse stays still (down-up)
 - first cube cant be removed in model editor
 - updates to models not showing without refreshing (in world)
+- showing world models in model picker only after one model is added to world
 
 ## Credits
 

@@ -4,6 +4,7 @@
 	import type { WorldData } from './types';
 	import WorldItemsViewer from './WorldItemsViewer.svelte';
 	import { T } from '@threlte/core';
+	import Water from '$lib/world/Water.svelte';
 
 	const { world }: { world: WorldData } = $props();
 </script>
@@ -19,7 +20,31 @@
 </T.PerspectiveCamera>
 
 <Float floatingRange={[-10, -5]} floatIntensity={5}>
-	<Terrain collider={false} animate />
+	<Terrain collider={false} animate settings={{
+		seed: 1,
+		size: 100,
+		terrainGradient: [
+			{ rgb: { r: 0.0, g: 0.05, b: 0.0 }, position: 0 },
+			{ rgb: { r: 0.0, g: 0.35, b: 0.0 }, position: 1 }
+		],
+		waterGradient: [
+			{ rgb: { r: 0.0, g: 0.05, b: 0.0 }, position: 0 },
+			{ rgb: { r: 0.0, g: 0.35, b: 0.0 }, position: 1 }
+		],
+	}} />
+
+	<Water animateIn animate settings={{
+		seed: 1,
+		size: 100,
+		terrainGradient: [
+			{ rgb: { r: 0.0, g: 0.05, b: 0.0 }, position: 0 },
+			{ rgb: { r: 0.0, g: 0.35, b: 0.0 }, position: 1 }
+		],
+		waterGradient: [
+			{ rgb: { r: 0.0, g: 0.00, b: 0.05 }, position: 0 },
+			{ rgb: { r: 0.1, g: 0.1, b: 0.55 }, position: 1 }
+		]
+	}} />
 
 	<WorldItemsViewer {world} />
 </Float>

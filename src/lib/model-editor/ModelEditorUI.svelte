@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
 	import { Button, PopoverColorPicker, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
 	import { addVoxel, applyModelEditorTransform, deleteVoxel, modelEditor } from './state.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
 	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
+	import { Models } from '$lib/roomy';
 
 	$effect(() => {
 		applyModelEditorTransform();
@@ -173,16 +174,39 @@
 	</div>
 </div>
 
-<div class="absolute bottom-2 right-2">
-	<Button size="iconLg" onclick={() => {
-		editingState.showModelEditor = false;
-		if(g.voxelObject?.id && g.voxelObject.voxels.length > 0) editingState.selectedModelId = g.voxelObject.id;;
-	}}>
+<div class="absolute right-2 bottom-2">
+	<Button
+		size="iconLg"
+		onclick={() => {
+			editingState.showModelEditor = false;
+			if (g.voxelObject?.id && g.voxelObject.voxels.length > 0)
+				editingState.selectedModelId = g.voxelObject.id;
+		}}
+	>
 		Back to world
 	</Button>
 </div>
 
-
 <div class="absolute top-3 right-3 z-10">
 	<PopoverColorPicker bind:rgb={modelEditor.color} />
 </div>
+
+
+<!-- delete from public model list -->
+<!-- <Button
+	size="lg"
+	class="absolute bottom-2 left-2"
+	onclick={async () => {
+		if (!g.voxelObject || !g.roomy) return;
+
+		const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
+
+		const models = await g.roomy.open(Models, id);
+		const index = (await models.models.items()).findIndex((m) => m.id === g.voxelObject?.id);
+		if (index === -1) return;
+		models.models.remove(index);
+		models.commit();
+	}}
+>
+	Delete
+</Button> -->

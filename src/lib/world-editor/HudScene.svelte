@@ -25,7 +25,7 @@
 	{#key editingState.selectedInstance?.group ?? editingState.selectedModelId ?? ''}
 		{#await models.getModel(editingState.selectedInstance?.group ?? editingState.selectedModelId ?? '') then voxels}
 			<T.Group
-				position={[-$viewport.width / 2 + 0.8, -$viewport.height / 2 + 1, 0]}
+				position={[$viewport.width / 2 - 0.8, -$viewport.height / 2 + 1, 0]}
 				oncreate={() => {
 					console.log('oncreate');
 				}}

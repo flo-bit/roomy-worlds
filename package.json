@@ -46,7 +46,7 @@
 		"@threlte/rapier": "^3.1.1",
 		"@threlte/studio": "^0.1.4",
 		"@types/three": "^0.175.0",
-		"fuchs": "^0.0.30",
+		"fuchs": "^0.0.31",
 		"three": "^0.175.0",
 		"uber-noise": "^0.2.2",
 		"vite-plugin-top-level-await": "^1.5.0",

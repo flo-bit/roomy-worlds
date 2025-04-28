@@ -5,8 +5,21 @@
 	import { shuffle } from '$lib/utils.svelte';
 	import { ColorGradient } from './colorgradient';
 	import { editingState } from '$lib/world-editor/state.svelte';
+	import type { WorldSettings } from '$lib/roomy';
 
-	const size = editingState.worldSettings.size;
+	let {
+		animate = true,
+		animateIn = false,
+		animationTime = 3,
+		settings
+	}: {
+		animate?: boolean;
+		animateIn?: boolean;
+		animationTime?: number;
+		settings: WorldSettings;
+	} = $props();
+
+	const size = settings.size;
 
 	const voxelSize = 1;
 
@@ -25,7 +38,7 @@
 	const dummy = new THREE.Object3D();
 
 	const waterNoise = new UberNoise({
-		seed: editingState.worldSettings.seed + 10,
+		seed: settings.seed + 10,
 		octaves: 3,
 		scale: 0.01,
 		min: 0,
@@ -34,17 +47,20 @@
 	});
 
 
-	const terrainNoise = new UberNoise({
-		seed: editingState.worldSettings.seed,
+	const options = settings.terrainNoise ?? {
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
 		max: 3,
 		warp: 1
-	});
+	};
+
+	options.seed = settings.seed;
+
+	const terrainNoise = new UberNoise(options);
 
 	const waterGradient = new ColorGradient({
-		stops: editingState.worldSettings.waterGradient.map(({ rgb, position }) => ({
+		stops: settings.waterGradient.map(({ rgb, position }) => ({
 			position: (position - 1),
 			value: new THREE.Color(rgb.r, rgb.g, rgb.b)
 		}))
@@ -76,8 +92,7 @@
 
 			const isEdge = surrounding.some(s => s > size / 2);
 
-
-			const height = noiseHeight + Math.pow(distance / (size / 2), 2) * -5;
+			const height = noiseHeight// + Math.pow(distance / (size / 2), 2) * -5;
 
 			if(water > (editingState.worldSettings.waterPercentage / 100 * 2 - 1)) continue;
 
@@ -102,17 +117,6 @@
 	if (instancedMesh.instanceColor) {
 		instancedMesh.instanceColor.needsUpdate = true;
 	}
-
-
-	let {
-		animate = true,
-		animateIn = false,
-		animationTime = 3
-	}: {
-		animate?: boolean;
-		animateIn?: boolean;
-		animationTime?: number;
-	} = $props();
 
 	let totalTime = 0;
 	const addPerSecond = totalVoxels / animationTime;

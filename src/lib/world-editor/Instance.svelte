@@ -8,8 +8,8 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { derivePromise } from '$lib/utils.svelte';
-	import { Instance, InstancedMesh, TransformControls } from '@threlte/extras';
-	import { applyTransform, editingState } from './state.svelte';
+	import { TransformControls } from '@threlte/extras';
+	import { addInstance, applyTransform, editingState } from './state.svelte';
 	import { Collider } from '@threlte/rapier';
 	import { models } from './models.svelte';
 	import { onMount } from 'svelte';
@@ -34,6 +34,7 @@
 		quaternion={instance.quaternion.toArray()}
 		scale={instance.scale.toArray()}
 		bind:controls={editingState.transformControls}
+		mode={editingState.tool === 'move' ? 'translate' : editingState.tool}
 	>
 		{#each voxels.value as voxel}
 			<T.Mesh
@@ -54,10 +55,17 @@
 		onclick={async (e) => {
 			e.stopPropagation();
 
-			await applyTransform();
+			if(editingState.selectedModelId) {
+				// place on top of instance
+				addInstance(editingState.selectedModelId, e.point);
+				return;
+			}
+				await applyTransform();
+				editingState.selectedModelId = null;
+				editingState.selectedInstance = instance;
+				
+				return;
 
-			editingState.selectedModelId = null;
-			editingState.selectedInstance = instance;
 		}}
 	>
 		<!-- <InstancedMesh>

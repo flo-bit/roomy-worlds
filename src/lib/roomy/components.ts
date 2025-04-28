@@ -289,3 +289,37 @@ export const PlayerLocationComponent = defComponent(
 	}>
 );
 
+// export const WorldSettingsComponent = defComponent(
+// 	'worldSettings:02JPFMTA2QAFY2D3CV1C0YBZQ1',
+// 	LoroMap<{
+// 		/** The JSON encoded content from the rich text editor. */
+// 		settings: string;
+// 	}>,
+// 	(map) => map.set('settings', '{}')
+// );
+
+export const GradientStopComponent = defComponent(
+	'gradientStop:02JPFMTA2QAFY2D3CV1C0YBZQ1',
+	LoroMap<{
+		r: number;
+		g: number;
+		b: number;
+		position: number;
+	}>
+);
+
+export const GradientComponent = defComponent(
+	'gradient:02JPFMTA2QAFY2D3CV1C0YBZQ1',
+	LoroMovableList<EntityIdStr>
+);
+
+export const WorldSettingsComponent = defComponent(
+	'worldSettings:02JPFMTA2QAFY2D3CV1C0YBZQ1',
+	LoroMap<{
+		seed: string;
+		size: number;
+		terrainGradient: EntityIdStr;
+		waterGradient: EntityIdStr;
+		waterPercentage: number;
+	}>
+);

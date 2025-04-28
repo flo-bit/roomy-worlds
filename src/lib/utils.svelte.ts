@@ -26,6 +26,7 @@ export function derivePromise<T>(
 import { g, initRoomy } from './roomy.svelte';
 import { goto } from '$app/navigation';
 import { World } from './roomy';
+import { editingState } from './world-editor/state.svelte';
 
 export async function createWorld(base: string) {
 	if (!g.roomy) {
@@ -34,7 +35,25 @@ export async function createWorld(base: string) {
 		if (!g.roomy) return;
 	}
 	const world = await g.roomy.create(World);
+
+	world.settings = {
+		seed: Math.random().toString(),
+		size: 100,
+		terrainGradient: [
+			{ rgb: { r: 0, g: 0.05, b: 0 }, position: 0 },
+			{ rgb: { r: 0, g: 0.35, b: 0 }, position: 1 }
+		],
+		waterGradient: [
+			{ rgb: { r: 0.0, g: 0.0, b: 0.05 }, position: 0 },
+			{ rgb: { r: 0.1, g: 0.1, b: 0.55 }, position: 1 }
+		],
+		waterPercentage: 35,
+		version: 1
+	};
+
 	world.commit();
+
+	editingState.showWorldSettings = true;
 
 	goto(base + `/world?id=${world.id}`);
 }
