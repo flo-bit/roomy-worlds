@@ -65,7 +65,7 @@
 	}
 
 
-	let totalAnimationTime = 5;
+	let totalAnimationTime = 2;
 	let addPerSecond = totalVoxels / totalAnimationTime;
 
 	let i = 0;

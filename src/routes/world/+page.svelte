@@ -13,8 +13,21 @@
 	import HudUi from '$lib/world-editor/HudUI.svelte';
 	import WorldEditorUi from '$lib/world-editor/WorldEditorUI.svelte';
 	import { g } from '$lib/roomy.svelte';
+	import { onMount } from 'svelte';
+	import { downloadWorld } from '$lib/download';
 
 	let showPerfMonitor = $state(false);
+
+	onMount(() => {
+		window.addEventListener('keydown', (e) => {
+			// on control + 5, save world
+			if(e.ctrlKey && e.key === '5' && g.world) {
+				e.preventDefault();
+				console.log('downloading world');
+				downloadWorld(g.world);
+			}
+		});
+	});
 </script>
 
 <div

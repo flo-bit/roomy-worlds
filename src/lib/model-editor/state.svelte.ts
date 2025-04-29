@@ -11,6 +11,8 @@ export const modelEditor: {
 	ghostDeleteId: EntityIdStr | null;
 	ghostPosition: [number, number, number] | null;
 
+	orbitControlsEnabled: boolean;
+
 	applyTransform: () => Promise<void>;
 } = $state({
 	tool: 'move',
@@ -19,6 +21,8 @@ export const modelEditor: {
 	transformControls: undefined,
 	ghostDeleteId: null,
 	ghostPosition: null,
+
+	orbitControlsEnabled: true,
 
 	applyTransform: applyModelEditorTransform
 });

@@ -1,12 +1,16 @@
 import type { EntityIdStr } from '@muni-town/leaf';
 import { downloadObjectAsJson } from './model-editor/import';
 import type { WorldData } from './viewer/types';
-import type { TransformedGroup } from './roomy';
+import type { TransformedGroup, World } from './roomy';
+import { g } from './roomy.svelte';
 
-export async function download(instances: TransformedGroup[]) {
+export async function downloadWorld(world: World) {
+	const instances: TransformedGroup[] = (await g.world?.instances.items()) ?? [];
+
 	const json: WorldData = {
 		instances: [],
-		models: {}
+		models: {},
+		settings: world.settings
 	};
 
 	const addedModels = new Set<EntityIdStr>();

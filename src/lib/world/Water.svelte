@@ -38,7 +38,7 @@
 	const dummy = new THREE.Object3D();
 
 	const waterNoise = new UberNoise({
-		seed: settings.seed + 10,
+		seed: settings.seed + 20,
 		octaves: 3,
 		scale: 0.01,
 		min: 0,

@@ -3,6 +3,8 @@
 	import { modelEditor } from './state.svelte';
 	import { T } from '@threlte/core';
 	import type { Voxel } from '$lib/roomy';
+	import { useTransformControls } from '@threlte/studio/extensions';
+	import {type TransformControlsEventMap } from 'three/examples/jsm/Addons.js';
 
 	let { voxel }: { voxel: Voxel } = $props();
 </script>
@@ -14,6 +16,9 @@
 		position={voxel.position.toArray()}
 		quaternion={voxel.quaternion.toArray()}
 		scale={voxel.scale.toArray()}
+		onchange={() => {
+			modelEditor.orbitControlsEnabled = !(modelEditor.transformControls?.dragging ?? true);
+		}}
 	>
 		<T.Mesh>
 			<T.BoxGeometry />

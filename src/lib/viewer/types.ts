@@ -1,3 +1,5 @@
+import type { WorldSettings } from '$lib/roomy';
+
 export type WorldData = {
 	instances: {
 		id: string;
@@ -23,4 +25,5 @@ export type WorldData = {
 			}[];
 		};
 	};
+	settings: WorldSettings;
 };

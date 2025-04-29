@@ -6,6 +6,7 @@
 	import GhostVoxel from './GhostVoxel.svelte';
 	import { g } from '$lib/roomy.svelte';
 	import { derivePromise } from '$lib/utils.svelte';
+	import { modelEditor } from './state.svelte';
 
 	interactivity({
 		filter: (hits) => {
@@ -18,8 +19,8 @@
 	);
 </script>
 
-<T.PerspectiveCamera position={[10, 10, 10]} makeDefault>
-	<OrbitControls />
+<T.PerspectiveCamera position={[10, 10, 10]} makeDefault name="model-editor-camera">
+	<OrbitControls enabled={modelEditor.orbitControlsEnabled} />
 </T.PerspectiveCamera>
 
 <T.AmbientLight intensity={0.4} />

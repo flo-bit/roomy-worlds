@@ -51,15 +51,17 @@
 
 <InstanceEditorUi />
 
-<Button
-	size="lg"
-	class={cn(
-		'bg-accent-100 hover:bg-accent-200 absolute bottom-4',
-		editingState.showWorldSettings ? 'left-98' : 'left-18'
-	)}
-	onclick={() => {
-		editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
-	}}
->
-	{editingState.camera === 'first' ? 'Back to World View' : 'Walk around'}
-</Button>
+{#if !editingState.showWorldSettings}
+	<Button
+		size="lg"
+		class={cn(
+			'bg-accent-100 hover:bg-accent-200 absolute bottom-4',
+			editingState.showWorldSettings ? 'left-98' : 'left-18'
+		)}
+		onclick={() => {
+			editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
+		}}
+	>
+		{editingState.camera === 'first' ? 'Back to World View' : 'Walk around'}
+	</Button>
+{/if}
