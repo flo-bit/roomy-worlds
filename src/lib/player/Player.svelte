@@ -22,7 +22,7 @@
 		height?: number;
 		speed?: number;
 		runningSpeed?: number;
-		playerLocation?: PlayerLocation;
+		playerLocation?: PlayerLocation | null;
 	} = $props();
 
 	let isRunning = false;
@@ -138,12 +138,17 @@
 	});
 
 	async function updatePosition() {
-		if (!playerLocation) return;
+		if (!playerLocation) {
+			console.log('no player location');
+			return;
+		}
 
-		console.log('update location');
+		console.log('update location', editingState.selectedCharacter);
 		playerLocation.x = position[0];
 		playerLocation.y = position[1];
 		playerLocation.z = position[2];
+		playerLocation.rotation = rotation;
+		playerLocation.model = editingState.selectedCharacter ?? 'female b';
 		playerLocation.time = Date.now();
 		playerLocation.commit();
 	}

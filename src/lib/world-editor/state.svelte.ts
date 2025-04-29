@@ -1,4 +1,4 @@
-import { TransformedGroup, type WorldSettings } from '$lib/roomy';
+import { PlayerLocation, TransformedGroup, type WorldSettings } from '$lib/roomy';
 import { g, initRoomy } from '$lib/roomy.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
 import { Quaternion, Vector3 } from 'three';
@@ -103,5 +103,75 @@ export async function deleteInstance(id: string) {
 	if (instance === undefined || instance < 0) return;
 
 	g.world?.instances.remove(instance);
+	g.world?.commit();
+}
+
+async function createPlayerLocation() {
+	console.log('createPlayerLocation');
+	if (!g.roomy) {
+		await initRoomy();
+
+		if (!g.roomy) return;
+	}
+
+	const player = await g.roomy.create(PlayerLocation);
+
+	player.x = 0;
+	player.y = 0;
+	player.z = 0;
+	player.rotation = 0;
+	player.model = editingState.selectedCharacter ?? 'male f';
+	player.time = Date.now();
+	player.commit();
+
+	g.world?.players.push(player);
+	g.world?.commit();
+
+	localStorage.setItem('playerId', player.id);
+	return player;
+}
+
+export async function getPlayerLocation() {
+	// get player location
+	const players = await g.world?.players.items();
+	if (!players) return;
+
+	// get saved id
+	const savedId = localStorage.getItem('playerId');
+	console.log('saved id', savedId);
+	if (!savedId) {
+		return createPlayerLocation();
+	}
+
+	// find player by id
+	const player = players?.find((p) => p.id === savedId);
+
+	if (!player) {
+		console.log('player id not found', players);
+		return createPlayerLocation();
+	}
+
+	console.log('reusing player location', player);
+
+	return player;
+}
+
+export async function removeOldPlayerLocations() {
+	// remove a random player location that is more than 10 seconds old
+	const players = await g.world?.players.items();
+	if (!players) return;
+
+	const now = Date.now();
+	const tenSecondsAgo = now - 10000;
+
+	// remove a random player location that is more than 10 seconds old
+	// first filter all by time
+	const oldPlayers = players.filter((p) => p.time && p.time < tenSecondsAgo);
+	if (oldPlayers.length === 0) return;
+
+	// remove a random one
+	const randomIndex = Math.floor(Math.random() * oldPlayers.length);
+
+	g.world?.players.remove(randomIndex);
 	g.world?.commit();
 }

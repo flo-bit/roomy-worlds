@@ -41,9 +41,6 @@
 	instancedMesh.receiveShadow = true;
 
 	const dummy = new THREE.Object3D();
-	const color = new THREE.Color(0x00ff00);
-
-	console.log('seed', settings.seed);
 	const heightfield: number[] = [];
 
 	const options = settings.terrainNoise ?? {
@@ -93,7 +90,6 @@
 			dummy.position.set(x, height, z);
 			dummy.scale.set(1, 3, 1);
 			dummy.updateMatrix();
-			//color.setRGB(0, 0.15 * noise + 0.2, 0);
 
 			const color = gradient.get(noise);
 

@@ -974,28 +974,30 @@ export class PlayerLocation extends EntityWrapper {
 	set z(value: number) {
 		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('z', value));
 	}
-}
 
-// export type WorldSettings = {
-// 	seed: string;
-// 	size: number;
-// 	terrainGradient: {
-// 		rgb: { r: number; g: number; b: number };
-// 		position: number;
-// 	}[];
-// 	waterGradient: {
-// 		rgb: { r: number; g: number; b: number };
-// 		position: number;
-// 	}[];
-// 	version?: number;
-// };
+	get rotation() {
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('rotation'));
+	}
+
+	set rotation(value: number) {
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('rotation', value));
+	}
+
+	get model() {
+		return this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.get('model'));
+	}
+
+	set model(value: string) {
+		this.entity.getOrInit(c.PlayerLocationComponent, (entity) => entity.set('model', value));
+	}
+}
 
 export class World extends NamedEntity {
 	get instances(): EntityList<TransformedGroup> {
 		return new EntityList(this.peer, this.entity, c.WorldComponent, TransformedGroup);
 	}
 
-	get locations(): EntityList<PlayerLocation> {
+	get players(): EntityList<PlayerLocation> {
 		return new EntityList(this.peer, this.entity, c.PlayerLocationsComponent, PlayerLocation);
 	}
 
@@ -1009,62 +1011,6 @@ export class World extends NamedEntity {
 		this.entity.getOrInit(c.WorldSettingsComponent, (entity) =>
 			entity.set('settings', JSON.stringify(value))
 		);
-	}
-
-	get terrainGradient(): EntityIdStr {
-		return this.entity.getOrInit(c.WorldSettingsComponent, (entity) =>
-			entity.get('terrainGradient')
-		);
-	}
-
-	async loadTerrainGradient(): Promise<Gradient> {
-		return await this.open(Gradient, this.terrainGradient);
-	}
-
-	get seed(): string {
-		return this.entity.getOrInit(c.WorldSettingsComponent, (entity) => entity.get('seed'));
-	}
-
-	set seed(value: string) {
-		this.entity.getOrInit(c.WorldSettingsComponent, (entity) => entity.set('seed', value));
-	}
-}
-
-export class GradientStop extends EntityWrapper {
-	get r() {
-		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('r'));
-	}
-
-	set r(value: number) {
-		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('r', value));
-	}
-
-	get g() {
-		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('g'));
-	}
-	set g(value: number) {
-		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('g', value));
-	}
-
-	get b() {
-		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('b'));
-	}
-	set b(value: number) {
-		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('b', value));
-	}
-
-	get position() {
-		return this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.get('position'));
-	}
-
-	set position(value: number) {
-		this.entity.getOrInit(c.GradientStopComponent, (entity) => entity.set('position', value));
-	}
-}
-
-export class Gradient extends EntityWrapper {
-	get stops(): EntityList<GradientStop> {
-		return new EntityList(this.peer, this.entity, c.GradientComponent, GradientStop);
 	}
 }
 

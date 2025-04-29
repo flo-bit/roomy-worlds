@@ -5,13 +5,14 @@
 	import Player from '$lib/player/Player.svelte';
 	import { onMount } from 'svelte';
 	import Instance from './Instance.svelte';
-	import { addInstance, editingState } from './state.svelte';
+	import { addInstance, editingState, getPlayerLocation } from './state.svelte';
 	import { ACESFilmicToneMapping } from 'three';
 	import Water from '$lib/world/Water.svelte';
 	import HudScene from './HudScene.svelte';
 	import { Debug } from '@threlte/rapier';
 	import { derivePromise } from '$lib/utils.svelte';
 	import { g } from '$lib/roomy.svelte';
+	import Players from './Players.svelte';
 
 	interactivity({
 		filter: (hits) => {
@@ -21,15 +22,13 @@
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 
-	let terrainGradient = derivePromise([], async () =>
-		g.world ? (await g.world.loadTerrainGradient()).stops.items() : []
-	);
-
-	$inspect(terrainGradient.value);
-
 	const { renderer } = useThrelte();
 
-	onMount(() => {
+	let playerLocation = derivePromise(null, async () => await getPlayerLocation());
+
+	$inspect(playerLocation);
+
+	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
 			// on c switch camera
 			if (e.key === 'c') {
@@ -38,6 +37,7 @@
 		});
 
 		renderer.toneMapping = ACESFilmicToneMapping;
+
 	});
 
 	$effect(() => {
@@ -59,7 +59,7 @@
 		<OrbitControls />
 	</T.PerspectiveCamera>
 {:else}
-	<Player />
+	<Player playerLocation={playerLocation.value} />
 {/if}
 
 <T.DirectionalLight position={[0, 10, -10]} />
@@ -86,6 +86,8 @@
 {#each instances.value as instance}
 	<Instance {instance} />
 {/each}
+
+<Players />
 
 <HUD>
 	<HudScene />
