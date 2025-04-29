@@ -21,6 +21,7 @@ import {
 	type ComponentDef,
 	Cursor,
 	Entity,
+	EntityId,
 	type EntityIdStr,
 	type IntoEntityId,
 	intoEntityId,
@@ -1011,6 +1012,34 @@ export class World extends NamedEntity {
 		this.entity.getOrInit(c.WorldSettingsComponent, (entity) =>
 			entity.set('settings', JSON.stringify(value))
 		);
+	}
+
+	get spaceId(): EntityIdStr {
+		return this.entity.getOrInit(c.WorldChatComponent, (entity) => entity.get('space'));
+	}
+
+	set spaceId(value: EntityIdStr) {
+		this.entity.getOrInit(c.WorldChatComponent, (entity) => entity.set('space', value));
+	}
+
+	get channelId(): EntityIdStr {
+		return this.entity.getOrInit(c.WorldChatComponent, (entity) => entity.get('channel'));
+	}
+
+	set channelId(value: EntityIdStr) {
+		this.entity.getOrInit(c.WorldChatComponent, (entity) => entity.set('channel', value));
+	}
+
+	async loadChannel(): Promise<Channel | null> {
+		if (!this.channelId) {
+			// create a new channel
+			const channel = await this.create(Channel);
+			this.channelId = channel.id;
+			this.commit();
+			channel.commit();
+			return channel;
+		}
+		return this.open(Channel, this.channelId);
 	}
 }
 

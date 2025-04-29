@@ -1,6 +1,6 @@
 <script>
 	import { Button, cn } from 'fuchs';
-	import { editingState } from './state.svelte';
+	import { applyTransform, editingState } from './state.svelte';
 	import InstanceEditorUi from './InstanceEditorUI.svelte';
 </script>
 
@@ -27,6 +27,33 @@
 
 	<span class="sr-only">Add Model</span>
 </Button>
+
+{#if editingState.selectedInstance || editingState.selectedModelId}
+	<Button
+		size="iconSm"
+		class={cn(
+			'bg-accent-100 hover:bg-accent-200 absolute top-18 rounded-xl',
+			editingState.showWorldSettings ? 'left-84' : 'left-4'
+		)}
+		onclick={() => {
+			applyTransform();
+			editingState.selectedInstance = null;
+			editingState.selectedModelId = null;
+		}}
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="2.5"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+		</svg>
+
+		<span class="sr-only"> deselect </span>
+	</Button>
+{/if}
 
 <Button
 	class={cn(

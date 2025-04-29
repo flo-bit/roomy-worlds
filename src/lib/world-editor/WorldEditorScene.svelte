@@ -30,6 +30,8 @@
 
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
+			if (e.target instanceof HTMLInputElement || (e.target instanceof HTMLElement && e.target.contentEditable)) return;
+
 			// on c switch camera
 			if (e.key === 'c') {
 				editingState.camera = editingState.camera === 'first' ? 'third' : 'first';

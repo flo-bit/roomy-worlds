@@ -14,6 +14,8 @@ export const editingState = $state({
 	camera: 'third' as 'first' | 'third',
 	modelPickerType: 'public' as 'private' | 'world' | 'public',
 
+	showChat: false,
+
 	selectedCharacter: null as string | null,
 	showCharacterPicker: false,
 

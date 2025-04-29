@@ -292,6 +292,14 @@ export const PlayerLocationComponent = defComponent(
 	}>
 );
 
+export const WorldChatComponent = defComponent(
+	'worldChat:02JPFMTA2QAFY2D3CV1C0YBZQ2',
+	LoroMap<{
+		space: EntityIdStr;
+		channel: EntityIdStr;
+	}>
+);
+
 export const WorldSettingsComponent = defComponent(
 	'worldSettings:02JPFMTA2QAFY2D3CV1C0YBZQ1',
 	LoroMap<{

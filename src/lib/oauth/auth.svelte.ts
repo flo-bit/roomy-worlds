@@ -105,6 +105,13 @@ async function finalizeLogin(params: URLSearchParams, did?: string) {
 		setAgentAndXRPC(session);
 		localStorage.setItem('last-login', session.info.sub);
 
+		// redirect back to the saved url
+		const redirect = localStorage.getItem('oauth-redirect');
+		if (redirect) {
+			localStorage.removeItem('oauth-redirect');
+			window.location.href = redirect;
+		}
+
 		await loadProfile(session.info.sub);
 
 		client.isLoggedIn = true;
@@ -118,7 +125,7 @@ async function finalizeLogin(params: URLSearchParams, did?: string) {
 
 async function resumeSession(did: string) {
 	try {
-		const session = await getSession(did as `did:${string}`, { allowStale: true });
+		const session = await getSession(did as `did:${string}:${string}`, { allowStale: true });
 		client.session = session;
 
 		setAgentAndXRPC(session);
@@ -168,6 +175,9 @@ async function authorizationFlow(input: string) {
 		scope: metadata.scope
 	});
 
+	// save current url to local to redirect back after login
+	localStorage.setItem('oauth-redirect', location.href);
+
 	await new Promise((resolve) => setTimeout(resolve, 200));
 
 	window.location.assign(authUrl);
@@ -179,4 +189,15 @@ async function authorizationFlow(input: string) {
 
 		window.addEventListener('pageshow', listener, { once: true });
 	});
+}
+
+import { AtpBaseClient } from '@atproto/api';
+
+let agent: AtpBaseClient | null = null;
+
+export async function getProfile({ did }: { did: string }) {
+	agent ??= new AtpBaseClient({ service: 'https://public.api.bsky.app' });
+
+	const data = await agent.app.bsky.actor.getProfile({ actor: did });
+	return data.data;
 }

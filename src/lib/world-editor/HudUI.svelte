@@ -3,7 +3,7 @@
 </script>
 
 {#if editingState.selectedInstance || editingState.selectedModelId}
-	<div class="absolute bottom-2 right-4 z-10 flex flex-col gap-2">
+	<div class="absolute top-18 left-4 z-10 flex flex-col gap-2">
 		{#if editingState.selectedInstance}
 			<div class="flex items-center gap-2">
 				<span class="text-base-800 text-sm"> moving </span>

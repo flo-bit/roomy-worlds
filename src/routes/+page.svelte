@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { createWorld } from '$lib/utils.svelte';
-	import BlueskyLoginModal, { blueskyLoginModalState } from '$lib/BlueskyLoginModal.svelte';
-	import { login } from '$lib/oauth';
-	import { Badge, Button, Prose } from 'fuchs';
+	import { Badge, blueskyLoginModalState, Button, Prose } from 'fuchs';
 
 	import { Canvas } from '@threlte/core';
 	import world from './viewer/world.json';
@@ -53,7 +51,7 @@
 
 			<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
 
-			<Button class="hidden w-fit" size="lg" onclick={() => blueskyLoginModalState.show()}
+			<Button class="w-fit" size="lg" onclick={() => blueskyLoginModalState.show()}
 				>Login</Button
 			>
 		</div>
@@ -81,8 +79,6 @@
 		<span class="sr-only"> Toggle Text </span>
 	</button>
 {/if}
-
-<BlueskyLoginModal {login} />
 
 <div class="fixed inset-0 -z-10 h-screen w-screen">
 	<Canvas toneMapping={ACESFilmicToneMapping}>

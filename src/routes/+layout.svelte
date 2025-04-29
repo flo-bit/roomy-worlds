@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../app.css';
-	import { initClient } from '$lib/oauth';
+	import { initClient, login } from '$lib/oauth';
 	import { onMount } from 'svelte';
-	import { Head } from 'fuchs';
+	import { BlueskyLoginModal, Head } from 'fuchs';
 
 	let { children } = $props();
 
@@ -14,3 +14,5 @@
 {@render children()}
 
 <Head title="roomy worlds" emojiFavicon="🏝️" />
+
+<BlueskyLoginModal {login} />

@@ -46,6 +46,7 @@
 		"@threlte/extras": "^9.1.3",
 		"@threlte/rapier": "^3.1.1",
 		"@threlte/studio": "^0.1.4",
+		"@tiptap/extension-placeholder": "^2.11.7",
 		"@types/three": "^0.175.0",
 		"fuchs": "^0.0.31",
 		"howler": "^2.2.4",

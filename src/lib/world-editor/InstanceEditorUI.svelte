@@ -13,10 +13,8 @@
 
 	onMount(() => {
 		window.addEventListener('keydown', async (e) => {
-			// if target is input, don't handle
-			if (e.target instanceof HTMLInputElement) return;
-
-			console.log(e.key);
+			// if target is input or div thats content editable, don't handle
+			if (e.target instanceof HTMLInputElement || (e.target instanceof HTMLElement && e.target.contentEditable)) return;
 
 			if (e.key === 'r') {
 				selectedTool = 'rotate';
