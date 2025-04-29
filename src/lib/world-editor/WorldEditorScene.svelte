@@ -12,7 +12,6 @@
 	import { Debug } from '@threlte/rapier';
 	import { derivePromise } from '$lib/utils.svelte';
 	import { g } from '$lib/roomy.svelte';
-	import Players from './Players.svelte';
 
 	interactivity({
 		filter: (hits) => {
@@ -24,22 +23,25 @@
 
 	const { renderer } = useThrelte();
 
-	let playerLocation = derivePromise(null, async () => await getPlayerLocation());
-
-	$inspect(playerLocation);
-
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
-			if (e.target instanceof HTMLInputElement || (e.target instanceof HTMLElement && e.target.contentEditable)) return;
+			if (
+				e.target instanceof HTMLInputElement ||
+				(e.target instanceof HTMLElement && e.target.contentEditable === 'true')
+			)
+				return;
 
 			// on c switch camera
 			if (e.key === 'c') {
-				editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
+				if(editingState.camera === 'third' && !editingState.selectedCharacter) {
+					editingState.showCharacterPicker = true;
+				} else {
+					editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
+				}
 			}
 		});
 
 		renderer.toneMapping = ACESFilmicToneMapping;
-
 	});
 
 	$effect(() => {
@@ -61,7 +63,7 @@
 		<OrbitControls />
 	</T.PerspectiveCamera>
 {:else}
-	<Player playerLocation={playerLocation.value} />
+	<Player />
 {/if}
 
 <T.DirectionalLight position={[0, 10, -10]} />
@@ -88,8 +90,6 @@
 {#each instances.value as instance}
 	<Instance {instance} />
 {/each}
-
-<Players />
 
 <HUD>
 	<HudScene />

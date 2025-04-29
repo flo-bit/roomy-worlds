@@ -131,11 +131,11 @@
 		// updatePosition();
 	});
 
-	onMount(() => {
-		setInterval(() => {
-			updatePosition();
-		}, 1000);
-	});
+	// onMount(() => {
+	// 	setInterval(() => {
+	// 		updatePosition();
+	// 	}, 1000);
+	// });
 
 	async function updatePosition() {
 		if (!playerLocation) {

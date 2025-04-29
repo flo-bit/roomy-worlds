@@ -52,7 +52,7 @@
 				Placeholder.configure({ placeholder: 'Write something ...' }),
 				initKeyboardShortcutHandler({
 					onEnter: () => {
-						onEnter?.(editor?.getJSON());
+						onEnter?.(editor?.getJSON() ?? { type: 'doc', content: [] });
 					}
 				})
 			],

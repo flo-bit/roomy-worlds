@@ -3,7 +3,6 @@
 	import type { PlayerLocation } from '$lib/roomy';
 	import { T, useTask } from '@threlte/core';
 	import { Vector3 } from 'three';
-	import { editingState } from './state.svelte';
 
 	let {
 		player
@@ -39,7 +38,7 @@
 
 		// interpolate rotation
 		rotation = rotation * 0.95 + (player.rotation ?? 0) * 0.05;
-		
+
 		moving = dist > 0.5;
 		if (dist < 0.05) return;
 

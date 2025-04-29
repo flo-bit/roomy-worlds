@@ -17,8 +17,6 @@
 	const user = derivePromise(null, async () => {
 		return await users.getUser(authorDid.value);
 	});
-
-	$inspect(user);
 </script>
 
 <div class="flex w-full items-start gap-1">
