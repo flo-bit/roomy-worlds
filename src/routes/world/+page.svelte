@@ -15,16 +15,32 @@
 	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
 	import { downloadWorld } from '$lib/download';
+	import { Howl } from 'howler';
+	import { base } from '$app/paths';
 
 	let showPerfMonitor = $state(false);
+
+	let sound = $state<Howl | null>(null);
 
 	onMount(() => {
 		window.addEventListener('keydown', (e) => {
 			// on control + 5, save world
-			if(e.ctrlKey && e.key === '5' && g.world) {
+			if (e.ctrlKey && e.key === '5' && g.world) {
 				e.preventDefault();
 				console.log('downloading world');
 				downloadWorld(g.world);
+			}
+		});
+
+		sound = new Howl({
+			src: [base + '/audio.mp3'],
+			autoplay: true,
+			volume: 0.5,
+			onend: function () {
+				// play again after 5-20 seconds
+				setTimeout(() => {
+					sound?.play();
+				}, Math.random() * 15000 + 5000);
 			}
 		});
 	});
@@ -59,7 +75,6 @@
 		{#if g.world?.settings}
 			<WorldSettingsUi />
 		{/if}
-		
 	{/if}
 	<WorldEditorUi />
 

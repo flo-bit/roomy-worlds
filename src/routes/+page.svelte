@@ -47,6 +47,7 @@
 				<p class="flex flex-wrap gap-8">
 					<a href="https://github.com/flo-bit/roomy-worlds" target="_blank"> Source </a>
 					<a href="https://roomy.chat" target="_blank"> Roomy Chat </a>
+					<a href="https://soundcloud.com/nicholas-palmer-4" target="_blank"> Music by Nicholas Palmer </a>
 				</p>
 			</Prose>
 

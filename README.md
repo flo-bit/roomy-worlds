@@ -98,3 +98,4 @@ as well as see all models made in any window.
 ## Credits
 
 - 3d character models from [kenney](https://kenney.nl/assets/mini-characters-1)
+- Music by [Nicholas Palmer](https://soundcloud.com/nicholas-palmer-4)
