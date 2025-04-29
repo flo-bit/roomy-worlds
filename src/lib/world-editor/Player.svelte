@@ -37,8 +37,11 @@
 			z = position[2];
 		}
 
+		// interpolate rotation
+		rotation = rotation * 0.95 + (player.rotation ?? 0) * 0.05;
+		
 		moving = dist > 0.5;
-		if (!moving) return;
+		if (dist < 0.05) return;
 
 		// otherwise, interpolate linearly
 		let direction = new Vector3(position[0] - x, position[1] - y, position[2] - z);
@@ -47,8 +50,6 @@
 		y += direction.y * dt * 2;
 		z += direction.z * dt * 2;
 
-		// interpolate rotation
-		rotation = rotation * 0.95 + (player.rotation ?? 0) * 0.05;
 	});
 
 
