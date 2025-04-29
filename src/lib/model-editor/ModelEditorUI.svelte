@@ -5,6 +5,7 @@
 	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
 	import { Models } from '$lib/roomy';
+	import { dev } from '$app/environment';
 
 	$effect(() => {
 		applyModelEditorTransform();
@@ -191,22 +192,23 @@
 	<PopoverColorPicker bind:rgb={modelEditor.color} />
 </div>
 
-
 <!-- delete from public model list -->
-<!-- <Button
-	size="lg"
-	class="absolute bottom-2 left-2"
-	onclick={async () => {
-		if (!g.voxelObject || !g.roomy) return;
+{#if dev}
+	<Button
+		size="lg"
+		class="absolute bottom-2 left-2"
+		onclick={async () => {
+			if (!g.voxelObject || !g.roomy) return;
 
-		const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
+			const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
 
-		const models = await g.roomy.open(Models, id);
-		const index = (await models.models.items()).findIndex((m) => m.id === g.voxelObject?.id);
-		if (index === -1) return;
-		models.models.remove(index);
-		models.commit();
-	}}
->
-	Delete
-</Button> -->
+			const models = await g.roomy.open(Models, id);
+			const index = (await models.models.items()).findIndex((m) => m.id === g.voxelObject?.id);
+			if (index === -1) return;
+			models.models.remove(index);
+			models.commit();
+		}}
+	>
+		Delete
+	</Button>
+{/if}

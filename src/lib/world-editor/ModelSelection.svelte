@@ -7,6 +7,7 @@
 	import { g, initRoomy } from '$lib/roomy.svelte';
 	import { modelEditor } from '$lib/model-editor/state.svelte';
 	import { Models, VoxelGroup } from '$lib/roomy';
+	import { dev } from '$app/environment';
 
 	let globalModels: Models | null = $state(null);
 
@@ -68,6 +69,9 @@
 		// filter all items that have no voxels
 		items = items.filter((item) => item.voxels.voxels.length > 0);
 
+		// remove duplicates (id)
+		items = items.filter((item, index, self) => index === self.findIndex((t) => t.voxels.id === item.voxels.id));
+
 		return items;
 	}
 </script>
@@ -95,5 +99,5 @@
 		editingState.selectedInstance = null;
 		editingState.selectedModelId = voxels.id;
 	}}
-	showEditButton={editingState.modelPickerType === 'private'}
+	showEditButton={editingState.modelPickerType === 'private' || dev}
 />

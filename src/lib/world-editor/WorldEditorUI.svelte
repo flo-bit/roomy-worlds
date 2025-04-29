@@ -73,7 +73,11 @@
 				editingState.showWorldSettings ? 'left-98' : 'left-18'
 			)}
 			onclick={() => {
-				editingState.camera = 'first';
+				if (editingState.selectedCharacter) {
+					editingState.camera = 'first';
+				} else {
+					editingState.showCharacterPicker = true;
+				}
 			}}
 		>
 			Walk around

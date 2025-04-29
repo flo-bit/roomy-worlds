@@ -14,6 +14,9 @@ export const editingState = $state({
 	camera: 'third' as 'first' | 'third',
 	modelPickerType: 'public' as 'private' | 'world' | 'public',
 
+	selectedCharacter: null as string | null,
+	showCharacterPicker: false,
+
 	tool: 'move' as 'move' | 'rotate' | 'scale',
 
 	worldSettings: {

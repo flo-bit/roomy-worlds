@@ -17,6 +17,7 @@
 	import { downloadWorld } from '$lib/download';
 	import { Howl } from 'howler';
 	import { base } from '$app/paths';
+	import CharacterSelection from '$lib/character-picker/CharacterSelection.svelte';
 
 	let showPerfMonitor = $state(false);
 
@@ -82,3 +83,6 @@
 {:else}
 	<ModelEditorUi />
 {/if}
+
+
+<CharacterSelection />

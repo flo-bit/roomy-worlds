@@ -7,6 +7,7 @@
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 	import { PlayerLocation } from '$lib/roomy';
 	import { onMount } from 'svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
 
 	let {
 		position = [0, 10, 0],
@@ -233,8 +234,8 @@
 				rotation.y={rotation + Math.PI}
 				currentAction={animation}
 				scale={2}
-				gender="female"
-				version="f"
+				gender={editingState.selectedCharacter?.split(' ')[0].toLowerCase() as 'male' | 'female'}
+				version={editingState.selectedCharacter?.split(' ')[1] as 'a' | 'b' | 'c' | 'd' | 'e' | 'f'}
 			/>
 		</CollisionGroups>
 	</RigidBody>
