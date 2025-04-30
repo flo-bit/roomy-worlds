@@ -58,8 +58,8 @@
 	let selectedTool = $state(modelEditor.tool);
 </script>
 
-<div class="absolute top-2 left-2">
-	<div class="bg-base-100 flex gap-4 rounded-2xl p-2">
+<div class="absolute top-2 right-2">
+	<div class="bg-base-100 flex gap-4 rounded-2xl p-2 px-3">
 		<!-- add cube -->
 		<Toggle
 			bind:pressed={
@@ -172,6 +172,8 @@
 				</svg>
 			</ToggleGroupItem>
 		</ToggleGroup>
+
+		<PopoverColorPicker bind:rgb={modelEditor.color} />
 	</div>
 </div>
 
@@ -186,10 +188,6 @@
 	>
 		Back to world
 	</Button>
-</div>
-
-<div class="absolute top-3 right-3 z-10">
-	<PopoverColorPicker bind:rgb={modelEditor.color} />
 </div>
 
 <!-- delete from public model list -->

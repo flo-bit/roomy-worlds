@@ -10,11 +10,8 @@
 <T.Mesh
 	rotation.x={-Math.PI / 2}
 	onclick={(e) => {
-		console.log(e.point, modelEditor.tool);
-		e.stopPropagation();
 		if (modelEditor.tool !== 'place') return;
-
-		console.log(e.point);
+		e.stopPropagation();
 
 		addVoxel(
 			[e.point.x, e.point.y + 0.5, e.point.z],
@@ -28,8 +25,9 @@
 		modelEditor.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
 	}}
 	onpointermove={(e) => {
-		e.stopPropagation();
 		if (modelEditor.tool !== 'place') return;
+		e.stopPropagation();
+		
 		modelEditor.ghostPosition = [e.point.x, e.point.y + 0.5, e.point.z];
 	}}
 	onpointerleave={() => {

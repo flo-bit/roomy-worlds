@@ -27,7 +27,8 @@
 		window.addEventListener('keydown', (e) => {
 			if (
 				e.target instanceof HTMLInputElement ||
-				(e.target instanceof HTMLElement && e.target.contentEditable === 'true')
+				(e.target instanceof HTMLElement && e.target.contentEditable === 'true') ||
+				editingState.showModelEditor
 			)
 				return;
 

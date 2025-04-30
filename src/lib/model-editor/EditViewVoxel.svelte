@@ -14,6 +14,9 @@
 	scale={voxel.scale.toArray()}
 	onclick={(e) => {
 		e.stopPropagation();
+
+		if(!modelEditor.orbitControlsEnabled) return;
+
 		if (modelEditor.tool === 'delete') {
 			//editorState.cubes.splice(index, 1);
 			deleteVoxel(voxel.id);

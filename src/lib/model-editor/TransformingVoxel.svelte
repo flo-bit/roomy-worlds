@@ -17,7 +17,15 @@
 		quaternion={voxel.quaternion.toArray()}
 		scale={voxel.scale.toArray()}
 		onchange={() => {
-			modelEditor.orbitControlsEnabled = !(modelEditor.transformControls?.dragging ?? true);
+			let enabled = !(modelEditor.transformControls?.dragging ?? true);
+
+			if(!enabled) {
+				modelEditor.orbitControlsEnabled = false;
+			} else if(modelEditor.orbitControlsEnabled === false) {
+				setTimeout(() => {
+					modelEditor.orbitControlsEnabled = true;
+				}, 200);
+			}
 		}}
 	>
 		<T.Mesh>
