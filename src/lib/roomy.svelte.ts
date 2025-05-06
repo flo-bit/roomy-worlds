@@ -16,7 +16,8 @@ export const g = $state({
 	world: undefined as World | undefined,
 	roomy: undefined as Roomy | undefined,
 	token: undefined as string | undefined,
-	did: undefined as string | undefined
+	did: undefined as string | undefined,
+	isLocal: false as boolean
 });
 
 export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
@@ -37,6 +38,8 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
 	//if ((!token || !did) && type === 'remote') type = 'local';
 
 	console.log('initRoomy', type, token, did);
+
+	g.isLocal = type === 'local';
 
 	if (type === 'local') {
 		peer = new SveltePeer(new StorageManager(indexedDBStorageAdapter(storageId)));

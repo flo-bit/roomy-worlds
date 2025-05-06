@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import Instance from './Instance.svelte';
 	import { addInstance, editingState, getPlayerLocation } from './state.svelte';
-	import { ACESFilmicToneMapping } from 'three';
+	import { ACESFilmicToneMapping, CameraHelper } from 'three';
 	import Water from '$lib/world/Water.svelte';
 	import HudScene from './HudScene.svelte';
 	import { Debug } from '@threlte/rapier';
@@ -21,7 +21,7 @@
 
 	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
 
-	const { renderer } = useThrelte();
+	const { renderer, scene } = useThrelte();
 
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
@@ -70,7 +70,7 @@
 {/if}
 
 <T.DirectionalLight
-	position={[0, 10, -10]}
+	position={[0, 100, -100]}
 	castShadow
 	shadow.camera.top={100}
 	shadow.camera.bottom={-100}

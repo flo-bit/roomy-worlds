@@ -28,7 +28,7 @@
 </Float>
 
 <T.DirectionalLight
-	position={[0, 10, -10]}
+	position={[0, 100, -100]}
 	castShadow
 	shadow.camera.top={100}
 	shadow.camera.bottom={-100}

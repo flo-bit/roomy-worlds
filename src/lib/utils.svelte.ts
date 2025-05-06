@@ -28,9 +28,9 @@ import { goto } from '$app/navigation';
 import { World } from './roomy';
 import { editingState } from './world-editor/state.svelte';
 
-export async function createWorld(base: string) {
+export async function createWorld(base: string, local: boolean = false) {
 	if (!g.roomy) {
-		await initRoomy();
+		await initRoomy(local ? 'local' : undefined);
 
 		if (!g.roomy) return;
 	}
@@ -51,13 +51,11 @@ export async function createWorld(base: string) {
 		version: 1
 	};
 
-	//world.channelId = 'leaf:hh593yrjjs5w4e5qbj7h0ymcvmnjjyvzew8dnbrpb5fp95v5spa0';
-
 	world.commit();
 
 	editingState.showWorldSettings = true;
 
-	goto(base + `/world?id=${world.id}`);
+	goto(base + `/world?id=${world.id}${local ? '&local' : ''}`);
 }
 
 export function shuffle<T>(array: T[]): T[] {

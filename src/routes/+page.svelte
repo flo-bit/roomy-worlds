@@ -9,6 +9,7 @@
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
 	import { goto } from '$app/navigation';
+	import { initRoomy } from '$lib/roomy.svelte';
 
 	let showText = $state(true);
 </script>
@@ -40,30 +41,40 @@
 				<p>Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.</p>
 
 				<p class="italic">
-					Work in progress/Preview only: You can create new worlds/models, but might disappear/change unexpectedly with new
-					updates. Lots of bugs too.
+					Work in progress/Preview only: You can create new worlds/models, but might
+					disappear/change unexpectedly with new updates. Lots of bugs too.
 				</p>
 				<p class="flex flex-wrap gap-8">
 					<a href="https://github.com/flo-bit/roomy-worlds" target="_blank"> Source </a>
 					<a href="https://roomy.chat" target="_blank"> Roomy Chat </a>
-					<a href="https://soundcloud.com/nicholas-palmer-4" target="_blank"> Music by Nicholas Palmer </a>
+					<a href="https://soundcloud.com/nicholas-palmer-4" target="_blank">
+						Music by Nicholas Palmer
+					</a>
 				</p>
 			</Prose>
 
-			<div class="flex gap-2 mt-4">
-				<Button class="w-fit" size="lg" onclick={() => {
-					// world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg
-					goto(base + '/world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg');
-				}}
+			<div class="mt-4 flex gap-2">
+				<Button
+					class="w-fit"
+					size="lg"
+					onclick={() => {
+						// world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg
+						goto(base + '/world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg');
+					}}
 				>
 					Join shared world
 				</Button>
 
 				<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
 
-			<!-- <Button class="w-fit" size="lg" onclick={() => blueskyLoginModalState.show()}
-				>Login</Button
-			> -->
+				<Button
+					class="w-fit"
+					size="lg"
+					onclick={async () => {
+						await initRoomy('local');
+						createWorld(base, true);
+					}}>New Local World</Button
+				>
 			</div>
 		</div>
 	</div>

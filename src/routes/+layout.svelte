@@ -10,7 +10,12 @@
 	onMount(() => {
 		initClient();
 
-		initRoomy();
+
+		if (window.location.search.includes('local')) {
+			initRoomy('local');
+		} else {
+			initRoomy();
+		}
 	});
 </script>
 
