@@ -128,7 +128,6 @@ Command: npx @threlte/gltf@3.0.1 ./static/characters/character-female-b.glb -s -
 				<T is={gltf.nodes.root} />
 				<T.SkinnedMesh
 					name="body-mesh"
-					castShadow
 					receiveShadow
 					geometry={gltf.nodes['body-mesh'].geometry}
 					material={gltf.materials.colormap}
@@ -137,7 +136,6 @@ Command: npx @threlte/gltf@3.0.1 ./static/characters/character-female-b.glb -s -
 				/>
 				<T.SkinnedMesh
 					name="head-mesh"
-					castShadow
 					receiveShadow
 					geometry={gltf.nodes['head-mesh'].geometry}
 					material={gltf.materials.colormap}

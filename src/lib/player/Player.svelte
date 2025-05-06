@@ -162,27 +162,29 @@
 
 	function onKeyDown(e: KeyboardEvent) {
 		//console.log('down', e.key.toLowerCase());
-		switch (e.key.toLowerCase()) {
+		console.log('down', e.code.toLowerCase());
+		switch (e.code.toLowerCase()) {
 			case 'arrowdown':
-			case 's':
+			case 'keys':
 				backward = 1;
 				break;
 			case 'arrowup':
-			case 'w':
+			case 'keyw':
 				forward = 1;
 				break;
 			case 'arrowleft':
-			case 'a':
+			case 'keya':
 				left = 1;
 				break;
 			case 'arrowright':
-			case 'd':
+			case 'keyd':
 				right = 1;
 				break;
-			case 'shift':
+			case 'shiftleft':
+			case 'shiftright':
 				isRunning = true;
 				break;
-			case ' ':
+			case 'space':
 				jump();
 			default:
 				break;
@@ -191,25 +193,26 @@
 
 	function onKeyUp(e: KeyboardEvent) {
 		//console.log('up', e.key.toLowerCase());
-		switch (e.key.toLowerCase()) {
+		switch (e.code.toLowerCase()) {
 			case 'arrowdown':
-			case 's':
+			case 'keys':
 				backward = 0;
 				break;
 			case 'arrowup':
-			case 'w':
+			case 'keyw':
 				forward = 0;
 				break;
 			case 'arrowleft':
-			case 'a':
+			case 'keya':
 				left = 0;
 				break;
 			case 'arrowright':
-			case 'd':
+			case 'keyd':
 				right = 0;
 				break;
 
-			case 'shift':
+			case 'shiftleft':
+			case 'shiftright':
 				isRunning = false;
 				break;
 			default:

@@ -7,20 +7,17 @@
 	import ModelSelection from '$lib/world-editor/ModelSelection.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
 	import ModelScene from '$lib/model-editor/ModelEditorScene.svelte';
-	import { ChatBubble, cn } from 'fuchs';
+	import { cn } from 'fuchs';
 	import ModelEditorUi from '$lib/model-editor/ModelEditorUI.svelte';
 	import WorldSettingsUi from '$lib/world-editor/WorldSettingsUI.svelte';
-	import HudUi from '$lib/world-editor/HudUI.svelte';
 	import WorldEditorUi from '$lib/world-editor/WorldEditorUI.svelte';
 	import { g } from '$lib/roomy.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { downloadWorld } from '$lib/download';
 	import { Howl } from 'howler';
 	import { base } from '$app/paths';
 	import CharacterSelection from '$lib/character-picker/CharacterSelection.svelte';
 	import { derivePromise } from '$lib/utils.svelte';
-	import { Announcement, Message } from '$lib/roomy';
-	import Tiptap from '$lib/chat/tiptap.svelte';
 	import Chat from '$lib/chat/Chat.svelte';
 
 	let showPerfMonitor = $state(false);
@@ -51,6 +48,10 @@
 				);
 			}
 		});
+	});
+
+	onDestroy(() => {
+		sound?.stop();
 	});
 
 	let channel = derivePromise(null, async () => {
@@ -93,8 +94,6 @@
 		{/if}
 	{/if}
 	<WorldEditorUi />
-
-	<!-- <HudUi /> -->
 {:else}
 	<ModelEditorUi />
 {/if}

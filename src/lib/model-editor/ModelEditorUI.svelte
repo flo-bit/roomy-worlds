@@ -210,3 +210,22 @@
 		Delete
 	</Button>
 {/if}
+
+<!-- add to public model list -->
+{#if dev}
+	<Button
+		size="lg"
+		class="absolute bottom-2 left-28"
+		onclick={async () => {
+			if (!g.voxelObject || !g.roomy) return;
+
+			const id = 'leaf:6hv4pxwp66xa5g9jqqz2q4jr39ryahrceafe71e2vwys1fstjmw0';
+
+			const models = await g.roomy.open(Models, id);
+			models.models.push(g.voxelObject);
+			models.commit();
+		}}
+	>
+		Publish
+	</Button>
+{/if}

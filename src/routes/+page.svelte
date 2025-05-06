@@ -8,6 +8,7 @@
 	import WorldViewerScene from '$lib/viewer/WorldViewerScene.svelte';
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
+	import { goto } from '$app/navigation';
 
 	let showText = $state(true);
 </script>
@@ -49,11 +50,21 @@
 				</p>
 			</Prose>
 
-			<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
+			<div class="flex gap-2 mt-4">
+				<Button class="w-fit" size="lg" onclick={() => {
+					// world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg
+					goto(base + '/world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg');
+				}}
+				>
+					Join shared world
+				</Button>
 
-			<Button class="w-fit" size="lg" onclick={() => blueskyLoginModalState.show()}
+				<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
+
+			<!-- <Button class="w-fit" size="lg" onclick={() => blueskyLoginModalState.show()}
 				>Login</Button
-			>
+			> -->
+			</div>
 		</div>
 	</div>
 {:else}

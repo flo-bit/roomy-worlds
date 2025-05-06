@@ -32,13 +32,15 @@
 			)
 				return;
 
-			// on c switch camera
-			if (e.key === 'c') {
-				if(editingState.camera === 'third' && !editingState.selectedCharacter) {
+			// on shift+c switch camera
+			if (e.key.toLowerCase() === 'c' && e.shiftKey) {
+				if (editingState.camera === 'third' && !editingState.selectedCharacter) {
 					editingState.showCharacterPicker = true;
 				} else {
 					editingState.camera = editingState.camera === 'first' ? 'third' : 'first';
 				}
+
+				editingState.showWorldSettings = false;
 			}
 		});
 
@@ -67,7 +69,14 @@
 	<Player />
 {/if}
 
-<T.DirectionalLight position={[0, 10, -10]} />
+<T.DirectionalLight
+	position={[0, 10, -10]}
+	castShadow
+	shadow.camera.top={100}
+	shadow.camera.bottom={-100}
+	shadow.camera.left={-100}
+	shadow.camera.right={100}
+/>
 
 {#key editingState.worldSettings.version + editingState.worldSettings.waterPercentage + editingState.worldSettings.size}
 	<Terrain
