@@ -20,7 +20,7 @@ export const g = $state({
 	isLocal: false as boolean
 });
 
-export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
+export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'dev') {
 	const savedCatalogId = localStorage.getItem('catalogId');
 	const catalogId = new EntityId((savedCatalogId as EntityIdStr) ?? undefined);
 	if (!savedCatalogId) localStorage.setItem('catalogId', catalogId.toString());
@@ -62,7 +62,9 @@ export async function initRoomy(type: 'local' | 'remote' | 'dev' = 'remote') {
 		// use local dev server
 		peer = new SveltePeer(
 			new StorageManager(indexedDBStorageAdapter(storageId)),
-			await webSocketSyncer(new WebSocket('ws://localhost:8095'))
+			await webSocketSyncer(
+				new WebSocket('wss://9154-2003-d4-774f-bc14-b5df-fbb9-6e1c-2cf3.ngrok-free.app/')
+			)
 		);
 	}
 	try {
