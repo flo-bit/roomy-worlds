@@ -10,9 +10,11 @@
 <T.Mesh
 	rotation.x={-Math.PI / 2}
 	onclick={(e) => {
+		console.log(e, modelEditor.tool);
 		if (modelEditor.tool !== 'place') return;
 		e.stopPropagation();
 
+		console.log(e.point);
 		addVoxel(
 			[e.point.x, e.point.y + 0.5, e.point.z],
 			[modelEditor.color.r, modelEditor.color.g, modelEditor.color.b]

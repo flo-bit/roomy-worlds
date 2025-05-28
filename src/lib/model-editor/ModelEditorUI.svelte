@@ -1,24 +1,14 @@
 <script lang="ts">
-	import { Button, PopoverColorPicker, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
+	import { Button, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
 	import { addVoxel, applyModelEditorTransform, deleteVoxel, modelEditor } from './state.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
-	import { Models } from '$lib/roomy';
-	import { dev } from '$app/environment';
+
+	import { PopoverColorPicker } from '@fuxui/colors';
 
 	$effect(() => {
 		applyModelEditorTransform();
-
 		modelEditor.tool = selectedTool;
-
-		if (modelEditor.selectedVoxel !== null) {
-			modelEditor.selectedVoxel.r = modelEditor.color.r;
-			modelEditor.selectedVoxel.g = modelEditor.color.g;
-			modelEditor.selectedVoxel.b = modelEditor.color.b;
-
-			modelEditor.selectedVoxel.commit();
-		}
 	});
 
 	onMount(() => {
@@ -44,8 +34,14 @@
 				await new Promise((resolve) => setTimeout(resolve, 10));
 				// clone
 				let v = modelEditor.selectedVoxel;
+				if (!v?.transform) return;
 
-				addVoxel([v.x, v.y, v.z], [v.r, v.g, v.b], [v.sx, v.sy, v.sz], [v.qx, v.qy, v.qz, v.qw]);
+				addVoxel(
+					[v.transform.x, v.transform.y, v.transform.z],
+					[v.r, v.g, v.b],
+					[v.transform.sx, v.transform.sy, v.transform.sz],
+					[v.transform.rx, v.transform.ry, v.transform.rz, v.transform.rw]
+				);
 			} else if (e.key === 'x') {
 				// delete
 				if (modelEditor.selectedVoxel === null) return;
@@ -173,7 +169,15 @@
 			</ToggleGroupItem>
 		</ToggleGroup>
 
-		<PopoverColorPicker bind:rgb={modelEditor.color} />
+		<PopoverColorPicker
+			bind:rgb={modelEditor.color}
+			onchange={(e) => {
+				if (!modelEditor.selectedVoxel) return;
+				modelEditor.selectedVoxel.r = e.rgb.r;
+				modelEditor.selectedVoxel.g = e.rgb.g;
+				modelEditor.selectedVoxel.b = e.rgb.b;
+			}}
+		/>
 	</div>
 </div>
 
@@ -182,8 +186,8 @@
 		size="iconLg"
 		onclick={() => {
 			editingState.showModelEditor = false;
-			if (g.voxelObject?.id && g.voxelObject.voxels.length > 0)
-				editingState.selectedModelId = g.voxelObject.id;
+			if (modelEditor.voxelObject)
+				editingState.selectedModelId = modelEditor.voxelObject.id;
 		}}
 	>
 		Back to world
@@ -191,7 +195,7 @@
 </div>
 
 <!-- delete from public model list -->
-{#if dev}
+<!-- {#if dev}
 	<Button
 		size="lg"
 		class="absolute bottom-2 left-2"
@@ -209,10 +213,10 @@
 	>
 		Delete
 	</Button>
-{/if}
+{/if} -->
 
 <!-- add to public model list -->
-{#if dev}
+<!-- {#if dev}
 	<Button
 		size="lg"
 		class="absolute bottom-2 left-28"
@@ -228,4 +232,4 @@
 	>
 		Publish
 	</Button>
-{/if}
+{/if} -->

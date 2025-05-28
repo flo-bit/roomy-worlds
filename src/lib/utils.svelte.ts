@@ -1,61 +1,41 @@
-/**
- * Helper that allows you to do something similar to the `$derive` rune but for a function returning
- * a promise.
- *
- * @param default_value The initial value to set the reactive state to before the promise has
- * resolved.
- * @param get A reactive closure that returns a promise with the target value. This will be re-run
- * if any reactive state that it depends on has changed, just like `$derive`.
- * */
-export function derivePromise<T>(
-	default_value: T,
-	get: () => Promise<T>
-): {
-	/** Accessor for the inner, reactive value. */
-	value: T;
-} {
-	const state = $state({ value: default_value });
-	$effect(() => {
-		get().then((v) => {
-			state.value = v;
-		});
-	});
-	return state;
-}
-
-import { g, initRoomy } from './roomy.svelte';
 import { goto } from '$app/navigation';
-import { World } from './roomy';
+import { Group } from 'jazz-tools';
+import { InstanceList, Model, VoxelList, World } from './schema';
 import { editingState } from './world-editor/state.svelte';
 
-export async function createWorld(base: string, local: boolean = false) {
-	if (!g.roomy) {
-		await initRoomy(local ? 'local' : undefined);
+export function publicGroup(readWrite: 'reader' | 'writer' = 'writer') {
+	const group = Group.create();
+	group.addMember('everyone', readWrite);
 
-		if (!g.roomy) return;
-	}
-	const world = await g.roomy.create(World);
+	return group;
+}
 
-	world.settings = {
-		seed: Math.random().toString(),
-		size: 100,
-		terrainGradient: [
-			{ rgb: { r: 0, g: 0.05, b: 0 }, position: 0 },
-			{ rgb: { r: 0, g: 0.35, b: 0 }, position: 1 }
-		],
-		waterGradient: [
-			{ rgb: { r: 0.0, g: 0.0, b: 0.05 }, position: 0 },
-			{ rgb: { r: 0.1, g: 0.1, b: 0.55 }, position: 1 }
-		],
-		waterPercentage: 35,
-		version: 1
-	};
-
-	world.commit();
+export async function createWorld(base: string) {
+	const world = World.create(
+		{
+			instances: InstanceList.create([], { owner: publicGroup() })
+		},
+		{
+			owner: publicGroup()
+		}
+	);
 
 	editingState.showWorldSettings = true;
 
-	goto(base + `/world?id=${world.id}${local ? '&local' : ''}`);
+	goto(base + `/world?id=${world.id}`);
+}
+
+export function createModel() {
+	const model = Model.create(
+		{
+			voxels: VoxelList.create([], { owner: publicGroup() })
+		},
+		{
+			owner: publicGroup()
+		}
+	);
+
+	return model;
 }
 
 export function shuffle<T>(array: T[]): T[] {

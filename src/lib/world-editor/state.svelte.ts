@@ -1,12 +1,14 @@
-import { PlayerLocation, TransformedGroup, type WorldSettings } from '$lib/roomy';
-import { g, initRoomy } from '$lib/roomy.svelte';
+import { Instance, Transform, World } from '$lib/schema';
+import { publicGroup } from '$lib/utils.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
-import { Quaternion, Vector3 } from 'three';
+import { CoState } from 'jazz-svelte';
+import type { Loaded } from 'jazz-tools';
+import { Vector3 } from 'three';
 import type { TransformControls } from 'three/examples/jsm/Addons.js';
 
 export const editingState = $state({
-	selectedInstance: null as TransformedGroup | null,
-	selectedModelId: null as EntityIdStr | null,
+	selectedInstance: null as string | null,
+	selectedModelId: null as string | null,
 	transformControls: undefined as TransformControls | undefined,
 	showModelEditor: false,
 	showWorldSettings: false,
@@ -48,7 +50,9 @@ export const editingState = $state({
 		}[],
 		waterPercentage: 35,
 		version: -1
-	} as WorldSettings
+	},
+	worldId: null as string | null,
+	world: null as Loaded<typeof World> | null
 });
 
 export type AddInstanceFunction = (id: EntityIdStr, position: Vector3) => void;
@@ -57,123 +61,62 @@ export type AddInstanceFunction = (id: EntityIdStr, position: Vector3) => void;
 export async function applyTransform() {
 	if (editingState.selectedInstance === null || !editingState.transformControls?.object) return;
 
-	const instance = editingState.selectedInstance;
+	const instance = new CoState(Instance, editingState.selectedInstance);
 
-	instance.x = editingState.transformControls.object.position.x;
-	instance.y = editingState.transformControls.object.position.y;
-	instance.z = editingState.transformControls.object.position.z;
+	if (!instance.current) return;
+	if (!instance.current.transform) return;
+	instance.current.transform.x = editingState.transformControls.object.position.x;
+	instance.current.transform.y = editingState.transformControls.object.position.y;
+	instance.current.transform.z = editingState.transformControls.object.position.z;
 
-	instance.sx = editingState.transformControls.object.scale.x;
-	instance.sy = editingState.transformControls.object.scale.y;
-	instance.sz = editingState.transformControls.object.scale.z;
+	instance.current.transform.sx = editingState.transformControls.object.scale.x;
+	instance.current.transform.sy = editingState.transformControls.object.scale.y;
+	instance.current.transform.sz = editingState.transformControls.object.scale.z;
 
-	instance.qx = editingState.transformControls.object.quaternion.x;
-	instance.qy = editingState.transformControls.object.quaternion.y;
-	instance.qz = editingState.transformControls.object.quaternion.z;
-	instance.qw = editingState.transformControls.object.quaternion.w;
-
-	instance.commit();
-
-	console.log('commit');
+	instance.current.transform.rx = editingState.transformControls.object.quaternion.x;
+	instance.current.transform.ry = editingState.transformControls.object.quaternion.y;
+	instance.current.transform.rz = editingState.transformControls.object.quaternion.z;
+	instance.current.transform.rw = editingState.transformControls.object.quaternion.w;
 
 	await new Promise((resolve) => setTimeout(resolve, 10));
 }
 
-export async function addInstance(id: EntityIdStr, position: Vector3) {
-	if (!g.roomy) {
-		await initRoomy();
+export async function addInstance(id: string, position: Vector3) {
+	const instance = Instance.create(
+		{
+			model: id,
+			transform: Transform.create(
+				{
+					x: position.x,
+					y: position.y,
+					z: position.z,
+					sx: 1,
+					sy: 1,
+					sz: 1,
+					rx: 0,
+					ry: 0,
+					rz: 0,
+					rw: 1
+				},
+				{ owner: publicGroup() }
+			)
+		},
+		{ owner: publicGroup() }
+	);
 
-		if (!g.roomy) return;
-	}
-
-	const instance = await g.roomy.create(TransformedGroup);
-	instance.group = id;
-	instance.position = position;
-	instance.quaternion = new Quaternion();
-	instance.scale = new Vector3(1, 1, 1);
-	instance.commit();
-
-	g.world?.instances.push(instance);
-	g.world?.commit();
+	// const world = new CoState(World, editingState.worldId);
+	console.log('editingState.world', editingState.world);
+	console.log(editingState.world?.current?.instances);
+	editingState.world?.current?.instances?.push(instance);
 }
 
 export async function deleteInstance(id: string) {
-	const instances = await g.world?.instances.items();
+	const world = new CoState(World, editingState.worldId);
+
 	// find voxel by id
-	const instance = instances?.findIndex((v) => v.id === id);
+	const instance = world.current?.instances?.findIndex((v) => v?.id === id);
 	console.log(instance);
 	if (instance === undefined || instance < 0) return;
 
-	g.world?.instances.remove(instance);
-	g.world?.commit();
-}
-
-async function createPlayerLocation() {
-	console.log('createPlayerLocation');
-	if (!g.roomy) {
-		await initRoomy();
-
-		if (!g.roomy) return;
-	}
-
-	const player = await g.roomy.create(PlayerLocation);
-
-	player.x = 0;
-	player.y = 0;
-	player.z = 0;
-	player.rotation = 0;
-	player.model = editingState.selectedCharacter ?? 'male f';
-	player.time = Date.now();
-	player.commit();
-
-	g.world?.players.push(player);
-	g.world?.commit();
-
-	localStorage.setItem('playerId', player.id);
-	return player;
-}
-
-export async function getPlayerLocation() {
-	// get player location
-	const players = await g.world?.players.items();
-	if (!players) return;
-
-	// get saved id
-	const savedId = localStorage.getItem('playerId');
-	console.log('saved id', savedId);
-	if (!savedId) {
-		return createPlayerLocation();
-	}
-
-	// find player by id
-	const player = players?.find((p) => p.id === savedId);
-
-	if (!player) {
-		console.log('player id not found', players);
-		return createPlayerLocation();
-	}
-
-	console.log('reusing player location', player);
-
-	return player;
-}
-
-export async function removeOldPlayerLocations() {
-	// remove a random player location that is more than 10 seconds old
-	const players = await g.world?.players.items();
-	if (!players) return;
-
-	const now = Date.now();
-	const tenSecondsAgo = now - 10000;
-
-	// remove a random player location that is more than 10 seconds old
-	// first filter all by time
-	const oldPlayers = players.filter((p) => p.time && p.time < tenSecondsAgo);
-	if (oldPlayers.length === 0) return;
-
-	// remove a random one
-	const randomIndex = Math.floor(Math.random() * oldPlayers.length);
-
-	g.world?.players.remove(randomIndex);
-	g.world?.commit();
+	world.current?.instances?.splice(instance, 1);
 }

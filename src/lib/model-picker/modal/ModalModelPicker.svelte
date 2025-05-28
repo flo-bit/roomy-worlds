@@ -2,7 +2,6 @@
 	import { Button, cn, Modal, Select } from 'fuchs';
 	import ModelPicker from '../base/ModelPicker.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import type { VoxelGroup } from '$lib/roomy';
 
 	let {
 		items,
@@ -14,9 +13,9 @@
 		showEditButton = false
 	}: {
 		open: boolean;
-		items: { voxels: VoxelGroup; label: string }[];
+		items: { path: string; label: string }[];
 		alwaysRotate?: boolean;
-		onselect?: ({ voxels, label }: { voxels: VoxelGroup; label: string }) => void;
+		onselect?: ({ path, label }: { path: string; label: string }) => void;
 		title?: string;
 		newModelButtonClick?: () => void;
 		showEditButton?: boolean;

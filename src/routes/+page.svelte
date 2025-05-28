@@ -9,7 +9,6 @@
 	import { type WorldData } from '$lib/viewer/types';
 	import { ACESFilmicToneMapping } from 'three';
 	import { goto } from '$app/navigation';
-	import { initRoomy } from '$lib/roomy.svelte';
 
 	let showText = $state(true);
 </script>
@@ -66,15 +65,6 @@
 				</Button>
 
 				<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
-
-				<Button
-					class="w-fit"
-					size="lg"
-					onclick={async () => {
-						await initRoomy('local');
-						createWorld(base, true);
-					}}>New Local World</Button
-				>
 			</div>
 		</div>
 	</div>

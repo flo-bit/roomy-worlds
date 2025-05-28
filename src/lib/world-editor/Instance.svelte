@@ -7,85 +7,116 @@
 
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { derivePromise } from '$lib/utils.svelte';
 	import { TransformControls } from '@threlte/extras';
 	import { addInstance, applyTransform, editingState } from './state.svelte';
 	import { Collider } from '@threlte/rapier';
-	import { models } from './models.svelte';
 	import { onMount } from 'svelte';
 	import { Spring } from 'svelte/motion';
-	import { TransformedGroup } from '$lib/roomy';
+	import type { Loaded } from 'jazz-tools';
+	import { Instance, Model } from '$lib/schema';
+	import { CoState } from 'jazz-svelte';
 
-	let { instance }: { instance: TransformedGroup } = $props();
+	let { instance }: { instance: Loaded<typeof Instance> } = $props();
 
-	let voxels = derivePromise([], async () => models.getModel(instance.group));
+	let voxels = $derived(
+		new CoState(Model, instance.model, {
+			resolve: {
+				voxels: {
+					$each: true,
+					$onError: null
+				}
+			}
+		})
+	);
 
-
-	let scale = new Spring(0)
+	let scale = new Spring(0);
 
 	onMount(() => {
 		scale.target = 1;
-	})
+	});
 </script>
 
-{#if editingState.selectedInstance === instance}
+{#if editingState.selectedInstance === instance?.id && instance.transform}
 	<TransformControls
-		position={instance.position.toArray()}
-		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray()}
+		position={[instance.transform.x, instance.transform.y, instance.transform.z]}
+		quaternion={[
+			instance.transform.rx,
+			instance.transform.ry,
+			instance.transform.rz,
+			instance.transform.rw
+		]}
+		scale={[instance.transform.sx, instance.transform.sy, instance.transform.sz]}
 		bind:controls={editingState.transformControls}
 		mode={editingState.tool === 'move' ? 'translate' : editingState.tool}
 	>
-		{#each voxels.value as voxel}
-			<T.Mesh
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-			>
-				<T is={geometry} />
-				<T is={material.clone()} color={voxel.color} />
-			</T.Mesh>
+		{#each voxels.current?.voxels ?? [] as voxel}
+			{#if voxel.transform}
+				<T.Mesh
+					position={[voxel.transform.x, voxel.transform.y, voxel.transform.z]}
+					quaternion={[
+						voxel.transform.rx,
+						voxel.transform.ry,
+						voxel.transform.rz,
+						voxel.transform.rw
+					]}
+					scale={[voxel.transform.sx, voxel.transform.sy, voxel.transform.sz]}
+				>
+					<T is={geometry} />
+					<T is={material.clone()} color={[voxel.r, voxel.g, voxel.b]} />
+				</T.Mesh>
+			{/if}
 		{/each}
 	</TransformControls>
-{:else}
+{:else if instance.transform}
 	<T.Group
-		position={instance.position.toArray()}
-		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray().map(s => scale.current * s) as [number, number, number]}
+		position={[instance.transform.x, instance.transform.y, instance.transform.z]}
+		quaternion={[
+			instance.transform.rx,
+			instance.transform.ry,
+			instance.transform.rz,
+			instance.transform.rw
+		]}
+		scale={[instance.transform.sx, instance.transform.sy, instance.transform.sz]}
 		onclick={async (e) => {
 			e.stopPropagation();
 
-			if(editingState.selectedModelId) {
+			if (editingState.selectedModelId) {
 				// place on top of instance
 				addInstance(editingState.selectedModelId, e.point);
 				return;
 			}
-				await applyTransform();
-				editingState.selectedModelId = null;
-				editingState.selectedInstance = instance;
-				
-				return;
+			await applyTransform();
+			editingState.selectedModelId = null;
+			editingState.selectedInstance = instance.id;
 
+			return;
 		}}
 	>
 		<!-- <InstancedMesh>
 		<T.BoxGeometry />
 		<T.MeshStandardMaterial /> -->
-		{#each voxels.value as voxel}
-			<T.Mesh
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-				castShadow
-				receiveShadow
-			>
-				<T is={geometry} />
-				<T is={material.clone()} color={voxel.color} />
+		{#each voxels.current?.voxels ?? [] as voxel}
+			{#if voxel.transform}
+				<T.Mesh
+					position={[voxel.transform.x, voxel.transform.y, voxel.transform.z]}
+					quaternion={[
+						voxel.transform.rx,
+						voxel.transform.ry,
+						voxel.transform.rz,
+						voxel.transform.rw
+					]}
+					scale={[voxel.transform.sx, voxel.transform.sy, voxel.transform.sz]}
+					castShadow
+					receiveShadow
+				>
+					<T is={geometry} />
+					<T is={material.clone()} color={[voxel.r, voxel.g, voxel.b]} />
 
-				{#if scale.current > 0.99}
-					<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
-				{/if}
-			</T.Mesh>
+					{#if scale.current > 0.99}
+						<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
+					{/if}
+				</T.Mesh>
+			{/if}
 		{/each}
 	</T.Group>
 {/if}

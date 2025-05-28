@@ -4,8 +4,6 @@
 	import Voxels from './Voxels.svelte';
 	import Floor from './Floor.svelte';
 	import GhostVoxel from './GhostVoxel.svelte';
-	import { g } from '$lib/roomy.svelte';
-	import { derivePromise } from '$lib/utils.svelte';
 	import { modelEditor } from './state.svelte';
 
 	interactivity({
@@ -13,10 +11,6 @@
 			return hits.slice(0, 1);
 		}
 	});
-
-	let voxels = derivePromise([], async () =>
-		g.voxelObject ? await g.voxelObject.voxels.items() : []
-	);
 </script>
 
 <T.PerspectiveCamera position={[10, 10, 10]} makeDefault name="model-editor-camera">
@@ -27,7 +21,7 @@
 <T.DirectionalLight position={[1, 2, 5]} />
 
 <!-- all the voxels -->
-<Voxels voxels={voxels.value} />
+<Voxels voxels={modelEditor.voxelObject?.current?.voxels} />
 
 <!-- floor that we can click on to place voxels -->
 <Floor />

@@ -5,7 +5,6 @@
 	import Controller from './ThirdPersonControls.svelte';
 	import CharacterModel, { type ActionName } from './CharacterModel.svelte';
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
-	import { PlayerLocation } from '$lib/roomy';
 	import { onMount } from 'svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
 
@@ -14,15 +13,13 @@
 		radius = 0.4,
 		height = 1.4,
 		speed = 6,
-		runningSpeed = 9,
-		playerLocation
+		runningSpeed = 9
 	}: {
 		position?: [number, number, number];
 		radius?: number;
 		height?: number;
 		speed?: number;
 		runningSpeed?: number;
-		playerLocation?: PlayerLocation | null;
 	} = $props();
 
 	let isRunning = false;
@@ -127,31 +124,8 @@
 			rigidBody.setTranslation(new Vector3(0, 10, 0), true);
 			rigidBody.setLinvel(new Vector3(0, 0, 0), true);
 		}
-
-		// updatePosition();
 	});
 
-	// onMount(() => {
-	// 	setInterval(() => {
-	// 		updatePosition();
-	// 	}, 1000);
-	// });
-
-	async function updatePosition() {
-		if (!playerLocation) {
-			console.log('no player location');
-			return;
-		}
-
-		console.log('update location', editingState.selectedCharacter);
-		playerLocation.x = position[0];
-		playerLocation.y = position[1];
-		playerLocation.z = position[2];
-		playerLocation.rotation = rotation;
-		playerLocation.model = editingState.selectedCharacter ?? 'female b';
-		playerLocation.time = Date.now();
-		playerLocation.commit();
-	}
 
 	function jump() {
 		//console.log('jump', grounded);

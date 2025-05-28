@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { Button, PopoverColorPicker, Toggle, ToggleGroup, ToggleGroupItem } from 'fuchs';
+	import { Button, ToggleGroup, ToggleGroupItem } from 'fuchs';
 	import { applyTransform, deleteInstance, editingState } from '$lib/world-editor/state.svelte';
-	import { g } from '$lib/roomy.svelte';
 	import { onMount } from 'svelte';
-	import { Models } from '$lib/roomy';
 
 	$effect(() => {
 		applyTransform();
@@ -27,18 +25,18 @@
 				selectedTool = 'move';
 			} else if (e.key === 'd') {
 				if (!editingState.selectedInstance) return;
-				editingState.selectedModelId = editingState.selectedInstance.group;
+				editingState.selectedModelId = editingState.selectedInstance;
 				editingState.selectedInstance = null;
 			} else if (e.key === 'p') {
 				if (!editingState.selectedInstance) return;
 
 				applyTransform();
-				editingState.selectedModelId = editingState.selectedInstance.group;
+				editingState.selectedModelId = editingState.selectedInstance;
 				editingState.selectedInstance = null;
 			} else if (e.key === 'x') {
 				// delete
 				if (!editingState.selectedInstance) return;
-				deleteInstance(editingState.selectedInstance.id);
+				deleteInstance(editingState.selectedInstance);
 				editingState.selectedInstance = null;
 			} else if (e.key === 'Escape') {
 				applyTransform();
@@ -151,7 +149,7 @@
 				onclick={() => {
 					if (!editingState.selectedInstance) return;
 					console.log(editingState.selectedInstance);
-					editingState.selectedModelId = editingState.selectedInstance.group;
+					editingState.selectedModelId = editingState.selectedInstance;
 					console.log(editingState.selectedModelId);
 					editingState.selectedInstance = null;
 				}}

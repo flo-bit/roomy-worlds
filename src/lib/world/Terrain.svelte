@@ -7,24 +7,21 @@
 	import type { IntersectionEvent } from '@threlte/extras';
 	import { shuffle } from '$lib/utils.svelte';
 	import { ColorGradient } from './colorgradient';
-	import type { WorldSettings } from '$lib/roomy';
 	import { applyTransform, editingState } from '$lib/world-editor/state.svelte';
 
 	let {
 		clickedTerrain,
 		collider = true,
 		animate = false,
-		animationTime = 3,
-		settings
+		animationTime = 3
 	}: {
 		clickedTerrain?: (e: IntersectionEvent<MouseEvent>) => void;
 		collider?: boolean;
 		animate?: boolean;
 		animationTime?: number;
-		settings: WorldSettings;
 	} = $props();
 
-	const size = settings.size;
+	const size = 100;
 
 	const voxelSize = 1;
 
@@ -43,7 +40,7 @@
 	const dummy = new THREE.Object3D();
 	const heightfield: number[] = [];
 
-	const options = settings.terrainNoise ?? {
+	const options = {
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
@@ -51,11 +48,9 @@
 		warp: 1
 	};
 
-	options.seed = settings.seed;
-
 	const upperNoise = new UberNoise(options);
 	const lowerNoise = new UberNoise({
-		seed: settings.seed + 10,
+		seed: 10,
 		octaves: 6,
 		scale: 0.05,
 		min: 0,
@@ -65,13 +60,64 @@
 
 	const lowerIndices = new Set<number>();
 
-
 	const gradient = new ColorGradient({
-		stops: settings.terrainGradient.map(({ rgb, position }) => ({
-			position: (position - 0.5) * 2,
-			value: new THREE.Color(rgb.r, rgb.g, rgb.b)
-		}))
+		stops: [
+			{ value: new THREE.Color(0, 0.2, 0), position: -1 },
+			{ value: new THREE.Color(0, 0.35, 0), position: 1 }
+		]
 	});
+
+	const moveNoise = new UberNoise({
+		seed: 10,
+		octaves: 3,
+		scale: 0.01,
+		min: -10,
+		max: 10
+	});
+
+	const geo = new THREE.IcosahedronGeometry(size / 2, 30);
+	let a = new THREE.Vector3();
+
+	const colors = new Float32Array(geo.attributes.position.count * 3);
+
+	const color = new THREE.Color(0, 0.05, 0);
+
+	for (let i = 0; i < geo.attributes.position.count; i++) {
+		a.fromBufferAttribute(geo.attributes.position, i);
+
+		let x = a.x;
+		let y = a.y;
+		let z = a.z;
+		if (a.y > 0) {
+			const noiseHeight = upperNoise.get(a.x, a.y, a.z);
+			y = noiseHeight;
+
+			const normalized = upperNoise.normalized(a.x, a.z);
+
+			color.set(gradient.get(normalized));
+		} else {
+			y = Math.pow(Math.abs(y / (size / 2)), 2.5) * -(size / 3);
+
+			const distance = Math.sqrt(x * x + z * z);
+
+			const percentage = Math.pow(Math.min(distance / (size / 2), 1), 2);
+
+			color.setRGB(0.3 * percentage + 0.1, 0.03 * percentage + 0.02, 0);
+		}
+
+		colors[i * 3] = color.r;
+		colors[i * 3 + 1] = color.g;
+		colors[i * 3 + 2] = color.b;
+
+		// x += moveNoise.get(a.x, a.y, a.z);
+		// z += moveNoise.get(a.x, a.y, a.z);
+
+		geo.attributes.position.setXYZ(i, x, y, z);
+	}
+
+	geo.attributes.position.needsUpdate = true;
+
+	geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 	for (let x = -size / 2; x < size / 2; x += voxelSize) {
 		for (let z = -size / 2; z < size / 2; z += voxelSize) {
@@ -85,7 +131,7 @@
 				continue;
 			}
 
-			const height = noiseHeight// + Math.pow(distance / (size / 2), 2) * -5;
+			const height = noiseHeight; // + Math.pow(distance / (size / 2), 2) * -5;
 			const noise = upperNoise.normalized(x, z);
 			dummy.position.set(x, height, z);
 			dummy.scale.set(1, 3, 1);
@@ -125,7 +171,6 @@
 
 	let heightfieldData = new Float32Array(heightfield);
 
-
 	let i = 0;
 	const addPerSecond = totalVoxels / animationTime;
 
@@ -141,7 +186,7 @@
 	});
 </script>
 
-<T
+<!-- <T
 	is={instancedMesh}
 	onclick={clickedTerrain
 		? (e) => {
@@ -152,12 +197,28 @@
 				clickedTerrain(e);
 			}
 		: undefined}
-
 	ondblclick={() => {
 		applyTransform();
 		editingState.selectedInstance = null;
 	}}
-/>
+/> -->
+
+<T.Mesh
+	onclick={clickedTerrain
+		? (e) => {
+				e.stopPropagation();
+
+				clickedTerrain(e);
+			}
+		: undefined}
+	ondblclick={() => {
+		applyTransform();
+		editingState.selectedInstance = null;
+	}}
+>
+	<T is={geo} />
+	<T.MeshStandardMaterial color={0xffffff} vertexColors />
+</T.Mesh>
 
 {#if collider}
 	<T.Group position={[-voxelSize / 2, 0, -voxelSize / 2]}>
