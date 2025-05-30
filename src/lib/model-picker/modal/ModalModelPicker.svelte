@@ -28,20 +28,6 @@
 	{title}
 >
 	<div class="flex flex-wrap items-center justify-between gap-2">
-		<Button size="lg" class="h-fit w-fit" onclick={newModelButtonClick}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="2.5"
-				stroke="currentColor"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-			</svg>
-
-			New Model
-		</Button>
-
 		<Select
 			items={[
 				{ label: 'private', value: 'private' },
@@ -59,8 +45,8 @@
 	<ModelPicker
 		{items}
 		{alwaysRotate}
-		onselect={({ voxels, label }) => {
-			onselect?.({ voxels, label });
+		onselect={(props) => {
+			onselect?.(props);
 			open = false;
 		}}
 		{showEditButton}

@@ -18,7 +18,14 @@
 		showWorld = true;
 
 		editingState.worldId = worldId;
-		editingState.world = new CoState(World, worldId);
+		editingState.world = new CoState(World, worldId, {
+			resolve: {
+				instances: {
+					$each: true,
+					$onError: null
+				}
+			}
+		});
 	});
 </script>
 

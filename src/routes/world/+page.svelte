@@ -3,7 +3,7 @@
 	import Scene from '$lib/world-editor/WorldEditorScene.svelte';
 	import { PerfMonitor } from '@threlte/extras';
 	import { World } from '@threlte/rapier';
-	import { ACESFilmicToneMapping } from 'three';
+	import { ACESFilmicToneMapping, CineonToneMapping } from 'three';
 	import ModelSelection from '$lib/world-editor/ModelSelection.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
 	import ModelScene from '$lib/model-editor/ModelEditorScene.svelte';
@@ -53,7 +53,7 @@
 			: 'left-0 w-screen'
 	)}
 >
-	<Canvas toneMapping={ACESFilmicToneMapping}>
+	<Canvas toneMapping={CineonToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />
 		{/if}

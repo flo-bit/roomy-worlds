@@ -4,8 +4,9 @@
 	import { onMount } from 'svelte';
 
 	$effect(() => {
-		applyTransform();
-
+		if (editingState.selectedInstance) {
+			applyTransform();
+		}
 		editingState.tool = selectedTool;
 	});
 
@@ -25,18 +26,18 @@
 				selectedTool = 'move';
 			} else if (e.key === 'd') {
 				if (!editingState.selectedInstance) return;
-				editingState.selectedModelId = editingState.selectedInstance;
+				editingState.selectedModelId = editingState.selectedInstance.id;
 				editingState.selectedInstance = null;
 			} else if (e.key === 'p') {
 				if (!editingState.selectedInstance) return;
 
 				applyTransform();
-				editingState.selectedModelId = editingState.selectedInstance;
+				editingState.selectedModelId = editingState.selectedInstance.id;
 				editingState.selectedInstance = null;
 			} else if (e.key === 'x') {
 				// delete
 				if (!editingState.selectedInstance) return;
-				deleteInstance(editingState.selectedInstance);
+				deleteInstance(editingState.selectedInstance.id);
 				editingState.selectedInstance = null;
 			} else if (e.key === 'Escape') {
 				applyTransform();
@@ -149,7 +150,7 @@
 				onclick={() => {
 					if (!editingState.selectedInstance) return;
 					console.log(editingState.selectedInstance);
-					editingState.selectedModelId = editingState.selectedInstance;
+					editingState.selectedModelId = editingState.selectedInstance.id;
 					console.log(editingState.selectedModelId);
 					editingState.selectedInstance = null;
 				}}

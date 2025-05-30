@@ -37,8 +37,10 @@
 			console.log('ref', ref);
 			ref.traverse((child) => {
 				if (child instanceof THREE.Mesh) {
-					child.material.flatShading = true;
-					
+					// child.material.flatShading = true;
+					child.castShadow = true;
+					child.receiveShadow = true;
+
 					console.log('child', child);
 				}
 			});

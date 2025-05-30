@@ -14,6 +14,8 @@
 	import { World } from '$lib/schema';
 	import GltfModel from '$lib/world/GLTFModel.svelte';
 	import { base } from '$app/paths';
+	import AutoColliderWrapper from '$lib/world/AutoColliderWrapper.svelte';
+	import { getPathsForModel } from './models';
 
 	interactivity({
 		filter: (hits) => {
@@ -84,16 +86,14 @@
 
 <Terrain
 	clickedTerrain={(e) => {
-		console.log('clickedTerrain', e, editingState.selectedModelId);
-		if (editingState.selectedModelId) {
-			addInstance(editingState.selectedModelId, e.point);
+		if (editingState.selectedModel) {
+			let paths = getPathsForModel(editingState.selectedModel);
+			let randomIndex = Math.floor(Math.random() * paths.length);
+			addInstance(paths[randomIndex], e.point);
 		}
 	}}
 	settings={editingState.worldSettings}
 />
-
-
-<GltfModel source={base + "/gltf/Tree_4_C_Color1.gltf"} position.y={1} scale={1} />
 
 {#if editingState.worldSettings.waterPercentage > 0}
 	<Water settings={editingState.worldSettings} />
@@ -103,7 +103,7 @@
 
 <Sky />
 
-{#each world.current?.instances ?? [] as instance}
+{#each editingState.world?.current?.instances ?? [] as instance (instance.id)}
 	<Instance {instance} />
 {/each}
 

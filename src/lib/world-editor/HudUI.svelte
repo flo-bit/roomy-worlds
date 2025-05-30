@@ -2,7 +2,7 @@
 	import { editingState, applyTransform } from './state.svelte';
 </script>
 
-{#if editingState.selectedInstance || editingState.selectedModelId}
+{#if editingState.selectedInstance || editingState.selectedModel}
 	<div class="absolute top-18 left-4 z-10 flex flex-col gap-2">
 		{#if editingState.selectedInstance}
 			<div class="flex items-center gap-2">
@@ -30,13 +30,13 @@
 					<span class="sr-only"> deselect </span>
 				</button>
 			</div>
-		{:else if editingState.selectedModelId}
+		{:else if editingState.selectedModel}
 			<div class="flex items-center gap-2">
 				<span class="text-base-800 text-sm"> placing </span>
 
 				<button
 					onclick={() => {
-						editingState.selectedModelId = null;
+						editingState.selectedModel = null;
 					}}
 					class="bg-base-200/20 text-base-900 cursor-pointer rounded-full p-0.5"
 				>

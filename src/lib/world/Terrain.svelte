@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { Vector3 as RapierVector3 } from '@dimforge/rapier3d-compat';
 	import { T, useTask } from '@threlte/core';
-	import { Collider } from '@threlte/rapier';
+	import { AutoColliders, Collider } from '@threlte/rapier';
 	import * as THREE from 'three';
 	import { UberNoise } from 'uber-noise';
 	import type { IntersectionEvent } from '@threlte/extras';
 	import { shuffle } from '$lib/utils.svelte';
 	import { ColorGradient } from './colorgradient';
 	import { applyTransform, editingState } from '$lib/world-editor/state.svelte';
+	import { mergeVertices, toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 	let {
 		clickedTerrain,
@@ -41,6 +42,7 @@
 	const heightfield: number[] = [];
 
 	const options = {
+		seed: 1,
 		octaves: 6,
 		scale: 0.03,
 		min: 0,
@@ -75,7 +77,7 @@
 		max: 10
 	});
 
-	const geo = new THREE.IcosahedronGeometry(size / 2, 30);
+	let geo = mergeVertices(new THREE.IcosahedronGeometry(size / 2, 30));
 	let a = new THREE.Vector3();
 
 	const colors = new Float32Array(geo.attributes.position.count * 3);
@@ -88,17 +90,18 @@
 		let x = a.x;
 		let y = a.y;
 		let z = a.z;
+
+		const distance = Math.sqrt(x * x + z * z);
+
 		if (a.y > 0) {
 			const noiseHeight = upperNoise.get(a.x, a.y, a.z);
-			y = noiseHeight;
+			y = noiseHeight + Math.pow(distance / (size / 2), 2) * -5;
 
 			const normalized = upperNoise.normalized(a.x, a.z);
 
 			color.set(gradient.get(normalized));
 		} else {
-			y = Math.pow(Math.abs(y / (size / 2)), 2.5) * -(size / 3);
-
-			const distance = Math.sqrt(x * x + z * z);
+			y = Math.pow(Math.abs(y / (size / 2)), 2.5) * -(size / 3) - lowerNoise.get(x, z) - 3;
 
 			const percentage = Math.pow(Math.min(distance / (size / 2), 1), 2);
 
@@ -116,6 +119,9 @@
 	}
 
 	geo.attributes.position.needsUpdate = true;
+
+	// update normals
+	geo.computeVertexNormals();
 
 	geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
@@ -184,6 +190,8 @@
 
 		i += addPerSecond * dt;
 	});
+
+	let pointerDownPosition: THREE.Vector2 | null = $state(null);
 </script>
 
 <!-- <T
@@ -202,25 +210,44 @@
 		editingState.selectedInstance = null;
 	}}
 /> -->
+<AutoColliders shape="trimesh">
+	<T.Mesh
+		ondblclick={() => {
+			applyTransform();
+			editingState.selectedInstance = null;
+		}}
+		onpointerdown={(e) => {
+			pointerDownPosition = new THREE.Vector2(e.nativeEvent.clientX, e.nativeEvent.clientY);
+		}}
+		onpointerup={(e) => {
+			console.log('pointerup', pointerDownPosition, e.normal?.y);
+			if (e.normal && e.normal.y <= 0.1) return;
+			console.log('pointerup', pointerDownPosition);
+			if (!pointerDownPosition) return;
 
-<T.Mesh
-	onclick={clickedTerrain
-		? (e) => {
+			let dist = Math.hypot(
+				e.nativeEvent.clientX - pointerDownPosition.x,
+				e.nativeEvent.clientY - pointerDownPosition.y
+			);
+			if (dist < 5) {
 				e.stopPropagation();
-
-				clickedTerrain(e);
+				console.log('clickedTerrain1', e);
+				clickedTerrain?.(e);
 			}
-		: undefined}
-	ondblclick={() => {
-		applyTransform();
-		editingState.selectedInstance = null;
-	}}
->
-	<T is={geo} />
-	<T.MeshStandardMaterial color={0xffffff} vertexColors />
-</T.Mesh>
 
-{#if collider}
+			pointerDownPosition = null;
+		}}
+		onpointerleave={() => {
+			pointerDownPosition = null;
+		}}
+		receiveShadow
+	>
+		<T is={geo} />
+		<T.MeshStandardMaterial color={0xffffff} vertexColors />
+	</T.Mesh>
+</AutoColliders>
+
+<!-- {#if collider}
 	<T.Group position={[-voxelSize / 2, 0, -voxelSize / 2]}>
 		<Collider
 			shape={'heightfield'}
@@ -232,4 +259,4 @@
 			]}
 		/>
 	</T.Group>
-{/if}
+{/if} -->

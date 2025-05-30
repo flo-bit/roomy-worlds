@@ -11,7 +11,7 @@
 	import { createModel } from '$lib/utils.svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-
+	import { getPathsForModel, models } from './models';
 
 	const globalModelListId = '';
 
@@ -34,8 +34,6 @@
 	// 	);
 	// });
 
-
-
 	const me = new AccountCoState(MyAppAccount, {
 		resolve: {
 			profile: true,
@@ -47,10 +45,8 @@
 			}
 		}
 	});
-	
-	onMount(async () => {
-		
-	});
+
+	onMount(async () => {});
 
 	function getItems() {
 		let items: { voxels: Loaded<typeof VoxelList>; label: string }[] = [];
@@ -69,13 +65,14 @@
 		// 	}[];
 		// }
 
-		items = me.current?.root.models?.map((model) => {
-			if (!model) return null;
-			return {
-				voxels: model.voxels,
-				label: model.name
-			}
-		}) ?? []
+		items =
+			me.current?.root.models?.map((model) => {
+				if (!model) return null;
+				return {
+					voxels: model.voxels,
+					label: model.name
+				};
+			}) ?? [];
 
 		console.log('items', me.current?.root.models);
 
@@ -85,10 +82,20 @@
 		// // remove duplicates (id)
 		// items = items.filter((item, index, self) => index === self.findIndex((t) => t.voxels.id === item.voxels.id));
 
-		return [{
-			path: base + '/gltf/Tree_4_A_Color1.gltf',
-			label: 'Tree'
-		}]
+		let m = models
+			.map((model) => {
+				return { path: getPathsForModel(model)[0], model };
+			})
+			.map((model) => {
+				return {
+					path: model.path,
+					label: model.model.label,
+					model: model.model
+				};
+			});
+		console.log(m);
+
+		return m;
 	}
 </script>
 
@@ -100,7 +107,7 @@
 		console.log('model', model, model?.id);
 
 		goto(`/model-editor?id=${model.id}`);
-		
+
 		modelEditor.tool = 'place';
 
 		editingState.showModelPicker = false;
@@ -108,10 +115,13 @@
 	}}
 	bind:open={editingState.showModelPicker}
 	items={getItems()}
-	onselect={({ voxels, label }) => {
+	onselect={({ path, label, model }) => {
 		applyTransform();
+		console.log('path', path);
 		editingState.selectedInstance = null;
-		editingState.selectedModelId = voxels.id;
+		editingState.selectedModelId = path;
+		editingState.selectedModel = model;
+		console.log('selectedModel', editingState.selectedModel);
 	}}
 	showEditButton={editingState.modelPickerType === 'private' || dev}
 />

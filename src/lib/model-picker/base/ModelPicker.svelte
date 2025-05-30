@@ -11,6 +11,12 @@
 	import { CoState } from 'jazz-svelte';
 	import { modelEditor } from '$lib/model-editor/state.svelte';
 
+
+	type Item = {
+		path: string;
+		label: string;
+	};
+
 	let {
 		items,
 		alwaysRotate = false,
@@ -21,9 +27,9 @@
 		maxColumns = 5,
 		showEditButton = false
 	}: {
-		items: { path: string; label: string }[];
+		items: Item[];
 		alwaysRotate?: boolean;
-		onselect?: ({ path, label }: { path: string; label: string }) => void;
+		onselect?: (item: Item) => void;
 		canvasClasses?: string;
 		portalTo?: string;
 		class?: string;
@@ -48,10 +54,10 @@
 		>
 			{#each items as item (item.path)}
 				<button
-					class="hover:bg-base-200/40 dark:hover:bg-base-800/40 relative m-4 inline-block cursor-pointer rounded-2xl p-4 transition-all duration-300 hover:scale-105"
+					class="hover:bg-base-200/40 dark:hover:bg-base-800/40 m-4 relative inline-block cursor-pointer rounded-2xl transition-all duration-300 hover:scale-105"
 					onclick={() => {
 						states[item.path].hover = false;
-						onselect?.({ path: item.path, label: item.label });
+						onselect?.(item);
 					}}
 					onpointerenter={() => {
 						states[item.path].hover = true;
