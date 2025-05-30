@@ -1,21 +1,14 @@
 <script lang="ts">
 	import { T, useThrelte } from '@threlte/core';
 	import { HUD, interactivity, OrbitControls, Sky } from '@threlte/extras';
-	import Terrain from '$lib/world/Terrain.svelte';
 	import Player from '$lib/player/Player.svelte';
 	import { onMount } from 'svelte';
 	import Instance from './Instance.svelte';
-	import { addInstance, editingState } from './state.svelte';
+	import { clickedOn, editingState } from './state.svelte';
 	import { ACESFilmicToneMapping } from 'three';
-	import Water from '$lib/world/Water.svelte';
-	// import HudScene from './HudScene.svelte';
-	import { Debug } from '@threlte/rapier';
-	import { CoState } from 'jazz-svelte';
-	import { World } from '$lib/schema';
-	import GltfModel from '$lib/world/GLTFModel.svelte';
-	import { base } from '$app/paths';
-	import AutoColliderWrapper from '$lib/world/AutoColliderWrapper.svelte';
-	import { getPathsForModel } from './models';
+	import HudScene from './HudScene.svelte';
+	import Ground from '$lib/world/Ground.svelte';
+	import Dof from '$lib/world/DOF.svelte';
 
 	interactivity({
 		filter: (hits) => {
@@ -23,18 +16,7 @@
 		}
 	});
 
-	let world = $derived(
-		new CoState(World, editingState.worldId, {
-			resolve: {
-				instances: {
-					$each: true,
-					$onError: null
-				}
-			}
-		})
-	);
-
-	const { renderer, scene } = useThrelte();
+	const { renderer } = useThrelte();
 
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
@@ -64,12 +46,12 @@
 {#if editingState.camera === 'third'}
 	<T.PerspectiveCamera
 		makeDefault
-		position={[100, 50, 100]}
+		position={[20, 20, 20]}
 		oncreate={(ref) => {
 			ref.lookAt(0, 1, 0);
 		}}
 	>
-		<OrbitControls />
+		<OrbitControls maxPolarAngle={Math.PI / 2} />
 	</T.PerspectiveCamera>
 {:else}
 	<Player />
@@ -82,23 +64,23 @@
 	shadow.camera.bottom={-100}
 	shadow.camera.left={-100}
 	shadow.camera.right={100}
+	shadow.mapSize.width={1024}
+	shadow.mapSize.height={1024}
+	shadow.bias={-0.00001}
 />
 
-<Terrain
+<T.Mesh>
+	<T.SphereGeometry args={[0.1, 32, 32]} />
+	<T.MeshStandardMaterial color="red" />
+</T.Mesh>
+
+<Ground
 	clickedTerrain={(e) => {
-		if (editingState.selectedModel) {
-			let paths = getPathsForModel(editingState.selectedModel);
-			let randomIndex = Math.floor(Math.random() * paths.length);
-			addInstance(paths[randomIndex], e.point);
-		}
+		clickedOn(e.point, true);
 	}}
-	settings={editingState.worldSettings}
 />
 
-{#if editingState.worldSettings.waterPercentage > 0}
-	<Water settings={editingState.worldSettings} />
-{/if}
-
+<!-- <Dof /> -->
 <!-- <Debug /> -->
 
 <Sky />
@@ -107,6 +89,6 @@
 	<Instance {instance} />
 {/each}
 
-<!-- <HUD>
+<HUD>
 	<HudScene />
-</HUD> -->
+</HUD>

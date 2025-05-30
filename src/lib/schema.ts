@@ -51,42 +51,33 @@ export const Space = co.map({
 export const SpaceList = co.list(Space);
 
 export const Transform = co.map({
-	x: z.number(),
-	y: z.number(),
-	z: z.number(),
+	position: z.object({
+		x: z.number(),
+		y: z.number(),
+		z: z.number()
+	}),
 
-	sx: z.number(),
-	sy: z.number(),
-	sz: z.number(),
+	quaternion: z.object({
+		x: z.number(),
+		y: z.number(),
+		z: z.number(),
+		w: z.number()
+	}),
 
-	rx: z.number(),
-	ry: z.number(),
-	rz: z.number(),
-	rw: z.number()
+	scale: z.object({
+		x: z.number(),
+		y: z.number(),
+		z: z.number()
+	})
 });
-
-export const Voxel = co.map({
-	transform: Transform,
-	r: z.number(),
-	g: z.number(),
-	b: z.number(),
-
-	visible: z.boolean(),
-	collider: z.boolean()
-});
-
-export const VoxelList = co.list(Voxel);
-
-export const Model = co.map({
-	voxels: VoxelList,
-	name: z.string().optional()
-});
-
-export const ModelList = co.list(Model);
 
 export const Instance = co.map({
+	path: z.string(),
 	model: z.string(),
-	transform: Transform
+	variant: z.string().optional(),
+	color: z.string().optional(),
+	transform: Transform,
+	collision: z.boolean().optional()
 });
 export type InstanceType = co.loaded<typeof Instance>;
 
@@ -105,9 +96,7 @@ export const MyAppProfile = co.profile({
 
 export const LastReadList = co.record(z.string(), z.date());
 
-export const MyAppRoot = co.map({
-	models: ModelList
-});
+export const MyAppRoot = co.map({});
 
 export const MyAppAccount = co
 	.account({
@@ -116,10 +105,7 @@ export const MyAppAccount = co
 	})
 	.withMigration((account, creationProps?: { name: string }) => {
 		if (account.root === undefined) {
-			account.root = MyAppRoot.create({
-				models: ModelList.create([])
-			});
-			console.log('account.root', account.root);
+			account.root = MyAppRoot.create({});
 		}
 
 		if (account.profile === undefined) {

@@ -119,7 +119,7 @@
 		position = [pos.x, pos.y, pos.z];
 
 		// respawn if falling of the map
-		if (position[1] < -30) {
+		if (position[1] < -10) {
 			position = [0, 10, 0];
 			rigidBody.setTranslation(new Vector3(0, 10, 0), true);
 			rigidBody.setLinvel(new Vector3(0, 0, 0), true);
@@ -130,7 +130,7 @@
 	function jump() {
 		//console.log('jump', grounded);
 		if (!grounded) return;
-		rigidBody?.applyImpulse(new Vector3(0, 700, 0), true);
+		rigidBody?.applyImpulse(new Vector3(0, 800, 0), true);
 		grounded = false;
 	}
 
@@ -197,7 +197,7 @@
 
 <svelte:window onkeydown={onKeyDown} onkeyup={onKeyUp} />
 
-<T.PerspectiveCamera makeDefault fov={70}>
+<T.PerspectiveCamera makeDefault fov={70} near={2.5}>
 	<Controller bind:object={capRef} />
 </T.PerspectiveCamera>
 

@@ -1,13 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { createWorld } from '$lib/utils.svelte';
-	import { Badge, blueskyLoginModalState, Button, Prose } from 'fuchs';
-
-	import { Canvas } from '@threlte/core';
-	import world from './viewer/world.json';
-	import WorldViewerScene from '$lib/viewer/WorldViewerScene.svelte';
-	import { type WorldData } from '$lib/viewer/types';
-	import { ACESFilmicToneMapping } from 'three';
+	import { Badge, Button, Prose } from '@fuxui/base';
 	import { goto } from '$app/navigation';
 
 	let showText = $state(true);
@@ -57,8 +51,7 @@
 					class="w-fit"
 					size="lg"
 					onclick={() => {
-						// world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg
-						goto(base + '/world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg');
+						goto(base + '/world?id=co_zZuMcGqVV6frxxg7qF4WPP12ih5');
 					}}
 				>
 					Join shared world
@@ -91,9 +84,3 @@
 		<span class="sr-only"> Toggle Text </span>
 	</button>
 {/if}
-
-<div class="fixed inset-0 -z-10 h-screen w-screen">
-	<Canvas toneMapping={ACESFilmicToneMapping}>
-		<WorldViewerScene world={world as unknown as WorldData} />
-	</Canvas>
-</div>

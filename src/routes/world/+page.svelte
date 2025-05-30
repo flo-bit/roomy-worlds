@@ -6,9 +6,7 @@
 	import { ACESFilmicToneMapping, CineonToneMapping } from 'three';
 	import ModelSelection from '$lib/world-editor/ModelSelection.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import ModelScene from '$lib/model-editor/ModelEditorScene.svelte';
 	import { cn } from 'fuchs';
-	import ModelEditorUi from '$lib/model-editor/ModelEditorUI.svelte';
 	import WorldEditorUi from '$lib/world-editor/WorldEditorUI.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { Howl } from 'howler';
@@ -45,39 +43,19 @@
 	<Chat timeline={channel.value} />
 {/if} -->
 
-<div
-	class={cn(
-		'absolute h-[100dvh] transition-all duration-200',
-		!editingState.showModelEditor && editingState.showWorldSettings
-			? 'left-80 w-[calc(100vw-320px)]'
-			: 'left-0 w-screen'
-	)}
->
+<div class={cn('absolute left-0 h-[100dvh] w-screen transition-all duration-200')}>
 	<Canvas toneMapping={CineonToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />
 		{/if}
 		<World framerate={60}>
-			{#if editingState.showModelEditor}
-				<ModelScene />
-			{:else}
-				<Scene />
-			{/if}
+			<Scene />
 		</World>
 	</Canvas>
 </div>
 
 <ModelSelection />
 
-{#if !editingState.showModelEditor}
-	{#if editingState.showWorldSettings}
-		<!-- {#if g.world?.settings}
-			<WorldSettingsUi />
-		{/if} -->
-	{/if}
-	<WorldEditorUi />
-{:else}
-	<ModelEditorUi />
-{/if}
+<WorldEditorUi />
 
 <CharacterSelection />

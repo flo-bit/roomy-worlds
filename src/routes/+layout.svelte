@@ -3,8 +3,8 @@
 
 	import { JazzProvider } from 'jazz-svelte';
 	import { MyAppAccount } from '$lib/schema';
-	import { BlueskyLoginModal, Head, Toaster } from 'fuchs';
-	import { login } from '$lib/oauth';
+	import { Head } from '@fuxui/base';
+	import { Toaster } from '$lib/sonner';
 
 	let { children } = $props();
 </script>
@@ -18,8 +18,6 @@
 	{@render children()}
 </JazzProvider>
 
-<Toaster />
+<Toaster colors={{ default: 'accent', error: 'pink' }} position="top-right" />
 
 <Head title="roomy worlds" emojiFavicon="🏝️" />
-
-<BlueskyLoginModal login={login} />

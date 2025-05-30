@@ -54,6 +54,7 @@
 		"howler": "^2.2.4",
 		"jazz-svelte": "^0.14.14",
 		"jazz-tools": "^0.14.14",
+		"postprocessing": "^6.37.3",
 		"three": "^0.175.0",
 		"uber-noise": "^0.2.2",
 		"vite-plugin-top-level-await": "^1.5.0",

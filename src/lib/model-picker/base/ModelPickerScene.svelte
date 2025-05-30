@@ -59,23 +59,6 @@
 				group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
 			}}
 		>
-			<!-- {#each voxels as voxel}
-				{#if voxel?.transform}
-					<T.Mesh
-						position={[voxel.transform.x, voxel.transform.y, voxel.transform.z]}
-						quaternion={[
-							voxel.transform.rx,
-							voxel.transform.ry,
-							voxel.transform.rz,
-							voxel.transform.rw
-						]}
-						scale={[voxel.transform.sx, voxel.transform.sy, voxel.transform.sz]}
-					>
-						<T.BoxGeometry args={[1, 1, 1]} />
-						<T.MeshStandardMaterial color={[voxel.r, voxel.g, voxel.b]} />
-					</T.Mesh>
-				{/if}
-			{/each} -->
 			<GLTF
 				url={path}
 				onload={(gltf: Group & { scene: Object3D }) => {

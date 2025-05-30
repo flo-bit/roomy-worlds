@@ -6,11 +6,6 @@
 	import { Button, cn } from 'fuchs';
 	import { ACESFilmicToneMapping } from 'three';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import { Model, type VoxelList } from '$lib/schema';
-	import type { Loaded } from 'jazz-tools';
-	import { CoState } from 'jazz-svelte';
-	import { modelEditor } from '$lib/model-editor/state.svelte';
-
 
 	type Item = {
 		path: string;

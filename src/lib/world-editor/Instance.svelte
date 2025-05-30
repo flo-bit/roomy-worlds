@@ -1,22 +1,14 @@
-<script module>
-	import * as THREE from 'three';
-
-	const material = new THREE.MeshStandardMaterial();
-	const geometry = new THREE.BoxGeometry(1, 1, 1);
-</script>
-
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { TransformControls, type IntersectionEvent } from '@threlte/extras';
-	import { addInstance, applyTransform, editingState } from './state.svelte';
-	import { Collider } from '@threlte/rapier';
+	import { applyTransform, clickedOn, editingState } from './state.svelte';
 	import { onMount } from 'svelte';
 	import { Spring } from 'svelte/motion';
 	import type { Loaded } from 'jazz-tools';
-	import { Instance, Model } from '$lib/schema';
-	import { CoState } from 'jazz-svelte';
+	import { Instance } from '$lib/schema';
 	import GltfModel from '$lib/world/GLTFModel.svelte';
 	import AutoColliderWrapper from '$lib/world/AutoColliderWrapper.svelte';
+	import { Vector2 } from 'three';
 
 	let { instance }: { instance: Loaded<typeof Instance> } = $props();
 
@@ -26,18 +18,18 @@
 		scale.target = 1;
 	});
 
-	let pointerDownPosition: THREE.Vector2 | null = $state(null);
+	let pointerDownPosition: Vector2 | null = $state(null);
 
 	async function onclick(e: IntersectionEvent<MouseEvent>) {
 		e.stopPropagation();
 
-		if (editingState.selectedModelId) {
+		if (editingState.selectedModel) {
 			// place on top of instance
-			addInstance(editingState.selectedModelId, e.point);
+			clickedOn(e.point);
 			return;
 		}
+
 		await applyTransform();
-		editingState.selectedModel = null;
 		editingState.selectedInstance = instance;
 
 		return;
@@ -46,39 +38,39 @@
 
 {#if editingState.selectedInstance?.id === instance.id && instance.transform}
 	<TransformControls
-		position={[instance.transform.x, instance.transform.y, instance.transform.z]}
+		position={[instance.transform.position.x, instance.transform.position.y, instance.transform.position.z]}
 		quaternion={[
-			instance.transform.rx,
-			instance.transform.ry,
-			instance.transform.rz,
-			instance.transform.rw
+			instance.transform.quaternion.x,
+			instance.transform.quaternion.y,
+			instance.transform.quaternion.z,
+			instance.transform.quaternion.w
 		]}
-		scale={[instance.transform.sx, instance.transform.sy, instance.transform.sz]}
+		scale={[instance.transform.scale.x, instance.transform.scale.y, instance.transform.scale.z]}
 		bind:controls={editingState.transformControls}
 		mode={editingState.tool === 'move' ? 'translate' : editingState.tool}
 	>
-		<GltfModel source={instance.model} />
+		<GltfModel source={instance.path} />
 	</TransformControls>
 {:else if instance.transform}
 	<T.Group
-		position={[instance.transform.x, instance.transform.y, instance.transform.z]}
+		position={[instance.transform.position.x, instance.transform.position.y, instance.transform.position.z]}
 		quaternion={[
-			instance.transform.rx,
-			instance.transform.ry,
-			instance.transform.rz,
-			instance.transform.rw
+			instance.transform.quaternion.x,
+			instance.transform.quaternion.y,
+			instance.transform.quaternion.z,
+			instance.transform.quaternion.w
 		]}
 		scale={[
-			instance.transform.sx * scale.current,
-			instance.transform.sy * scale.current,
-			instance.transform.sz * scale.current
+			instance.transform.scale.x * scale.current,
+			instance.transform.scale.y * scale.current,
+			instance.transform.scale.z * scale.current
 		]}
 		onpointerdown={(e) => {
-			pointerDownPosition = new THREE.Vector2(e.nativeEvent.clientX, e.nativeEvent.clientY);
+			pointerDownPosition = new Vector2(e.nativeEvent.clientX, e.nativeEvent.clientY);
 		}}
 		onpointerup={(e) => {
 			if (pointerDownPosition) {
-				const delta = new THREE.Vector2(
+				const delta = new Vector2(
 					e.nativeEvent.clientX - pointerDownPosition.x,
 					e.nativeEvent.clientY - pointerDownPosition.y
 				);
@@ -92,11 +84,11 @@
 			pointerDownPosition = null;
 		}}
 	>
-		{#if scale.current < 0.99}
-			<GltfModel source={instance.model} />
+		{#if scale.current < 0.99 || !instance.collision}
+			<GltfModel source={instance.path} />
 		{:else}
 			<AutoColliderWrapper>
-				<GltfModel source={instance.model} />
+				<GltfModel source={instance.path} />
 			</AutoColliderWrapper>
 		{/if}
 	</T.Group>

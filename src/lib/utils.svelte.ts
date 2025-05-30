@@ -1,7 +1,8 @@
 import { goto } from '$app/navigation';
 import { Group } from 'jazz-tools';
-import { InstanceList, Model, VoxelList, World } from './schema';
+import { Instance, InstanceList, Transform, World } from './schema';
 import { editingState } from './world-editor/state.svelte';
+import { getPathsForModel, models } from './world-editor/models';
 
 export function publicGroup(readWrite: 'reader' | 'writer' = 'writer') {
 	const group = Group.create();
@@ -11,31 +12,37 @@ export function publicGroup(readWrite: 'reader' | 'writer' = 'writer') {
 }
 
 export async function createWorld(base: string) {
+	const model = models.find((m) => m.path === 'Hill_8x8x2_Color{color}');
+	console.log(model);
+	const path = getPathsForModel(model!, undefined, '1')[0];
+	const startInstance = Instance.create(
+		{
+			path,
+			model: 'Hill_8x8x2_Color1',
+			transform: Transform.create(
+				{
+					position: { x: 0, y: 0, z: 0 },
+					quaternion: { x: 0, y: 0, z: 0, w: 1 },
+					scale: { x: 1, y: 1, z: 1 }
+				},
+				publicGroup()
+			),
+			collision: true,
+			color: '1'
+		},
+		publicGroup()
+	);
+
 	const world = World.create(
 		{
-			instances: InstanceList.create([], { owner: publicGroup() })
+			instances: InstanceList.create([startInstance], publicGroup())
 		},
-		{
-			owner: publicGroup()
-		}
+		publicGroup()
 	);
 
 	editingState.showWorldSettings = true;
 
 	goto(base + `/world?id=${world.id}`);
-}
-
-export function createModel() {
-	const model = Model.create(
-		{
-			voxels: VoxelList.create([], { owner: publicGroup() })
-		},
-		{
-			owner: publicGroup()
-		}
-	);
-
-	return model;
 }
 
 export function shuffle<T>(array: T[]): T[] {

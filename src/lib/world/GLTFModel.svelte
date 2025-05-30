@@ -23,28 +23,23 @@
 	const suspend = useSuspense();
 
 	const gltf = suspend(useGltf(source));
-
-	$effect(() => {
-		
-	});
 </script>
 
 <T.Group bind:ref dispose={false} {...props}>
 	{#await gltf}
 		{@render fallback?.()}
 	{:then { scene }}
-		<T is={scene.clone()} oncreate={(ref) => {
-			console.log('ref', ref);
-			ref.traverse((child) => {
-				if (child instanceof THREE.Mesh) {
-					// child.material.flatShading = true;
-					child.castShadow = true;
-					child.receiveShadow = true;
-
-					console.log('child', child);
-				}
-			});
-		}} />
+		<T
+			is={scene.clone()}
+			oncreate={(ref) => {
+				ref.traverse((child) => {
+					if (child instanceof THREE.Mesh) {
+						child.castShadow = true;
+						child.receiveShadow = true;
+					}
+				});
+			}}
+		/>
 	{:catch err}
 		{@render error?.({ error: err })}
 	{/await}

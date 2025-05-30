@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Button, ToggleGroup, ToggleGroupItem } from 'fuchs';
 	import { applyTransform, deleteInstance, editingState } from '$lib/world-editor/state.svelte';
 	import { onMount } from 'svelte';
+	import { models } from './models';
+	import { Popover, Button, ToggleGroup, ToggleGroupItem } from '@fuxui/base';
 
 	$effect(() => {
 		if (editingState.selectedInstance) {
@@ -26,13 +27,19 @@
 				selectedTool = 'move';
 			} else if (e.key === 'd') {
 				if (!editingState.selectedInstance) return;
-				editingState.selectedModelId = editingState.selectedInstance.id;
+				editingState.selectedModel = models.find(
+					(m) => m.path === editingState.selectedInstance?.model
+				) ?? null;
 				editingState.selectedInstance = null;
 			} else if (e.key === 'p') {
 				if (!editingState.selectedInstance) return;
 
 				applyTransform();
-				editingState.selectedModelId = editingState.selectedInstance.id;
+
+				editingState.selectedModel = models.find(
+					(m) => m.path === editingState.selectedInstance?.model
+				) ?? null;
+
 				editingState.selectedInstance = null;
 			} else if (e.key === 'x') {
 				// delete
@@ -43,7 +50,7 @@
 				applyTransform();
 
 				editingState.selectedInstance = null;
-				editingState.selectedModelId = null;
+				editingState.selectedModel = null;
 			}
 		});
 	});
@@ -53,7 +60,7 @@
 
 {#if editingState.selectedInstance}
 	<div class="absolute top-2 right-2">
-		<div class="bg-base-100 flex gap-4 rounded-2xl p-2">
+		<div class="bg-base-100 flex gap-4 rounded-2xl p-2 items-center">
 			<ToggleGroup
 				type="single"
 				bind:value={
@@ -149,9 +156,10 @@
 				variant="ghost"
 				onclick={() => {
 					if (!editingState.selectedInstance) return;
-					console.log(editingState.selectedInstance);
-					editingState.selectedModelId = editingState.selectedInstance.id;
-					console.log(editingState.selectedModelId);
+
+					editingState.selectedModel = models.find(
+						(m) => m.path === editingState.selectedInstance?.model
+					) ?? null;
 					editingState.selectedInstance = null;
 				}}
 			>
@@ -172,6 +180,14 @@
 
 				<span class="sr-only">Clone instance</span>
 			</Button>
+
+
+			<!-- <Popover>
+				{#snippet child({ props })}
+					<button {...props} class="bg-accent-500 mr-4 size-6 cursor-pointer rounded-full"></button>
+				{/snippet}
+				
+			</Popover> -->
 		</div>
 	</div>
 {/if}
