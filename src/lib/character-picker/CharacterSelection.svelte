@@ -5,52 +5,36 @@
 
 	const items = [
 		{
-			path: '/characters/character-male-a.glb',
-			label: 'Male A'
+			path: '/new-characters/Protagonist_A.glb',
+			label: 'Protagonist A'
 		},
 		{
-			path: '/characters/character-female-a.glb',
-			label: 'Female A'
+			path: '/new-characters/Protagonist_B.glb',
+			label: 'Protagonist B'
 		},
 		{
-			path: '/characters/character-male-b.glb',
-			label: 'Male B'
+			path: '/new-characters/Hiker.glb',
+			label: 'Hiker'
 		},
 		{
-			path: '/characters/character-female-b.glb',
-			label: 'Female B'
+			path: '/new-characters/Caveman.glb',
+			label: 'Caveman'
 		},
 		{
-			path: '/characters/character-male-c.glb',
-			label: 'Male C'
+			path: '/new-characters/Witch.glb',
+			label: 'Witch'
 		},
 		{
-			path: '/characters/character-female-c.glb',
-			label: 'Female C'
+			path: '/new-characters/CombatMech.glb',
+			label: 'Combat Mech'
 		},
 		{
-			path: '/characters/character-male-d.glb',
-			label: 'Male D'
+			path: '/new-characters/Superhero.glb',
+			label: 'Superhero'
 		},
 		{
-			path: '/characters/character-female-d.glb',
-			label: 'Female D'
-		},
-		{
-			path: '/characters/character-male-e.glb',
-			label: 'Male E'
-		},
-		{
-			path: '/characters/character-female-e.glb',
-			label: 'Female E'
-		},
-		{
-			path: '/characters/character-male-f.glb',
-			label: 'Male F'
-		},
-		{
-			path: '/characters/character-female-f.glb',
-			label: 'Female F'
+			path: '/new-characters/Vampire.glb',
+			label: 'Vampire'
 		}
 	].map((item) => ({
 		path: base + item.path,

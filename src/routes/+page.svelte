@@ -51,7 +51,7 @@
 					class="w-fit"
 					size="lg"
 					onclick={() => {
-						goto(base + '/world?id=co_zZuMcGqVV6frxxg7qF4WPP12ih5');
+						goto(base + '/world?id=co_zQLdXMAmNc7kkzeRBu7MyWDoRD1');
 					}}
 				>
 					Join shared world

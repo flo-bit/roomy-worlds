@@ -9,6 +9,7 @@
 	import HudScene from './HudScene.svelte';
 	import Ground from '$lib/world/Ground.svelte';
 	import Dof from '$lib/world/DOF.svelte';
+	import { Debug } from '@threlte/rapier';
 
 	interactivity({
 		filter: (hits) => {

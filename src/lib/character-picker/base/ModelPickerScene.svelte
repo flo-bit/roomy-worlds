@@ -53,7 +53,7 @@
 				const center = box.getCenter(new Vector3());
 
 				let maxSize = Math.max(size.x, size.y, size.z);
-				let scale = 0.9 / maxSize;
+				let scale = 1 / maxSize;
 
 				group.scale.set(scale, scale, scale);
 				group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
@@ -61,3 +61,6 @@
 		/>
 	</T.Group>
 </T.Group>
+
+
+<T.HemisphereLight args={[0xffffff, 0x440808, 1]} />

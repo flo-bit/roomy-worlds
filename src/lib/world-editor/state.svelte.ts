@@ -43,18 +43,24 @@ export async function applyTransform() {
 
 	if (!instance) return;
 	if (!instance.transform) return;
-	instance.transform.position.x = editingState.transformControls.object.position.x;
-	instance.transform.position.y = editingState.transformControls.object.position.y;
-	instance.transform.position.z = editingState.transformControls.object.position.z;
+	instance.transform.position = {
+		x: editingState.transformControls.object.position.x,
+		y: editingState.transformControls.object.position.y,
+		z: editingState.transformControls.object.position.z
+	};
 
-	instance.transform.scale.x = editingState.transformControls.object.scale.x;
-	instance.transform.scale.y = editingState.transformControls.object.scale.y;
-	instance.transform.scale.z = editingState.transformControls.object.scale.z;
+	instance.transform.scale = {
+		x: editingState.transformControls.object.scale.x,
+		y: editingState.transformControls.object.scale.y,
+		z: editingState.transformControls.object.scale.z
+	};
 
-	instance.transform.quaternion.x = editingState.transformControls.object.quaternion.x;
-	instance.transform.quaternion.y = editingState.transformControls.object.quaternion.y;
-	instance.transform.quaternion.z = editingState.transformControls.object.quaternion.z;
-	instance.transform.quaternion.w = editingState.transformControls.object.quaternion.w;
+	instance.transform.quaternion = {
+		x: editingState.transformControls.object.quaternion.x,
+		y: editingState.transformControls.object.quaternion.y,
+		z: editingState.transformControls.object.quaternion.z,
+		w: editingState.transformControls.object.quaternion.w
+	};
 
 	console.log(instance);
 	await new Promise((resolve) => setTimeout(resolve, 10));
@@ -64,7 +70,7 @@ export function clickedOn(point: Vector3, isFloor?: boolean) {
 	if (!editingState.selectedModel) return;
 
 	if (isFloor && !editingState.selectedModel.canPlaceOnFloor) {
-		toast.error('This model cannot be placed on the floor');
+		toast.error('This model can only be placed on top of other models');
 		return;
 	}
 	const currentColor = (editingState.modelPickerColor ?? 0) + 1;

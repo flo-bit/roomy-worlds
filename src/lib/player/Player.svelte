@@ -3,17 +3,24 @@
 	import { T } from '@threlte/core';
 	import { RigidBody, CollisionGroups, Collider, usePhysicsTask } from '@threlte/rapier';
 	import Controller from './ThirdPersonControls.svelte';
-	import CharacterModel, { type ActionName } from './CharacterModel.svelte';
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 	import { onMount } from 'svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
+	import ProtagonistA, { type ActionName } from './Protagonist_A.svelte';
+	import ProtagonistB from './Protagonist_B.svelte';
+	import Hiker from './Hiker.svelte';
+	import Caveman from './Caveman.svelte';
+	import Witch from './Witch.svelte';
+	import CombatMech from './CombatMech.svelte';
+	import Superhero from './Superhero.svelte';
+	import Vampire from './Vampire.svelte';
 
 	let {
 		position = [0, 10, 0],
 		radius = 0.4,
 		height = 1.4,
-		speed = 6,
-		runningSpeed = 9
+		speed = 4,
+		runningSpeed = 8
 	}: {
 		position?: [number, number, number];
 		radius?: number;
@@ -99,18 +106,18 @@
 		}
 
 		if (temp.length() > 3 && isRunning) {
-			animation = 'sprint';
+			animation = 'Running_A';
 		} else if (temp.length() > 0.5) {
-			animation = 'walk';
+			animation = 'Walking_B';
 		} else {
-			animation = 'idle';
+			animation = 'Idle';
 		}
 
 		if (!grounded) {
 			if (linVel.y > 0) {
-				animation = 'jump';
+				animation = 'Jump_Start';
 			} else {
-				animation = 'fall';
+				animation = 'Jump_Idle';
 			}
 		}
 
@@ -125,7 +132,6 @@
 			rigidBody.setLinvel(new Vector3(0, 0, 0), true);
 		}
 	});
-
 
 	function jump() {
 		//console.log('jump', grounded);
@@ -197,7 +203,7 @@
 
 <svelte:window onkeydown={onKeyDown} onkeyup={onKeyUp} />
 
-<T.PerspectiveCamera makeDefault fov={70} near={2.5}>
+<T.PerspectiveCamera makeDefault fov={70} near={2}>
 	<Controller bind:object={capRef} />
 </T.PerspectiveCamera>
 
@@ -211,14 +217,63 @@
 				density={100}
 			/>
 
-			<CharacterModel
-				position.y={-0.7}
-				rotation.y={rotation + Math.PI}
-				currentAction={animation}
-				scale={2}
-				gender={editingState.selectedCharacter?.split(' ')[0].toLowerCase() as 'male' | 'female'}
-				version={editingState.selectedCharacter?.split(' ')[1] as 'a' | 'b' | 'c' | 'd' | 'e' | 'f'}
-			/>
+			{#if editingState.selectedCharacter === 'protagonist a'}
+				<ProtagonistA
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'protagonist b'}
+				<ProtagonistB
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'hiker'}
+				<Hiker
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'caveman'}
+				<Caveman
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'witch'}
+				<Witch
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'combat mech'}
+				<CombatMech
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'superhero'}
+				<Superhero
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'vampire'}
+				<Vampire
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{/if}
 		</CollisionGroups>
 	</RigidBody>
 </T.Group>
