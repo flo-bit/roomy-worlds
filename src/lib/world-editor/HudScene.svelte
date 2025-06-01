@@ -70,7 +70,7 @@
 					/>
 				{:else if editingState.selectedModel}
 					<GLTF
-						url={base + getPathsForModel(editingState.selectedModel, undefined, getColor())[0]}
+						url={getPathsForModel(editingState.selectedModel, undefined, getColor())[0]}
 						onload={(gltf: Group & { scene: Object3D }) => {
 							if (!group) return;
 

@@ -4,6 +4,7 @@
 	import type { Snippet } from 'svelte';
 	import { T, type Props } from '@threlte/core';
 	import { useGltf, useSuspense } from '@threlte/extras';
+	import { base } from '$app/paths';
 
 	let {
 		fallback,
@@ -22,7 +23,7 @@
 
 	const suspend = useSuspense();
 
-	const gltf = suspend(useGltf(source));
+	const gltf = suspend(useGltf(source.startsWith(base) ? source : base + source));
 </script>
 
 <T.Group bind:ref dispose={false} {...props}>
