@@ -57,11 +57,15 @@
 </div>
 
 {#if Object.keys(editingState.world?.current?.cells ?? {}).length < 1}
-	<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">Loading world...</div>
+	<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">
+		Loading world...
+	</div>
 {/if}
 
-<Joystick />
-<JumpButton />
+{#if editingState.camera === 'first'}
+	<Joystick />
+	<JumpButton />
+{/if}
 
 <ModelSelection />
 

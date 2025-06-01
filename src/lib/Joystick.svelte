@@ -8,6 +8,7 @@
 <script lang="ts">
 	let startPosition: { x: number; y: number } | null = $state(null);
 
+	let pointerId: number | null = $state(null);
 	const size = 72;
 
 	let x = $state(0);
@@ -17,6 +18,10 @@
 <svelte:window
 	onpointermove={(e) => {
 		if (!startPosition) return;
+		if (pointerId !== e.pointerId) {
+			return;
+		}
+		
 		let deltaX = (e.clientX - startPosition.x) / size;
 		let deltaY = (e.clientY - startPosition.y) / size;
 
@@ -32,7 +37,11 @@
 		x = deltaX * size;
 		y = deltaY * size;
 	}}
-	onpointerup={() => {
+	onpointerup={(e) => {
+		if (pointerId !== e.pointerId) {
+			return;
+		}
+		pointerId = null;
 		startPosition = null;
 
 		x = 0;
@@ -46,6 +55,7 @@
 	class="absolute bottom-4 left-4 size-36 rounded-full bg-white/20 pointer-fine:hidden"
 	onpointerdown={(e) => {
 		startPosition = { x: e.clientX, y: e.clientY };
+		pointerId = e.pointerId;
 	}}
 >
 	<div
