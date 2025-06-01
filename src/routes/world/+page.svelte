@@ -43,7 +43,7 @@
 	<Chat timeline={channel.value} />
 {/if} -->
 
-<div class={cn('absolute left-0 h-[100dvh] w-screen transition-all duration-200')}>
+<div class={cn('absolute inset-0 h-[100dvh] w-screen transition-all duration-200')}>
 	<Canvas toneMapping={CineonToneMapping}>
 		{#if showPerfMonitor}
 			<PerfMonitor anchorX={'right'} logsPerSecond={30} />

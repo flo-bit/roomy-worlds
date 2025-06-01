@@ -1,6 +1,14 @@
 import { goto } from '$app/navigation';
 import { Group } from 'jazz-tools';
-import { Instance, InstanceList, Transform, World } from './schema';
+import {
+	Cell,
+	Instance,
+	InstanceList,
+	PlayerDataList,
+	Transform,
+	World,
+	WorldCells
+} from './schema';
 import { editingState } from './world-editor/state.svelte';
 import { getPathsForModel, models } from './world-editor/models';
 
@@ -35,7 +43,18 @@ export async function createWorld(base: string) {
 
 	const world = World.create(
 		{
-			instances: InstanceList.create([startInstance], publicGroup())
+			cells: WorldCells.create(
+				{
+					'0,0': Cell.create(
+						{
+							instances: InstanceList.create([startInstance], publicGroup())
+						},
+						publicGroup()
+					)
+				},
+				publicGroup()
+			),
+			players: PlayerDataList.create({}, publicGroup())
 		},
 		publicGroup()
 	);

@@ -20,13 +20,25 @@
 		editingState.worldId = worldId;
 		editingState.world = new CoState(World, worldId, {
 			resolve: {
-				instances: {
+				cells: {
+					$each: {
+						instances: {
+							$each: true,
+							$onError: null
+						},
+						$onError: null
+					},
+					$onError: null
+				},
+				players: {
 					$each: true,
 					$onError: null
 				}
 			}
 		});
 	});
+
+	// $inspect(Object.keys(editingState.world?.current?.cells ?? {}));
 </script>
 
 {#if showWorld}

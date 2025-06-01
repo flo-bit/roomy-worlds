@@ -83,9 +83,36 @@ export type InstanceType = co.loaded<typeof Instance>;
 
 export const InstanceList = co.list(Instance);
 
-export const World = co.map({
+
+export const PlayerData = co.map({
+	position: z.object({
+		x: z.number(),
+		y: z.number(),
+		z: z.number()
+	}),
+	rotation: z.number(),
+	timestamp: z.number(),
+	character: z.string(),
+	velocity: z.object({
+		x: z.number(),
+		y: z.number(),
+		z: z.number()
+	})
+});
+
+export const PlayerDataList = co.record(z.string(), PlayerData);
+
+export const Cell = co.map({
 	instances: InstanceList
 });
+
+export const WorldCells = co.record(z.string(), Cell);
+
+export const World = co.map({
+	cells: WorldCells,
+	players: PlayerDataList
+});
+
 
 export const MyAppProfile = co.profile({
 	name: z.string(),

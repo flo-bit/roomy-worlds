@@ -5,7 +5,7 @@
 	import Controller from './ThirdPersonControls.svelte';
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 	import { onMount } from 'svelte';
-	import { editingState } from '$lib/world-editor/state.svelte';
+	import { editingState, updatePlayerData } from '$lib/world-editor/state.svelte';
 	import ProtagonistA, { type ActionName } from './Protagonist_A.svelte';
 	import ProtagonistB from './Protagonist_B.svelte';
 	import Hiker from './Hiker.svelte';
@@ -14,12 +14,14 @@
 	import CombatMech from './CombatMech.svelte';
 	import Superhero from './Superhero.svelte';
 	import Vampire from './Vampire.svelte';
+	import { AccountCoState } from 'jazz-svelte';
+	import { MyAppAccount } from '$lib/schema';
 
 	let {
 		position = [0, 10, 0],
 		radius = 0.4,
 		height = 1.4,
-		speed = 4,
+		speed = 5,
 		runningSpeed = 8
 	}: {
 		position?: [number, number, number];
@@ -28,6 +30,14 @@
 		speed?: number;
 		runningSpeed?: number;
 	} = $props();
+
+	const me = new AccountCoState(MyAppAccount, {
+		resolve: {
+			profile: true
+		}
+	});
+
+	const playerId = $derived(me.current?.profile?.id);
 
 	let isRunning = false;
 
@@ -55,9 +65,12 @@
 
 	let direction = new Vector3();
 
+	let timeSinceLastUpdate = 0;
+
 	usePhysicsTask((delta) => {
 		if (!rigidBody || !capsule) return;
 
+		timeSinceLastUpdate += delta;
 		total += delta;
 		// get direction
 
@@ -108,7 +121,7 @@
 		if (temp.length() > 3 && isRunning) {
 			animation = 'Running_A';
 		} else if (temp.length() > 0.5) {
-			animation = 'Walking_B';
+			animation = 'Walking_A';
 		} else {
 			animation = 'Idle';
 		}
@@ -130,6 +143,16 @@
 			position = [0, 10, 0];
 			rigidBody.setTranslation(new Vector3(0, 10, 0), true);
 			rigidBody.setLinvel(new Vector3(0, 0, 0), true);
+		}
+
+		if (timeSinceLastUpdate > 0.1 && playerId) {
+			timeSinceLastUpdate = 0;
+			updatePlayerData(playerId, pos, rotation);
+			
+		} else {
+			if(!playerId) {
+				console.log("no player id", me.current?.profile?.id)
+			}
 		}
 	});
 
@@ -208,7 +231,7 @@
 </T.PerspectiveCamera>
 
 <T.Group bind:ref={capsule} {position} rotation.y={Math.PI}>
-	<RigidBody bind:rigidBody enabledRotations={[false, false, false]} gravityScale={3}>
+	<RigidBody bind:rigidBody enabledRotations={[false, false, false]} gravityScale={2.5}>
 		<CollisionGroups groups={[0]}>
 			<Collider
 				shape={'capsule'}

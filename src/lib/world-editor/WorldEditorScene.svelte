@@ -10,6 +10,17 @@
 	import Ground from '$lib/world/Ground.svelte';
 	import Dof from '$lib/world/DOF.svelte';
 	import { Debug } from '@threlte/rapier';
+	import OtherPlayer from '$lib/player/OtherPlayer.svelte';
+	import { AccountCoState } from 'jazz-svelte';
+	import { MyAppAccount } from '$lib/schema';
+
+	const me = new AccountCoState(MyAppAccount, {
+		resolve: {
+			profile: true
+		}
+	});
+
+	const playerId = $derived(me.current?.profile?.id);
 
 	interactivity({
 		filter: (hits) => {
@@ -18,6 +29,12 @@
 	});
 
 	const { renderer } = useThrelte();
+
+	let {
+		interactive = true,
+		y = 0,
+		position = [0, 0, 0]
+	}: { interactive?: boolean; y?: number; position?: [number, number, number] } = $props();
 
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
@@ -70,13 +87,10 @@
 	shadow.bias={-0.00001}
 />
 
-<T.Mesh>
-	<T.SphereGeometry args={[0.1, 32, 32]} />
-	<T.MeshStandardMaterial color="red" />
-</T.Mesh>
-
 <Ground
 	clickedTerrain={(e) => {
+		if (!interactive) return;
+
 		clickedOn(e.point, true);
 	}}
 />
@@ -86,10 +100,30 @@
 
 <Sky />
 
-{#each editingState.world?.current?.instances ?? [] as instance (instance.id)}
-	<Instance {instance} />
-{/each}
+<T.Group position={[0, y, 0]}>
+	<T.Mesh>
+		<T.SphereGeometry args={[0.1, 32, 32]} />
+		<T.MeshStandardMaterial color="red" />
+	</T.Mesh>
 
+	{#each Object.entries(editingState.world?.current?.cells ?? {}) as [cellId, cell]}
+		{#if cell && cell.instances}
+			{#each cell.instances ?? [] as instance (instance?.id)}
+				{#if instance}
+					<Instance {instance} {interactive} {cellId} />
+				{/if}
+			{/each}
+		{/if}
+	{/each}
+
+	{#if playerId}
+		{#each Object.entries(editingState.world?.current?.players ?? {}) as [id, player] (id)}
+			{#if player && id !== playerId}
+				<OtherPlayer {player} />
+			{/if}
+		{/each}
+	{/if}
+</T.Group>
 <HUD>
 	<HudScene />
 </HUD>

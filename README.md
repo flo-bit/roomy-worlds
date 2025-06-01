@@ -101,8 +101,4 @@ as well as see all models made in any window.
 - Music by [Nicholas Palmer](https://soundcloud.com/nicholas-palmer-4)
 
 
-worlds:
-
-- co_zZjA7PJnSUXEP7VVKomrT3gL7hf
-- co_z7FMaWBpkYGHixseZu9iuA2LmTL
-- co_zQLdXMAmNc7kkzeRBu7MyWDoRD1
+- co_zVcp8qwBoWE6X95YWHMQHEuM1dX

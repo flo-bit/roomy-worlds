@@ -1,4 +1,12 @@
-import { Instance, Transform, World } from '$lib/schema';
+import {
+	Cell,
+	Instance,
+	InstanceList,
+	PlayerData,
+	PlayerDataList,
+	Transform,
+	World
+} from '$lib/schema';
 import { publicGroup } from '$lib/utils.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
 import type { Loaded } from 'jazz-tools';
@@ -9,6 +17,7 @@ import { toast } from '$lib/sonner';
 
 export const editingState = $state({
 	selectedInstance: null as Loaded<typeof Instance> | null,
+	selectedCellId: null as string | null,
 	selectedModelId: null as string | null,
 
 	selectedModel: null as Model | null,
@@ -75,7 +84,13 @@ export function clickedOn(point: Vector3, isFloor?: boolean) {
 	}
 	const currentColor = (editingState.modelPickerColor ?? 0) + 1;
 
-	const paths = getPathsForModel(editingState.selectedModel, undefined, currentColor.toString());
+	let variant = undefined;
+	if (editingState.selectedModel.variants) {
+		const randomVariant = Math.floor(Math.random() * editingState.selectedModel.variants?.length);
+		variant = editingState.selectedModel.variants[randomVariant];
+	}
+
+	const paths = getPathsForModel(editingState.selectedModel, variant, currentColor.toString());
 	const randomIndex = Math.floor(Math.random() * paths.length);
 	addInstance(
 		paths[randomIndex],
@@ -87,6 +102,14 @@ export function clickedOn(point: Vector3, isFloor?: boolean) {
 	);
 }
 
+export const cellSize = 50;
+
+export function getCellId(position: { x: number; y: number; z: number }) {
+	const x = Math.floor(position.x / cellSize);
+	const z = Math.floor(position.z / cellSize);
+	return `${x},${z}`;
+}
+
 export async function addInstance(
 	id: string,
 	model: string,
@@ -95,6 +118,8 @@ export async function addInstance(
 	variant?: string,
 	collision?: boolean
 ) {
+	if (!editingState.world) return;
+
 	const quaternion = new Quaternion();
 	quaternion.setFromAxisAngle(new Vector3(0, 1, 0), Math.random() * 2 * Math.PI);
 	const instance = Instance.create(
@@ -129,14 +154,85 @@ export async function addInstance(
 		{ owner: publicGroup() }
 	);
 
-	editingState.world?.current?.instances?.push(instance);
+	// check if cell exists
+	const cellId = getCellId(position);
+	const cell = editingState.world?.current?.cells[cellId];
+	if (!cell) {
+		createCell(cellId);
+	}
+
+	cell.instances.push(instance);
+	// editingState.world?.current?.instances?.push(instance);
+}
+
+export function createCell(cellId: string) {
+	if (!editingState.world) return;
+
+	const cell = Cell.create(
+		{
+			instances: InstanceList.create([], publicGroup())
+		},
+		publicGroup()
+	);
+
+	editingState.world.current.cells[cellId] = cell;
+
+	return cell;
 }
 
 export async function deleteInstance(id: string) {
+	const cell = editingState.selectedCellId;
+	if (!cell) return;
+
 	// find voxel by id
-	const instance = editingState.world?.current?.instances?.findIndex((v) => v?.id === id);
+	const instance = editingState.world?.current?.cells[cell]?.instances?.findIndex(
+		(v) => v?.id === id
+	);
 	console.log(instance);
 	if (instance === undefined || instance < 0) return;
 
-	editingState.world?.current?.instances?.splice(instance, 1);
+	editingState.world?.current?.cells[cell]?.instances?.splice(instance, 1);
+}
+
+export function updatePlayerData(
+	playerId: string,
+	position: { x: number; y: number; z: number },
+	rotation: number
+) {
+	if (!editingState.world) return;
+
+	const players = editingState.world.current.players;
+
+	if (!players[playerId]) {
+		console.log('creating player data', playerId);
+		players[playerId] = PlayerData.create(
+			{
+				position: position,
+				rotation: rotation,
+				timestamp: Date.now(),
+				character: editingState.selectedCharacter ?? 'player',
+				velocity: {
+					x: 0,
+					y: 0,
+					z: 0
+				}
+			},
+			publicGroup()
+		);
+	} else {
+		console.log('updating player data', playerId);
+		players[playerId].position = {
+			x: position.x,
+			y: position.y,
+			z: position.z
+		};
+		players[playerId].rotation = rotation;
+		players[playerId].timestamp = Date.now();
+		players[playerId].character = editingState.selectedCharacter ?? 'player';
+		players[playerId].velocity = {
+			x: 0,
+			y: 0,
+			z: 0
+		};
+	}
 }

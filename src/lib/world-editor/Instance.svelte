@@ -10,7 +10,7 @@
 	import AutoColliderWrapper from '$lib/world/AutoColliderWrapper.svelte';
 	import { Vector2 } from 'three';
 
-	let { instance }: { instance: Loaded<typeof Instance> } = $props();
+	let { instance, interactive, cellId }: { instance: Loaded<typeof Instance>; interactive: boolean; cellId: string } = $props();
 
 	let scale = new Spring(0);
 
@@ -21,6 +21,8 @@
 	let pointerDownPosition: Vector2 | null = $state(null);
 
 	async function onclick(e: IntersectionEvent<MouseEvent>) {
+		if (!interactive) return;
+		
 		e.stopPropagation();
 
 		if (editingState.selectedModel) {
@@ -31,6 +33,7 @@
 
 		await applyTransform();
 		editingState.selectedInstance = instance;
+		editingState.selectedCellId = cellId;
 
 		return;
 	}
