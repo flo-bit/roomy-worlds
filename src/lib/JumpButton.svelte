@@ -6,7 +6,7 @@
 
 <button
 	class="absolute right-20 bottom-4 inline-flex size-20 items-center justify-center rounded-full bg-white/30 pointer-fine:hidden"
-	onclick={() => {
+	onpointerdown={() => {
 		jumpButtonData.pressed = true;
 	}}
 >
