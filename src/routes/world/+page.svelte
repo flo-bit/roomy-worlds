@@ -54,6 +54,10 @@
 	</Canvas>
 </div>
 
+{#if Object.keys(editingState.world?.current?.cells ?? {}).length < 1}
+	<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">Loading world...</div>
+{/if}
+
 <ModelSelection />
 
 <WorldEditorUi />
