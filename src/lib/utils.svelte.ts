@@ -11,6 +11,7 @@ import {
 } from './schema';
 import { editingState } from './world-editor/state.svelte';
 import { getPathsForModel, models } from './world-editor/models';
+import { trackEvent } from './analytics';
 
 export function publicGroup(readWrite: 'reader' | 'writer' = 'writer') {
 	const group = Group.create();
@@ -60,6 +61,10 @@ export async function createWorld(base: string) {
 	);
 
 	editingState.showWorldSettings = true;
+
+	trackEvent('create_world', {
+		world_id: world.id
+	});
 
 	goto(base + `/world?id=${world.id}`);
 }
