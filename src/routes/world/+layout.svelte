@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { g, initRoomy } from '$lib/roomy.svelte';
-	import { World, type EntityIdStr } from '$lib/roomy';
-	import { goto } from '$app/navigation';
 	import { Button } from 'fuchs';
 	import { createWorld } from '$lib/utils.svelte';
 	import { base } from '$app/paths';
+	import { editingState } from '$lib/world-editor/state.svelte';
+	import { World } from '$lib/schema';
+	import { CoState } from 'jazz-svelte';
 
 	let { children } = $props();
 
@@ -17,26 +17,28 @@
 
 		showWorld = true;
 
-		if (!g.roomy) {
-			initRoomy();
-
-			if (!g.roomy) {
-				console.error('Failed to initialize roomy');
-				return;
+		editingState.worldId = worldId;
+		editingState.world = new CoState(World, worldId, {
+			resolve: {
+				cells: {
+					$each: {
+						instances: {
+							$each: true,
+							$onError: null
+						},
+						$onError: null
+					},
+					$onError: null
+				},
+				players: {
+					$each: true,
+					$onError: null
+				}
 			}
-		}
-
-		g.roomy
-			.open(World, worldId as EntityIdStr)
-			.then((world) => {
-				g.world = world;
-				console.log(world);
-			})
-			.catch((e) => {
-				console.error('Error opening world', e);
-				goto('/');
-			});
+		});
 	});
+
+	// $inspect(Object.keys(editingState.world?.current?.cells ?? {}));
 </script>
 
 {#if showWorld}

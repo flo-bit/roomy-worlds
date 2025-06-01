@@ -1,61 +1,67 @@
-/**
- * Helper that allows you to do something similar to the `$derive` rune but for a function returning
- * a promise.
- *
- * @param default_value The initial value to set the reactive state to before the promise has
- * resolved.
- * @param get A reactive closure that returns a promise with the target value. This will be re-run
- * if any reactive state that it depends on has changed, just like `$derive`.
- * */
-export function derivePromise<T>(
-	default_value: T,
-	get: () => Promise<T>
-): {
-	/** Accessor for the inner, reactive value. */
-	value: T;
-} {
-	const state = $state({ value: default_value });
-	$effect(() => {
-		get().then((v) => {
-			state.value = v;
-		});
-	});
-	return state;
+import { goto } from '$app/navigation';
+import { Group } from 'jazz-tools';
+import {
+	Cell,
+	Instance,
+	InstanceList,
+	PlayerDataList,
+	Transform,
+	World,
+	WorldCells
+} from './schema';
+import { editingState } from './world-editor/state.svelte';
+import { getPathsForModel, models } from './world-editor/models';
+
+export function publicGroup(readWrite: 'reader' | 'writer' = 'writer') {
+	const group = Group.create();
+	group.addMember('everyone', readWrite);
+
+	return group;
 }
 
-import { g, initRoomy } from './roomy.svelte';
-import { goto } from '$app/navigation';
-import { World } from './roomy';
-import { editingState } from './world-editor/state.svelte';
+export async function createWorld(base: string) {
+	const model = models.find((m) => m.path === 'Hill_8x8x2_Color{color}');
+	console.log(model);
+	const path = getPathsForModel(model!, undefined, '1')[0];
+	const startInstance = Instance.create(
+		{
+			path,
+			model: 'Hill_8x8x2_Color1',
+			transform: Transform.create(
+				{
+					position: { x: 0, y: 0, z: 0 },
+					quaternion: { x: 0, y: 0, z: 0, w: 1 },
+					scale: { x: 1, y: 1, z: 1 }
+				},
+				publicGroup()
+			),
+			collision: true,
+			color: '1'
+		},
+		publicGroup()
+	);
 
-export async function createWorld(base: string, local: boolean = false) {
-	if (!g.roomy) {
-		await initRoomy(local ? 'local' : undefined);
-
-		if (!g.roomy) return;
-	}
-	const world = await g.roomy.create(World);
-
-	world.settings = {
-		seed: Math.random().toString(),
-		size: 100,
-		terrainGradient: [
-			{ rgb: { r: 0, g: 0.05, b: 0 }, position: 0 },
-			{ rgb: { r: 0, g: 0.35, b: 0 }, position: 1 }
-		],
-		waterGradient: [
-			{ rgb: { r: 0.0, g: 0.0, b: 0.05 }, position: 0 },
-			{ rgb: { r: 0.1, g: 0.1, b: 0.55 }, position: 1 }
-		],
-		waterPercentage: 35,
-		version: 1
-	};
-
-	world.commit();
+	const world = World.create(
+		{
+			cells: WorldCells.create(
+				{
+					'0,0': Cell.create(
+						{
+							instances: InstanceList.create([startInstance], publicGroup())
+						},
+						publicGroup()
+					)
+				},
+				publicGroup()
+			),
+			players: PlayerDataList.create({}, publicGroup())
+		},
+		publicGroup()
+	);
 
 	editingState.showWorldSettings = true;
 
-	goto(base + `/world?id=${world.id}${local ? '&local' : ''}`);
+	goto(base + `/world?id=${world.id}`);
 }
 
 export function shuffle<T>(array: T[]): T[] {

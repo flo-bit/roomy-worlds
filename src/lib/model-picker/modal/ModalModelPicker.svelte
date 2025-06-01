@@ -2,7 +2,7 @@
 	import { Button, cn, Modal, Select } from 'fuchs';
 	import ModelPicker from '../base/ModelPicker.svelte';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import type { VoxelGroup } from '$lib/roomy';
+	import { ColorSelect } from '@fuxui/colors';
 
 	let {
 		items,
@@ -14,13 +14,17 @@
 		showEditButton = false
 	}: {
 		open: boolean;
-		items: { voxels: VoxelGroup; label: string }[];
+		items: { path: string; label: string }[];
 		alwaysRotate?: boolean;
-		onselect?: ({ voxels, label }: { voxels: VoxelGroup; label: string }) => void;
+		onselect?: ({ path, label }: { path: string; label: string }) => void;
 		title?: string;
 		newModelButtonClick?: () => void;
 		showEditButton?: boolean;
 	} = $props();
+
+	let colors = ['#3C741E', '#006A30', '#658E2B', '#00594E', '#AA7C23', '#AC660D', '#AA2E37', '#B46E6C'];
+
+	let modelPickerColor = $state(colors[editingState.modelPickerColor ?? 0]);
 </script>
 
 <Modal
@@ -29,39 +33,33 @@
 	{title}
 >
 	<div class="flex flex-wrap items-center justify-between gap-2">
-		<Button size="lg" class="h-fit w-fit" onclick={newModelButtonClick}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="2.5"
-				stroke="currentColor"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-			</svg>
-
-			New Model
-		</Button>
-
-		<Select
+		<!-- <Select
 			items={[
 				{ label: 'private', value: 'private' },
 				{ label: 'world', value: 'world' },
 				{ label: 'public', value: 'public' }
 			]}
 			bind:selected={editingState.modelPickerType}
-		></Select>
+		></Select> -->
+
+		<ColorSelect
+			colors={colors}
+			bind:selected={modelPickerColor}
+			onselected={(color) => {
+				editingState.modelPickerColor = colors.indexOf(color);
+			}}
+		/>
 	</div>
 
 	{#if items.length === 0}
-		<p class="pt-8 text-xl font-semibold">No models, create one!</p>
+		<p class="pt-8 text-xl font-semibold">Loading models...</p>
 	{/if}
 
 	<ModelPicker
 		{items}
 		{alwaysRotate}
-		onselect={({ voxels, label }) => {
-			onselect?.({ voxels, label });
+		onselect={(props) => {
+			onselect?.(props);
 			open = false;
 		}}
 		{showEditButton}

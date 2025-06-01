@@ -5,9 +5,12 @@
 	import { Portal } from 'bits-ui';
 	import { Button, cn } from 'fuchs';
 	import { ACESFilmicToneMapping } from 'three';
-	import type { VoxelGroup } from '$lib/roomy';
 	import { editingState } from '$lib/world-editor/state.svelte';
-	import { g } from '$lib/roomy.svelte';
+
+	type Item = {
+		path: string;
+		label: string;
+	};
 
 	let {
 		items,
@@ -19,9 +22,9 @@
 		maxColumns = 5,
 		showEditButton = false
 	}: {
-		items: { voxels: VoxelGroup; label: string }[];
+		items: Item[];
 		alwaysRotate?: boolean;
-		onselect?: ({ voxels, label }: { voxels: VoxelGroup; label: string }) => void;
+		onselect?: (item: Item) => void;
 		canvasClasses?: string;
 		portalTo?: string;
 		class?: string;
@@ -44,37 +47,37 @@
 				gridClasses
 			)}
 		>
-			{#each items as item (item.voxels.id)}
+			{#each items as item (item.path)}
 				<button
-					class="hover:bg-base-200/40 dark:hover:bg-base-800/40 relative m-4 inline-block cursor-pointer rounded-2xl p-4 transition-all duration-300 hover:scale-105"
+					class="hover:bg-base-200/40 dark:hover:bg-base-800/40 m-4 relative inline-block cursor-pointer rounded-2xl transition-all duration-300 hover:scale-105"
 					onclick={() => {
-						states[item.voxels.id].hover = false;
-						onselect?.({ voxels: item.voxels, label: item.label });
+						states[item.path].hover = false;
+						onselect?.(item);
 					}}
 					onpointerenter={() => {
-						states[item.voxels.id].hover = true;
+						states[item.path].hover = true;
 					}}
 					onpointerleave={() => {
-						states[item.voxels.id].hover = false;
+						states[item.path].hover = false;
 					}}
 				>
 					<div
 						class="aspect-square"
 						bind:this={
 							() => {
-								states[item.voxels.id] ??= {
+								states[item.path] ??= {
 									dom: undefined,
 									hover: false
 								};
 
-								return states[item.voxels.id].dom;
+								return states[item.path].dom;
 							},
 							(value) => {
-								states[item.voxels.id] ??= {
+								states[item.path] ??= {
 									dom: value,
 									hover: false
 								};
-								states[item.voxels.id].dom = value;
+								states[item.path].dom = value;
 							}
 						}
 					></div>
@@ -86,7 +89,7 @@
 								size="iconSm"
 								onclick={() => {
 									editingState.showModelEditor = true;
-									g.voxelObject = item.voxels;
+									//modelEditor.voxelObject = new CoState(Model, item.path);
 								}}
 							>
 								<svg
@@ -115,10 +118,10 @@
 <Portal>
 	<div class={cn('pointer-events-none fixed inset-0 z-50 h-full w-full', canvasClasses)}>
 		<Canvas toneMapping={ACESFilmicToneMapping}>
-			{#each items as item (states[item.voxels.id]?.dom ?? Math.random())}
-				{#if states[item.voxels.id] && states[item.voxels.id].dom}
-					<View dom={states[item.voxels.id].dom}>
-						<Scene voxels={item.voxels} hover={states[item.voxels.id].hover || alwaysRotate} />
+			{#each items as item (states[item.path]?.dom ?? Math.random())}
+				{#if states[item.path] && states[item.path].dom}
+					<View dom={states[item.path].dom}>
+						<Scene path={item.path} hover={states[item.path].hover || alwaysRotate} />
 					</View>
 				{/if}
 			{/each}

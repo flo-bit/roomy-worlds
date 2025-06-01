@@ -1,20 +1,19 @@
 <script lang="ts">
-	import type { VoxelGroup } from '$lib/roomy';
-	import { derivePromise } from '$lib/utils.svelte';
+	import type { VoxelList } from '$lib/schema';
 	import { T, useTask, useThrelte } from '@threlte/core';
+	import { GLTF } from '@threlte/extras';
+	import type { Loaded } from 'jazz-tools';
 	import { onMount } from 'svelte';
-	import { Box3, Group, Vector3 } from 'three';
+	import { Box3, Group, Object3D, Vector3 } from 'three';
 
 	let {
-		voxels,
+		path,
 		hover = false
 	}: {
-		voxels: VoxelGroup;
+		path: string;
 		scaleFactor?: number;
 		hover?: boolean;
 	} = $props();
-
-	let awaitedVoxels = derivePromise([], async () => (voxels ? await voxels.voxels.items() : []));
 
 	let rotation = $state(0);
 	let group: Group | undefined = $state();
@@ -43,7 +42,7 @@
 <T.DirectionalLight args={[0xffffff, 1]} position={[-1, 1, 1]} />
 
 <T.Group rotation={[0.5, rotation + 2.5, 0]}>
-	{#if awaitedVoxels.value.length > 0}
+	{#if path}
 		<T.Group
 			bind:ref={group}
 			oncreate={(ref) => {
@@ -60,32 +59,22 @@
 				group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
 			}}
 		>
-			{#each awaitedVoxels.value as voxel}
-				<T.Mesh
-					position={voxel.position.toArray()}
-					quaternion={voxel.quaternion.toArray()}
-					scale={voxel.scale.toArray()}
-				>
-					<T.BoxGeometry args={[1, 1, 1]} />
-					<T.MeshStandardMaterial color={voxel.color} />
-				</T.Mesh>
-			{/each}
-			<!-- <GLTF
-			url={path}
-			onload={(gltf: Group & { scene: Object3D }) => {
-				if (!group) return;
+			<GLTF
+				url={path}
+				onload={(gltf: Group & { scene: Object3D }) => {
+					if (!group) return;
 
-				const box = new Box3().setFromObject(gltf.scene);
-				const size = box.getSize(new Vector3());
-				const center = box.getCenter(new Vector3());
+					const box = new Box3().setFromObject(gltf.scene);
+					const size = box.getSize(new Vector3());
+					const center = box.getCenter(new Vector3());
 
-				let maxSize = Math.max(size.x, size.y, size.z);
-				let scale = 0.9 / maxSize;
+					let maxSize = Math.max(size.x, size.y, size.z);
+					let scale = 1.0 / maxSize;
 
-				group.scale.set(scale, scale, scale);
-				group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-			}}
-		/> -->
+					group.scale.set(scale, scale, scale);
+					group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+				}}
+			/>
 		</T.Group>
 	{/if}
 </T.Group>

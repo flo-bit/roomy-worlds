@@ -1,91 +1,98 @@
-<script module>
-	import * as THREE from 'three';
-
-	const material = new THREE.MeshStandardMaterial();
-	const geometry = new THREE.BoxGeometry(1, 1, 1);
-</script>
-
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { derivePromise } from '$lib/utils.svelte';
-	import { TransformControls } from '@threlte/extras';
-	import { addInstance, applyTransform, editingState } from './state.svelte';
-	import { Collider } from '@threlte/rapier';
-	import { models } from './models.svelte';
+	import { TransformControls, type IntersectionEvent } from '@threlte/extras';
+	import { applyTransform, clickedOn, editingState } from './state.svelte';
 	import { onMount } from 'svelte';
 	import { Spring } from 'svelte/motion';
-	import { TransformedGroup } from '$lib/roomy';
+	import type { Loaded } from 'jazz-tools';
+	import { Instance } from '$lib/schema';
+	import GltfModel from '$lib/world/GLTFModel.svelte';
+	import AutoColliderWrapper from '$lib/world/AutoColliderWrapper.svelte';
+	import { Vector2 } from 'three';
 
-	let { instance }: { instance: TransformedGroup } = $props();
+	let { instance, interactive, cellId }: { instance: Loaded<typeof Instance>; interactive: boolean; cellId: string } = $props();
 
-	let voxels = derivePromise([], async () => models.getModel(instance.group));
-
-
-	let scale = new Spring(0)
+	let scale = new Spring(0);
 
 	onMount(() => {
 		scale.target = 1;
-	})
+	});
+
+	let pointerDownPosition: Vector2 | null = $state(null);
+
+	async function onclick(e: IntersectionEvent<MouseEvent>) {
+		if (!interactive) return;
+		
+		e.stopPropagation();
+
+		if (editingState.selectedModel) {
+			// place on top of instance
+			clickedOn(e.point);
+			return;
+		}
+
+		await applyTransform();
+		editingState.selectedInstance = instance;
+		editingState.selectedCellId = cellId;
+
+		return;
+	}
 </script>
 
-{#if editingState.selectedInstance === instance}
+{#if editingState.selectedInstance?.id === instance.id && instance.transform}
 	<TransformControls
-		position={instance.position.toArray()}
-		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray()}
+		position={[instance.transform.position.x, instance.transform.position.y, instance.transform.position.z]}
+		quaternion={[
+			instance.transform.quaternion.x,
+			instance.transform.quaternion.y,
+			instance.transform.quaternion.z,
+			instance.transform.quaternion.w
+		]}
+		scale={[instance.transform.scale.x, instance.transform.scale.y, instance.transform.scale.z]}
 		bind:controls={editingState.transformControls}
 		mode={editingState.tool === 'move' ? 'translate' : editingState.tool}
 	>
-		{#each voxels.value as voxel}
-			<T.Mesh
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-			>
-				<T is={geometry} />
-				<T is={material.clone()} color={voxel.color} />
-			</T.Mesh>
-		{/each}
+		<GltfModel source={instance.path} />
 	</TransformControls>
-{:else}
+{:else if instance.transform}
 	<T.Group
-		position={instance.position.toArray()}
-		quaternion={instance.quaternion.toArray()}
-		scale={instance.scale.toArray().map(s => scale.current * s) as [number, number, number]}
-		onclick={async (e) => {
-			e.stopPropagation();
-
-			if(editingState.selectedModelId) {
-				// place on top of instance
-				addInstance(editingState.selectedModelId, e.point);
-				return;
+		position={[instance.transform.position.x, instance.transform.position.y, instance.transform.position.z]}
+		quaternion={[
+			instance.transform.quaternion.x,
+			instance.transform.quaternion.y,
+			instance.transform.quaternion.z,
+			instance.transform.quaternion.w
+		]}
+		scale={[
+			instance.transform.scale.x * scale.current,
+			instance.transform.scale.y * scale.current,
+			instance.transform.scale.z * scale.current
+		]}
+		onpointerdown={(e) => {
+			pointerDownPosition = new Vector2(e.nativeEvent.clientX, e.nativeEvent.clientY);
+		}}
+		onpointerup={(e) => {
+			if (pointerDownPosition) {
+				const delta = new Vector2(
+					e.nativeEvent.clientX - pointerDownPosition.x,
+					e.nativeEvent.clientY - pointerDownPosition.y
+				);
+				let dist = delta.length();
+				if (dist < 5) {
+					onclick(e);
+				}
 			}
-				await applyTransform();
-				editingState.selectedModelId = null;
-				editingState.selectedInstance = instance;
-				
-				return;
-
+		}}
+		onpointerleave={() => {
+			pointerDownPosition = null;
 		}}
 	>
-		<!-- <InstancedMesh>
-		<T.BoxGeometry />
-		<T.MeshStandardMaterial /> -->
-		{#each voxels.value as voxel}
-			<T.Mesh
-				position={voxel.position.toArray()}
-				quaternion={voxel.quaternion.toArray()}
-				scale={voxel.scale.toArray()}
-				castShadow
-				receiveShadow
-			>
-				<T is={geometry} />
-				<T is={material.clone()} color={voxel.color} />
-
-				{#if scale.current > 0.99}
-					<Collider shape={'cuboid'} args={[0.5, 0.5, 0.5]} />
-				{/if}
-			</T.Mesh>
-		{/each}
+		{#if scale.current < 0.99 || !instance.collision}
+			<GltfModel source={instance.path} />
+		{:else}
+			<AutoColliderWrapper>
+				<GltfModel source={instance.path} />
+			</AutoColliderWrapper>
+		{/if}
 	</T.Group>
 {/if}

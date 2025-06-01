@@ -1,18 +1,44 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { createWorld } from '$lib/utils.svelte';
-	import { Badge, blueskyLoginModalState, Button, Prose } from 'fuchs';
-
-	import { Canvas } from '@threlte/core';
-	import world from './viewer/world.json';
-	import WorldViewerScene from '$lib/viewer/WorldViewerScene.svelte';
-	import { type WorldData } from '$lib/viewer/types';
-	import { ACESFilmicToneMapping } from 'three';
+	import { Badge, Button, Prose } from '@fuxui/base';
 	import { goto } from '$app/navigation';
-	import { initRoomy } from '$lib/roomy.svelte';
-
+	import { Canvas } from '@threlte/core';
+	import { CineonToneMapping } from 'three';
+	import Scene from '$lib/world-editor/WorldEditorScene.svelte';
+	import { onMount } from 'svelte';
+	import { editingState } from '$lib/world-editor/state.svelte';
+	import { CoState } from 'jazz-svelte';
+	import { World as RapierWorld } from '@threlte/rapier';
+	import { World } from '$lib/schema';
+	
 	let showText = $state(true);
+
+	onMount(() => {
+		editingState.worldId = 'co_zioLGB74w8coU8iQ6tab4EbZbCL';
+		editingState.world = new CoState(World, 'co_zioLGB74w8coU8iQ6tab4EbZbCL', {
+			resolve: {
+				cells: {
+					$each: {
+						instances: {
+							$each: true,
+							$onError: null
+						}
+					},
+					$onError: null
+				}
+			}
+		});
+	});
 </script>
+
+<div class={'absolute inset-0 h-[100dvh] w-screen transition-all duration-200'}>
+	<Canvas toneMapping={CineonToneMapping}>
+		<RapierWorld framerate={60}>
+			<Scene interactive={false} y={-10} />
+		</RapierWorld>
+	</Canvas>
+</div>
 
 {#if showText}
 	<div class="mx-auto max-w-3xl px-4 py-4">
@@ -38,10 +64,10 @@
 				<h1>Roomy Worlds</h1>
 
 				<Badge>work in progress!</Badge>
-				<p>Roomy Worlds is a tool for creating and sharing small 3D worlds as a community.</p>
+				<p>Roomy Worlds is a tool for creating, sharing and editing 3D worlds as a community.</p>
 
 				<p class="italic">
-					Work in progress/Preview only: You can create new worlds/models, but might
+					Work in progress/Preview only: You can create new worlds/models, but they might
 					disappear/change unexpectedly with new updates. Lots of bugs too.
 				</p>
 				<p class="flex flex-wrap gap-8">
@@ -54,27 +80,17 @@
 			</Prose>
 
 			<div class="mt-4 flex gap-2">
-				<Button
+				<!-- <Button
 					class="w-fit"
 					size="lg"
 					onclick={() => {
-						// world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg
-						goto(base + '/world?id=leaf:2g1z4s86dabaej80a1db1bzc97xbdf2mc3jqxjcpq3ps11ppd5rg');
+						goto(base + '/world?id=co_zQLdXMAmNc7kkzeRBu7MyWDoRD1');
 					}}
 				>
 					Join shared world
-				</Button>
+				</Button> -->
 
 				<Button class="w-fit" size="lg" onclick={() => createWorld(base)}>New World</Button>
-
-				<Button
-					class="w-fit"
-					size="lg"
-					onclick={async () => {
-						await initRoomy('local');
-						createWorld(base, true);
-					}}>New Local World</Button
-				>
 			</div>
 		</div>
 	</div>
@@ -101,9 +117,3 @@
 		<span class="sr-only"> Toggle Text </span>
 	</button>
 {/if}
-
-<div class="fixed inset-0 -z-10 h-screen w-screen">
-	<Canvas toneMapping={ACESFilmicToneMapping}>
-		<WorldViewerScene world={world as unknown as WorldData} />
-	</Canvas>
-</div>

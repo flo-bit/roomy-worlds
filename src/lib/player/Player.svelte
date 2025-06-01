@@ -3,27 +3,41 @@
 	import { T } from '@threlte/core';
 	import { RigidBody, CollisionGroups, Collider, usePhysicsTask } from '@threlte/rapier';
 	import Controller from './ThirdPersonControls.svelte';
-	import CharacterModel, { type ActionName } from './CharacterModel.svelte';
 	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
-	import { PlayerLocation } from '$lib/roomy';
 	import { onMount } from 'svelte';
-	import { editingState } from '$lib/world-editor/state.svelte';
+	import { editingState, updatePlayerData } from '$lib/world-editor/state.svelte';
+	import ProtagonistA, { type ActionName } from './Protagonist_A.svelte';
+	import ProtagonistB from './Protagonist_B.svelte';
+	import Hiker from './Hiker.svelte';
+	import Caveman from './Caveman.svelte';
+	import Witch from './Witch.svelte';
+	import CombatMech from './CombatMech.svelte';
+	import Superhero from './Superhero.svelte';
+	import Vampire from './Vampire.svelte';
+	import { AccountCoState } from 'jazz-svelte';
+	import { MyAppAccount } from '$lib/schema';
 
 	let {
 		position = [0, 10, 0],
 		radius = 0.4,
 		height = 1.4,
-		speed = 6,
-		runningSpeed = 9,
-		playerLocation
+		speed = 5,
+		runningSpeed = 8
 	}: {
 		position?: [number, number, number];
 		radius?: number;
 		height?: number;
 		speed?: number;
 		runningSpeed?: number;
-		playerLocation?: PlayerLocation | null;
 	} = $props();
+
+	const me = new AccountCoState(MyAppAccount, {
+		resolve: {
+			profile: true
+		}
+	});
+
+	const playerId = $derived(me.current?.profile?.id);
 
 	let isRunning = false;
 
@@ -51,9 +65,12 @@
 
 	let direction = new Vector3();
 
+	let timeSinceLastUpdate = 0;
+
 	usePhysicsTask((delta) => {
 		if (!rigidBody || !capsule) return;
 
+		timeSinceLastUpdate += delta;
 		total += delta;
 		// get direction
 
@@ -102,18 +119,18 @@
 		}
 
 		if (temp.length() > 3 && isRunning) {
-			animation = 'sprint';
+			animation = 'Running_A';
 		} else if (temp.length() > 0.5) {
-			animation = 'walk';
+			animation = 'Walking_A';
 		} else {
-			animation = 'idle';
+			animation = 'Idle';
 		}
 
 		if (!grounded) {
 			if (linVel.y > 0) {
-				animation = 'jump';
+				animation = 'Jump_Start';
 			} else {
-				animation = 'fall';
+				animation = 'Jump_Idle';
 			}
 		}
 
@@ -122,41 +139,27 @@
 		position = [pos.x, pos.y, pos.z];
 
 		// respawn if falling of the map
-		if (position[1] < -30) {
+		if (position[1] < -10) {
 			position = [0, 10, 0];
 			rigidBody.setTranslation(new Vector3(0, 10, 0), true);
 			rigidBody.setLinvel(new Vector3(0, 0, 0), true);
 		}
 
-		// updatePosition();
-	});
-
-	// onMount(() => {
-	// 	setInterval(() => {
-	// 		updatePosition();
-	// 	}, 1000);
-	// });
-
-	async function updatePosition() {
-		if (!playerLocation) {
-			console.log('no player location');
-			return;
+		if (timeSinceLastUpdate > 0.1 && playerId) {
+			timeSinceLastUpdate = 0;
+			updatePlayerData(playerId, pos, rotation);
+			
+		} else {
+			if(!playerId) {
+				console.log("no player id", me.current?.profile?.id)
+			}
 		}
-
-		console.log('update location', editingState.selectedCharacter);
-		playerLocation.x = position[0];
-		playerLocation.y = position[1];
-		playerLocation.z = position[2];
-		playerLocation.rotation = rotation;
-		playerLocation.model = editingState.selectedCharacter ?? 'female b';
-		playerLocation.time = Date.now();
-		playerLocation.commit();
-	}
+	});
 
 	function jump() {
 		//console.log('jump', grounded);
 		if (!grounded) return;
-		rigidBody?.applyImpulse(new Vector3(0, 700, 0), true);
+		rigidBody?.applyImpulse(new Vector3(0, 800, 0), true);
 		grounded = false;
 	}
 
@@ -223,12 +226,12 @@
 
 <svelte:window onkeydown={onKeyDown} onkeyup={onKeyUp} />
 
-<T.PerspectiveCamera makeDefault fov={70}>
+<T.PerspectiveCamera makeDefault fov={70} near={2}>
 	<Controller bind:object={capRef} />
 </T.PerspectiveCamera>
 
 <T.Group bind:ref={capsule} {position} rotation.y={Math.PI}>
-	<RigidBody bind:rigidBody enabledRotations={[false, false, false]} gravityScale={3}>
+	<RigidBody bind:rigidBody enabledRotations={[false, false, false]} gravityScale={2.5}>
 		<CollisionGroups groups={[0]}>
 			<Collider
 				shape={'capsule'}
@@ -237,14 +240,63 @@
 				density={100}
 			/>
 
-			<CharacterModel
-				position.y={-0.7}
-				rotation.y={rotation + Math.PI}
-				currentAction={animation}
-				scale={2}
-				gender={editingState.selectedCharacter?.split(' ')[0].toLowerCase() as 'male' | 'female'}
-				version={editingState.selectedCharacter?.split(' ')[1] as 'a' | 'b' | 'c' | 'd' | 'e' | 'f'}
-			/>
+			{#if editingState.selectedCharacter === 'protagonist a'}
+				<ProtagonistA
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'protagonist b'}
+				<ProtagonistB
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'hiker'}
+				<Hiker
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'caveman'}
+				<Caveman
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'witch'}
+				<Witch
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'combat mech'}
+				<CombatMech
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'superhero'}
+				<Superhero
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{:else if editingState.selectedCharacter === 'vampire'}
+				<Vampire
+					position.y={-0.7}
+					rotation.y={rotation + Math.PI}
+					currentAction={animation}
+					scale={0.8}
+				/>
+			{/if}
 		</CollisionGroups>
 	</RigidBody>
 </T.Group>

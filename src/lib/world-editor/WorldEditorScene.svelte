@@ -1,17 +1,26 @@
 <script lang="ts">
 	import { T, useThrelte } from '@threlte/core';
 	import { HUD, interactivity, OrbitControls, Sky } from '@threlte/extras';
-	import Terrain from '$lib/world/Terrain.svelte';
 	import Player from '$lib/player/Player.svelte';
 	import { onMount } from 'svelte';
 	import Instance from './Instance.svelte';
-	import { addInstance, editingState, getPlayerLocation } from './state.svelte';
-	import { ACESFilmicToneMapping, CameraHelper } from 'three';
-	import Water from '$lib/world/Water.svelte';
+	import { clickedOn, editingState } from './state.svelte';
+	import { ACESFilmicToneMapping } from 'three';
 	import HudScene from './HudScene.svelte';
+	import Ground from '$lib/world/Ground.svelte';
+	import Dof from '$lib/world/DOF.svelte';
 	import { Debug } from '@threlte/rapier';
-	import { derivePromise } from '$lib/utils.svelte';
-	import { g } from '$lib/roomy.svelte';
+	import OtherPlayer from '$lib/player/OtherPlayer.svelte';
+	import { AccountCoState } from 'jazz-svelte';
+	import { MyAppAccount } from '$lib/schema';
+
+	const me = new AccountCoState(MyAppAccount, {
+		resolve: {
+			profile: true
+		}
+	});
+
+	const playerId = $derived(me.current?.profile?.id);
 
 	interactivity({
 		filter: (hits) => {
@@ -19,9 +28,13 @@
 		}
 	});
 
-	let instances = derivePromise([], async () => (g.world ? await g.world.instances.items() : []));
+	const { renderer } = useThrelte();
 
-	const { renderer, scene } = useThrelte();
+	let {
+		interactive = true,
+		y = 0,
+		position = [0, 0, 0]
+	}: { interactive?: boolean; y?: number; position?: [number, number, number] } = $props();
 
 	onMount(async () => {
 		window.addEventListener('keydown', (e) => {
@@ -46,24 +59,17 @@
 
 		renderer.toneMapping = ACESFilmicToneMapping;
 	});
-
-	$effect(() => {
-		if (g.world && g.world.settings.version > editingState.worldSettings.version) {
-			editingState.worldSettings = g.world.settings;
-			console.log('settings', editingState.worldSettings);
-		}
-	});
 </script>
 
 {#if editingState.camera === 'third'}
 	<T.PerspectiveCamera
 		makeDefault
-		position={[100, 50, 100]}
+		position={[20, 20, 20]}
 		oncreate={(ref) => {
 			ref.lookAt(0, 1, 0);
 		}}
 	>
-		<OrbitControls />
+		<OrbitControls maxPolarAngle={Math.PI / 2} />
 	</T.PerspectiveCamera>
 {:else}
 	<Player />
@@ -76,31 +82,48 @@
 	shadow.camera.bottom={-100}
 	shadow.camera.left={-100}
 	shadow.camera.right={100}
+	shadow.mapSize.width={1024}
+	shadow.mapSize.height={1024}
+	shadow.bias={-0.00001}
 />
 
-{#key editingState.worldSettings.version + editingState.worldSettings.waterPercentage + editingState.worldSettings.size}
-	<Terrain
-		clickedTerrain={(e) => {
-			if (editingState.selectedModelId) {
-				addInstance(editingState.selectedModelId, e.point);
-			}
-		}}
-		settings={editingState.worldSettings}
-	/>
+<Ground
+	clickedTerrain={(e) => {
+		if (!interactive) return;
 
-	{#if editingState.worldSettings.waterPercentage > 0}
-		<Water settings={editingState.worldSettings} />
-	{/if}
-{/key}
+		clickedOn(e.point, true);
+	}}
+/>
 
+<!-- <Dof /> -->
 <!-- <Debug /> -->
 
 <Sky />
 
-{#each instances.value as instance}
-	<Instance {instance} />
-{/each}
+<T.Group position={[0, y, 0]}>
+	<T.Mesh>
+		<T.SphereGeometry args={[0.1, 32, 32]} />
+		<T.MeshStandardMaterial color="red" />
+	</T.Mesh>
 
+	{#each Object.entries(editingState.world?.current?.cells ?? {}) as [cellId, cell]}
+		{#if cell && cell.instances}
+			{#each cell.instances ?? [] as instance (instance?.id)}
+				{#if instance}
+					<Instance {instance} {interactive} {cellId} />
+				{/if}
+			{/each}
+		{/if}
+	{/each}
+
+	{#if playerId}
+		{#each Object.entries(editingState.world?.current?.players ?? {}) as [id, player] (id)}
+			{#if player && id !== playerId}
+				<OtherPlayer {player} />
+			{/if}
+		{/each}
+	{/if}
+</T.Group>
 <HUD>
 	<HudScene />
 </HUD>
