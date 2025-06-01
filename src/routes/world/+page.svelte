@@ -12,6 +12,8 @@
 	import { Howl } from 'howler';
 	import { base } from '$app/paths';
 	import CharacterSelection from '$lib/character-picker/CharacterSelection.svelte';
+	import Joystick from '$lib/Joystick.svelte';
+	import JumpButton from '$lib/JumpButton.svelte';
 
 	let showPerfMonitor = $state(false);
 
@@ -57,6 +59,9 @@
 {#if Object.keys(editingState.world?.current?.cells ?? {}).length < 1}
 	<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">Loading world...</div>
 {/if}
+
+<Joystick />
+<JumpButton />
 
 <ModelSelection />
 

@@ -156,9 +156,9 @@ export async function addInstance(
 
 	// check if cell exists
 	const cellId = getCellId(position);
-	const cell = editingState.world?.current?.cells[cellId];
+	let cell = editingState.world?.current?.cells[cellId];
 	if (!cell) {
-		createCell(cellId);
+		cell = createCell(cellId);
 	}
 
 	cell.instances.push(instance);

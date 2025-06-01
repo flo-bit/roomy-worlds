@@ -4,62 +4,7 @@
 	import InstanceEditorUi from './InstanceEditorUI.svelte';
 </script>
 
-<Button
-	size="iconLg"
-	class={cn('bg-accent-100 hover:bg-accent-200 absolute right-4 bottom-4 duration-100')}
-	onclick={() => {
-		editingState.showWorldSettings = false;
-		editingState.showModelPicker = true;
-	}}
->
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		stroke-width="2.5"
-		stroke="currentColor"
-	>
-		<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-	</svg>
-
-	<span class="sr-only">Add Model</span>
-</Button>
-
-{#if editingState.selectedInstance || editingState.selectedModel}
-	<Button
-		size="iconSm"
-		class={cn('bg-accent-100 hover:bg-accent-200 absolute top-4 left-4 rounded-xl duration-100')}
-		onclick={() => {
-			applyTransform();
-			editingState.selectedInstance = null;
-			editingState.selectedModel = null;
-		}}
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="2.5"
-			stroke="currentColor"
-		>
-			<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-		</svg>
-
-		<span class="sr-only"> deselect </span>
-	</Button>
-
-	<span class={cn('absolute top-4 left-13 text-sm font-medium transition-all duration-100')}
-		>{editingState.selectedInstance ? 'editing' : 'placing'}
-	</span>
-{/if}
-
-<InstanceEditorUi />
-
-<div
-	class={cn(
-		'absolute bottom-4 flex flex-col gap-2 transition-all duration-100 left-4'
-	)}
->
+<div class="absolute right-4 bottom-4 flex flex-col gap-2">
 	{#if editingState.camera === 'first'}
 		<Button
 			size="iconLg"
@@ -113,4 +58,56 @@
 			<span class="sr-only">Walk around</span>
 		</Button>
 	{/if}
+	<Button
+		size="iconLg"
+		class={cn('bg-accent-100 hover:bg-accent-200 duration-100')}
+		onclick={() => {
+			editingState.showWorldSettings = false;
+			editingState.showModelPicker = true;
+		}}
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="2.5"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+		</svg>
+
+		<span class="sr-only">Add Model</span>
+	</Button>
 </div>
+
+{#if editingState.selectedInstance || editingState.selectedModel}
+	<Button
+		size="iconSm"
+		class={cn('bg-accent-100 hover:bg-accent-200 absolute top-4 left-4 rounded-xl duration-100')}
+		onclick={() => {
+			applyTransform();
+			editingState.selectedInstance = null;
+			editingState.selectedModel = null;
+		}}
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="2.5"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+		</svg>
+
+		<span class="sr-only"> deselect </span>
+	</Button>
+
+	<span class={cn('absolute top-4 left-13 text-sm font-medium transition-all duration-100')}
+		>{editingState.selectedInstance ? 'editing' : 'placing'}
+	</span>
+{/if}
+
+<InstanceEditorUi />
+
+<div class={cn('absolute bottom-4 left-4 flex flex-col gap-2 transition-all duration-100')}></div>

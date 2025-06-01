@@ -52,7 +52,7 @@
 			>
 				{#if editingState.selectedInstance}
 					<GLTF
-						url={base + editingState.selectedInstance.path}
+						url={editingState.selectedInstance.path}
 						onload={(gltf: Group & { scene: Object3D }) => {
 							if (!group) return;
 
@@ -62,7 +62,6 @@
 
 							let maxSize = Math.max(size.x, size.y, size.z);
 							let scale = 1.0 / maxSize;
-							console.log(scale);
 
 							group.scale.set(scale, scale, scale);
 							group.position.set(-center.x * scale, -center.y * scale, -center.z * scale);

@@ -16,6 +16,8 @@
 	import Vampire from './Vampire.svelte';
 	import { AccountCoState } from 'jazz-svelte';
 	import { MyAppAccount } from '$lib/schema';
+	import { joystickData } from '$lib/Joystick.svelte';
+	import { jumpButtonData } from '$lib/JumpButton.svelte';
 
 	let {
 		position = [0, 10, 0],
@@ -57,7 +59,7 @@
 
 	let rotation = $state(0);
 
-	let animation: ActionName = $state('idle');
+	let animation: ActionName = $state('Idle');
 
 	let total = 0;
 
@@ -74,9 +76,23 @@
 		total += delta;
 		// get direction
 
+		if (jumpButtonData.pressed && rigidBody) {
+			jumpButtonData.pressed = false;
+
+			jump();
+		}
+
+		let moveX = left - right;
+		let moveZ = forward - backward;
+
+		if (joystickData.x !== 0 || joystickData.y !== 0) {
+			moveX = -joystickData.x;
+			moveZ = -joystickData.y;
+		}
+
 		let smooth = 0.1;
 		direction.multiplyScalar(1 - smooth);
-		direction.add(new Vector3((left - right) * smooth, 0, (forward - backward) * smooth));
+		direction.add(new Vector3(moveX * smooth, 0, moveZ * smooth));
 
 		//const velVec = temp.fromArray([left - right, 0, forward - backward]); // left - right
 
@@ -148,10 +164,9 @@
 		if (timeSinceLastUpdate > 0.1 && playerId) {
 			timeSinceLastUpdate = 0;
 			updatePlayerData(playerId, pos, rotation);
-			
 		} else {
-			if(!playerId) {
-				console.log("no player id", me.current?.profile?.id)
+			if (!playerId) {
+				console.log('no player id', me.current?.profile?.id);
 			}
 		}
 	});
@@ -164,8 +179,6 @@
 	}
 
 	function onKeyDown(e: KeyboardEvent) {
-		//console.log('down', e.key.toLowerCase());
-		console.log('down', e.code.toLowerCase());
 		switch (e.code.toLowerCase()) {
 			case 'arrowdown':
 			case 'keys':
