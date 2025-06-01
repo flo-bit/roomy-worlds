@@ -5,12 +5,12 @@
 </script>
 
 <button
-	class="absolute right-20 bottom-4 inline-flex size-20 items-center justify-center rounded-full bg-white/30 pointer-fine:hidden"
+	class="absolute right-20 bottom-4 inline-flex size-20 touch-none items-center justify-center rounded-full bg-white/30 pointer-fine:hidden"
 	onpointerdown={() => {
 		jumpButtonData.pressed = true;
 	}}
 >
-	<svg xmlns="http://www.w3.org/2000/svg" class="size-12 text-base-100" viewBox="0 0 24 24"
+	<svg xmlns="http://www.w3.org/2000/svg" class="text-base-100 size-12" viewBox="0 0 24 24"
 		><g
 			fill="none"
 			stroke="currentColor"
