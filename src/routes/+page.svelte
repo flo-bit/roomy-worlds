@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { createWorld } from '$lib/utils.svelte';
-	import { Badge, Button, Prose } from '@fuxui/base';
+	import { createWorld, publicGroup } from '$lib/utils.svelte';
+	import { Badge, Button, Input, Prose } from '@fuxui/base';
 	import { goto } from '$app/navigation';
 	import { Canvas } from '@threlte/core';
 	import { CineonToneMapping } from 'three';
@@ -10,8 +10,9 @@
 	import { editingState } from '$lib/world-editor/state.svelte';
 	import { CoState } from 'jazz-svelte';
 	import { World as RapierWorld } from '@threlte/rapier';
-	import { World } from '$lib/schema';
-	
+	import { World, WorldsList } from '$lib/schema';
+	import { dev } from '$app/environment';
+
 	let showText = $state(true);
 
 	onMount(() => {
@@ -29,7 +30,15 @@
 				}
 			}
 		});
+
+		// create new worlds list
+		// const worldsList = WorldsList.create([], publicGroup());
+		// console.log(worldsList.id);
+		// load existing worlds list
+		editingState.worldsList = new CoState(WorldsList, 'co_zGK4PdhYyiPk83VoH1kPWPkF9s2');
 	});
+
+	$inspect(editingState.worldsList?.current);
 </script>
 
 <div class={'absolute inset-0 h-[100dvh] w-screen transition-all duration-200'}>
@@ -39,6 +48,27 @@
 		</RapierWorld>
 	</Canvas>
 </div>
+
+<!-- {#if dev}
+	<Button
+		onclick={() => {
+			console.log('submit', editingState.worldsList?.current);
+			if (!editingState.worldsList?.current) return;
+
+			for (const world of data) {
+				const set = new Set(editingState.worldsList.current);
+				if (set.has(world.propertyValue)) {
+					console.log('already exists', world.propertyValue);
+					continue;
+				}
+
+				editingState.worldsList.current.push(world.propertyValue);
+				console.log('added', world.propertyValue);
+			}
+			console.log(editingState.worldsList.current);
+		}}>Add Worlds</Button
+	>
+{/if} -->
 
 {#if showText}
 	<div class="mx-auto max-w-3xl px-4 py-4">
@@ -64,20 +94,20 @@
 				<h1>Roomy Worlds</h1>
 
 				<Badge>work in progress!</Badge>
-				<div class="flex gap-2 mt-4">
+				<div class="mt-4 flex gap-2">
 					Made by
 					<div class="flex items-center gap-2">
 						<a target="_blank" href="https://flo-bit.dev" class="text-accent-600 font-semibold"
 							>flo-bit</a
 						>
-	
+
 						<a
 							href="https://bsky.app/profile/flo-bit.dev"
 							target="_blank"
 							class="text-accent-700 hover:text-accent-600 dark:text-base-300 dark:hover:text-accent-400 transition-colors"
 						>
 							<span class="sr-only">Bluesky</span>
-	
+
 							<svg
 								role="img"
 								viewBox="0 0 24 24"
@@ -100,12 +130,32 @@
 					disappear/change unexpectedly with new updates. Lots of bugs too.
 				</p>
 				<p class="flex flex-wrap gap-x-8">
-					<a href="https://github.com/flo-bit/roomy-worlds" target="_blank" class="text-accent-700 hover:text-accent-600"> Source </a>
-					<a href="https://roomy.chat" target="_blank" class="text-accent-700 hover:text-accent-600"> Roomy Chat </a>
-					<a href="https://soundcloud.com/nicholas-palmer-4" target="_blank" class="text-accent-700 hover:text-accent-600">
+					<a
+						href="https://github.com/flo-bit/roomy-worlds"
+						target="_blank"
+						class="text-accent-700 hover:text-accent-600"
+					>
+						Source
+					</a>
+					<a
+						href="https://roomy.chat"
+						target="_blank"
+						class="text-accent-700 hover:text-accent-600"
+					>
+						Roomy Chat
+					</a>
+					<a
+						href="https://soundcloud.com/nicholas-palmer-4"
+						target="_blank"
+						class="text-accent-700 hover:text-accent-600"
+					>
 						Music: Nicholas Palmer
 					</a>
-					<a href="https://kaylousberg.itch.io/" target="_blank" class="text-accent-700 hover:text-accent-600">
+					<a
+						href="https://kaylousberg.itch.io/"
+						target="_blank"
+						class="text-accent-700 hover:text-accent-600"
+					>
 						Models: Kay Lousberg
 					</a>
 				</p>

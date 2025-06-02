@@ -100,6 +100,8 @@ export const PlayerData = co.map({
 	})
 });
 
+export const WorldsList = co.list(z.string());
+
 export const PlayerDataList = co.record(z.string(), PlayerData);
 
 export const Cell = co.map({

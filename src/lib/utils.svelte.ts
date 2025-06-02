@@ -66,6 +66,12 @@ export async function createWorld(base: string) {
 		world_id: world.id
 	});
 
+	console.log(editingState.worldsList.current);
+	if (editingState.worldsList.current) {
+		editingState.worldsList.current.push(world.id);
+		console.log('adding to list', editingState.worldsList.current);
+	}
+
 	goto(base + `/world?id=${world.id}`);
 }
 

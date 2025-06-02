@@ -5,7 +5,8 @@ import {
 	PlayerData,
 	PlayerDataList,
 	Transform,
-	World
+	World,
+	WorldsList
 } from '$lib/schema';
 import { publicGroup } from '$lib/utils.svelte';
 import type { EntityIdStr } from '@muni-town/leaf';
@@ -39,7 +40,9 @@ export const editingState = $state({
 	tool: 'move' as 'move' | 'rotate' | 'scale',
 
 	worldId: null as string | null,
-	world: null as Loaded<typeof World> | null
+	world: null as Loaded<typeof World> | null,
+
+	worldsList: null as Loaded<typeof WorldsList> | null
 });
 
 export type AddInstanceFunction = (id: EntityIdStr, position: Vector3) => void;
